@@ -1,0 +1,33 @@
+# Python byte-code
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing & Linting
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Datos y capturas (no versionados por peso y reproducibilidad)
+data/*.csv
+data/*.pcap
+data/*.parquet
+!data/.gitkeep
+
+# Modelos entrenados (no versionados)
+models/*.joblib
+!models/.gitkeep
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Empaquetado y distribución
+dist/
+build/
+*.egg-info/
