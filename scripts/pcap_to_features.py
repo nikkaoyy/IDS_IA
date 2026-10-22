@@ -267,7 +267,7 @@ def _parsear_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--capa", action="append", help="Capa afectada (por pcap).")
     p.add_argument("--ventana", type=float, default=5.0, help="Duración de ventana en segundos.")
     p.add_argument("--min-tramas", type=int, default=1, help="Mínimo de tramas por ventana.")
-    p.add_argument("--salida", default="data/dataset_lab.parquet", help="CSV o Parquet de salida.")
+    p.add_argument("--salida", default="data/dataset_lab.csv", help="CSV o Parquet de salida.")
     return p.parse_args(argv)
 
 

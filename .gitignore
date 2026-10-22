@@ -17,6 +17,7 @@ env/
 # Datos y capturas (no versionados por peso y reproducibilidad)
 data/*.csv
 data/*.pcap
+data/pcap/
 data/*.parquet
 !data/.gitkeep
 
