@@ -40,11 +40,28 @@ def test_evaluar_con_una_sola_clase():
     assert metricas["tasa_falsos_positivos"] == 0.0
 
 
-def test_guardar_artefacto_completo(tmp_path):
-    from unittest.mock import MagicMock
-    modelo = MagicMock()
-    scaler = MagicMock()
+def test_guardar_artefacto_completo():
+    """El artefacto debe guardar y recargar modelo + scaler + columnas (round-trip real).
+
+    Se usan estimadores reales (no mocks): joblib serializa vía pickle y un MagicMock
+    no es serializable, además de que así se valida que el artefacto es funcional.
+    """
+    import joblib
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.preprocessing import StandardScaler
+
+    X = np.random.default_rng(0).random((20, len(COLUMNAS_MODELO)))
+    y = np.array([0, 1] * 10)
+    scaler = StandardScaler().fit(X)
+    modelo = RandomForestClassifier(n_estimators=5, random_state=0).fit(scaler.transform(X), y)
+
     ruta = guardar_artefacto_completo(modelo, scaler, COLUMNAS_MODELO, "test_model")
-    assert ruta.exists()
-    assert ruta.name.endswith(".joblib")
-    ruta.unlink()  # Limpieza
+    try:
+        assert ruta.exists()
+        assert ruta.name.endswith(".joblib")
+        artefacto = joblib.load(ruta)
+        assert artefacto["columnas"] == COLUMNAS_MODELO
+        assert hasattr(artefacto["modelo"], "predict")
+        assert hasattr(artefacto["scaler"], "transform")
+    finally:
+        ruta.unlink()  # Limpieza
