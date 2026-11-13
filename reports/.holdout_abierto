@@ -1,0 +1,9 @@
+{
+  "commit": "e43a28f34415d4fe32ce8e4afa316f950f648260",
+  "arbol_con_cambios": false,
+  "fecha": "2026-11-13T10:49:44",
+  "dataset_holdout_sha256": "78c562970eb08e27d4f627de78f1b7f95164d4831c95b7f4417f78be583fe5b4",
+  "salida": "reports/holdout_e2.json",
+  "reaperturas": [],
+  "completado": "2026-11-13T10:52:27"
+}
