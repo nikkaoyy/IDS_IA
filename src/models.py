@@ -21,15 +21,15 @@ from .feature_schema import COLUMNAS_MODELO, VERSION_ESQUEMA
 MODELOS_DIR = Path(__file__).resolve().parent.parent / "models"
 
 
-def entrenar_random_forest(X_train, y_train) -> RandomForestClassifier:
+def entrenar_random_forest(X_train, y_train, semilla: int = RANDOM_STATE) -> RandomForestClassifier:
     modelo = RandomForestClassifier(
-        n_estimators=200, max_depth=None, random_state=RANDOM_STATE, n_jobs=-1, class_weight="balanced"
+        n_estimators=200, max_depth=None, random_state=semilla, n_jobs=-1, class_weight="balanced"
     )
     modelo.fit(X_train, y_train)
     return modelo
 
 
-def entrenar_xgboost(X_train, y_train) -> XGBClassifier:
+def entrenar_xgboost(X_train, y_train, semilla: int = RANDOM_STATE) -> XGBClassifier:
     # Estimación de desbalance para scale_pos_weight
     n_neg = (y_train == 0).sum()
     n_pos = (y_train == 1).sum()
@@ -38,7 +38,7 @@ def entrenar_xgboost(X_train, y_train) -> XGBClassifier:
     modelo = XGBClassifier(
         n_estimators=200, max_depth=6, learning_rate=0.1,
         eval_metric="logloss", scale_pos_weight=scale_pos,
-        random_state=RANDOM_STATE, n_jobs=-1,
+        random_state=semilla, n_jobs=-1,
     )
     modelo.fit(X_train, y_train)
     return modelo
