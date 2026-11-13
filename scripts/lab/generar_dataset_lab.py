@@ -6,8 +6,13 @@ Cada sesión usa una semilla distinta y sustituye al antiguo pcap por clase. No 
 root ni toca interfaces. Junto al CSV escribe `<csv>.meta.json` con el comando, las
 semillas y el commit, que `ficha_dataset.py` vuelca en la ficha versionada.
 
+Holdout de E2: los índices de `src.data.SESIONES_RESERVADAS` no se generan salvo con
+`--romper-holdout`, que solo debe usarse para construir el holdout, una vez.
+
 Uso:
     python scripts/lab/generar_dataset_lab.py [--sesiones 20] [--salida data/dataset_lab.csv]
+    python scripts/lab/generar_dataset_lab.py --inicio 20 --sesiones 10 --romper-holdout \
+        --salida data/holdout_e2.csv --dir-pcap data/pcap_holdout
 """
 from __future__ import annotations
 
@@ -30,13 +35,31 @@ import pandas as pd  # noqa: E402
 
 from scripts import pcap_to_features  # noqa: E402
 from scripts.lab import generar_trafico  # noqa: E402
-from src.data import SEMILLA_BASE_LAB, nombre_sesion  # noqa: E402
+from src.data import SEMILLA_BASE_LAB, SESIONES_RESERVADAS, HoldoutError, nombre_sesion  # noqa: E402
 
 logger = logging.getLogger("ids.lab.dataset")
 
 SESIONES = 20
 MAX_PROCESOS = 6  # cada sesión mantiene sus tramas en memoria
 SEMILLA_BASE = SEMILLA_BASE_LAB
+
+
+def indices_a_generar(inicio: int, sesiones: int, romper_holdout: bool = False) -> list[int]:
+    """Índices de sesión a generar; rechaza los reservados sin permiso explícito.
+
+    Raises:
+        HoldoutError: Si algún índice está en `SESIONES_RESERVADAS` y no se pasó
+            `romper_holdout`.
+    """
+    indices = list(range(inicio, inicio + sesiones))
+    reservados = [i for i in indices if i in SESIONES_RESERVADAS]
+    if reservados and not romper_holdout:
+        raise HoldoutError(
+            f"Los índices {reservados} pertenecen al holdout de E2 "
+            f"({SESIONES_RESERVADAS.start}-{SESIONES_RESERVADAS.stop - 1}); "
+            "usa --romper-holdout solo para construir el holdout."
+        )
+    return indices
 
 
 def _procesar(args: tuple[int, str]) -> pd.DataFrame:
@@ -79,9 +102,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--sesiones", type=int, default=SESIONES)
     p.add_argument("--salida", default="data/dataset_lab.csv")
     p.add_argument("--dir-pcap", default="data/pcap")
+    p.add_argument("--inicio", type=int, default=0, help="Índice de la primera sesión.")
+    p.add_argument("--romper-holdout", action="store_true",
+                   help="Permite generar sesiones reservadas para el holdout de E2.")
     args = p.parse_args(argv)
 
-    indices = list(range(args.sesiones))
+    try:
+        indices = indices_a_generar(args.inicio, args.sesiones, args.romper_holdout)
+    except HoldoutError as error:
+        logger.error("%s", error)
+        return 2
     Path(args.dir_pcap).mkdir(parents=True, exist_ok=True)
     trabajos = [(i, args.dir_pcap) for i in indices]
     with ProcessPoolExecutor(max_workers=min(os.cpu_count() or 1, MAX_PROCESOS)) as grupo:

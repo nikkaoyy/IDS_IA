@@ -8,7 +8,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedGroupKFold, train_test_split
 
-from .data import RANDOM_STATE
+from .data import RANDOM_STATE, verificar_holdout
 from .feature_schema import COLUMNAS_MODELO, ETIQUETA
 
 
@@ -40,7 +40,11 @@ def dividir(df: pd.DataFrame, test_size: float = 0.25):
     ningún dispositivo; sin ninguna se divide por fila. X se recorta al contrato canónico
     (`COLUMNAS_MODELO`): la traza y la identidad son metadatos de evaluación
     y no deben entrar al escalador ni al modelo.
+
+    Raises:
+        HoldoutError: Si `df` contiene sesiones reservadas para el holdout de E2.
     """
+    verificar_holdout(df)
     X = df[COLUMNAS_MODELO]
     y = df[ETIQUETA]
     grupos = grupos_de_division(df)
