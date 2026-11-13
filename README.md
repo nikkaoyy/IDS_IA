@@ -33,6 +33,8 @@ pip install -r requirements.txt
 python3 -m src.pipeline
 ```
 
+Pruebas: `pip install -r requirements.txt -r requirements-dev.txt` y luego `python -m pytest -q`.
+
 Esto ejecuta las Fases 2-4 de la metodología (datos, entrenamiento, evaluación
 comparativa y simulación de ataque) y guarda los modelos entrenados en `models/`.
 

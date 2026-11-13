@@ -19,6 +19,23 @@ logger = logging.getLogger("ids_pipeline.data")
 RANDOM_STATE = 42
 DIR_DATOS = Path(__file__).resolve().parent.parent / "data"
 
+# Identidad de las sesiones del laboratorio (etapa E1): `sesion_NNN` se genera con la
+# semilla `SEMILLA_BASE_LAB + NNN`. Vive aquí para que generación, ficha y entrenamiento
+# compartan la misma correspondencia nombre <-> semilla.
+SEMILLA_BASE_LAB = RANDOM_STATE * 1000
+PREFIJO_SESION = "sesion_"
+
+
+def nombre_sesion(indice: int) -> str:
+    """Nombre canónico de la sesión `indice` (p. ej. `sesion_007`)."""
+    return f"{PREFIJO_SESION}{indice:03d}"
+
+
+def indice_sesion(nombre: str) -> int | None:
+    """Índice de una sesión por su nombre; None si no sigue el patrón `sesion_NNN`."""
+    sufijo = str(nombre).removeprefix(PREFIJO_SESION)
+    return int(sufijo) if sufijo != str(nombre) and sufijo.isdigit() else None
+
 # Datasets aceptados, en orden de preferencia. El primero es el dataset propio
 # generado en el laboratorio virtual (Fase 1); el segundo, un CICIDS ya procesado.
 RUTA_DATASET_LAB = DIR_DATOS / "dataset_lab.csv"
