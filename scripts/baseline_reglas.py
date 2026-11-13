@@ -121,6 +121,14 @@ def muestra_para_puerta(df: pd.DataFrame, fraccion_benigno: float = 0.25,
     return pd.concat([df[df[ETIQUETA] == 1], benigno]).sort_index()
 
 
+def _relativa(ruta: Path) -> str:
+    """Ruta relativa a la raíz del repositorio si cae dentro; si no, tal cual."""
+    try:
+        return str(ruta.resolve().relative_to(_RAIZ))
+    except ValueError:
+        return str(ruta)
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Baseline de reglas y puerta de separabilidad.")
     p.add_argument("csv", nargs="?", type=Path, default=RUTA_DATASET_LAB)
@@ -133,7 +141,7 @@ def main(argv: list[str] | None = None) -> int:
     salida.parent.mkdir(parents=True, exist_ok=True)
     salida.write_text(json.dumps(
         {"umbral_puerta": UMBRAL_PUERTA, "metrica": "exactitud_balanceada",
-         "dataset": str(args.csv), "n_folds": N_FOLDS, "puerta": resumen, "reglas": resultados},
+         "dataset": _relativa(args.csv), "n_folds": N_FOLDS, "puerta": resumen, "reglas": resultados},
         indent=2, ensure_ascii=False) + "\n")
     tabla = pd.DataFrame(resultados)
     print(tabla[tabla["fold"] == 0].drop(columns="fold").round(4).to_string(index=False))
