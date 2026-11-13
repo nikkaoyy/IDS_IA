@@ -43,6 +43,8 @@ logger = logging.getLogger("ids.pcap_to_features")
 # Fijado antes de entrenar ningún modelo: una trama aislada no es comportamiento, dos sí
 # (arpspoof refresca cada ~2 s, así que el ARP lento aporta 2-3 tramas por ventana de 5 s).
 K_TRAMAS_ATAQUE = 2
+# Atributos del episodio que se copian a la fila (aditivos en E1).
+COLUMNAS_EPISODIO_OPCIONALES = ["variante", "intensidad"]
 
 
 def cargar_config(ruta_pcap: Path) -> ConfigSegmento:
@@ -71,11 +73,20 @@ def etiquetar_ventanas(
     salida["atacante"] = ""
     salida["episodio"] = -1
     salida["n_tramas_ataque"] = 0
+    for columna in COLUMNAS_EPISODIO_OPCIONALES:
+        salida[columna] = ""
     if manifiesto.empty:
         return salida
 
     t0_us = int(df["t0_us"].iloc[0])
     m = manifiesto.copy()
+    # Manifiestos anteriores a E1 no traen variante ni intensidad.
+    for columna in COLUMNAS_EPISODIO_OPCIONALES:
+        if columna not in m:
+            m[columna] = ""
+    m[COLUMNAS_EPISODIO_OPCIONALES] = m[COLUMNAS_EPISODIO_OPCIONALES].fillna("").astype(str)
+    claves_episodio = ["tipo", "capa", "atacante", "episodio", *COLUMNAS_EPISODIO_OPCIONALES]
+    destino = ["tipo_ataque", "capa", "atacante", "episodio", *COLUMNAS_EPISODIO_OPCIONALES]
     m["idx_ventana"] = (m["ts_us"] - t0_us) // round(ventana_s * 1_000_000)
     claves = set(zip(df["mac"], df["idx_ventana"]))
     m["mac"] = [
@@ -87,12 +98,13 @@ def etiquetar_ventanas(
         if (mac, idx) not in posicion:
             raise ValueError(f"Tramas de ataque sin fila: {mac}, ventana {idx}")
         fila = salida.index[posicion[(mac, idx)]]
-        dominante = grupo.groupby(["tipo", "capa", "atacante", "episodio"]).size().idxmax()
-        salida.loc[fila, ["tipo_ataque", "capa", "atacante", "episodio"]] = list(dominante)
+        dominante = grupo.groupby(claves_episodio).size().idxmax()
+        salida.loc[fila, destino] = list(dominante)
         salida.loc[fila, "n_tramas_ataque"] = len(grupo)
     salida[ETIQUETA] = (salida["n_tramas_ataque"] >= k).astype(int)
     # Por debajo de K la fila es benigna aunque conserve el conteo.
     baja = salida[ETIQUETA] == 0
+    # Como `atacante` y `episodio`, conservan variante e intensidad para poder recalcular K.
     salida.loc[baja, ["tipo_ataque", "capa"]] = ["normal", "ninguna"]
     return salida
 

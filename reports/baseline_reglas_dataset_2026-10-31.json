@@ -1,0 +1,592 @@
+{
+  "umbral_puerta": 0.85,
+  "metrica": "exactitud_balanceada",
+  "dataset": "data/dataset_lab.csv del 2026-10-31 (sha256 3d60dfff…d84a), generador de 0026bc3",
+  "n_folds": 4,
+  "puerta": {
+    "arp_spoofing": {
+      "exactitud_balanceada_max": 1.0,
+      "por_fold": {
+        "0": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0
+      },
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "regla": "arp_replies_no_solicitadas <= 1.00",
+      "exactitud_balanceada_fold0": 1.0,
+      "exactitud_balanceada_media": 1.0,
+      "cumple": false
+    },
+    "dns_spoofing": {
+      "exactitud_balanceada_max": 0.9994406054623232,
+      "por_fold": {
+        "0": 0.9990527209773307,
+        "1": 0.9991897848068447,
+        "2": 0.9994406054623232,
+        "3": 0.9993754109138725
+      },
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0011187890753537348,
+      "regla": "dns_multiples_respuestas_txid <= 1.50",
+      "exactitud_balanceada_fold0": 0.9990527209773307,
+      "exactitud_balanceada_media": 0.9992646305400927,
+      "cumple": false
+    },
+    "icmp_flood": {
+      "exactitud_balanceada_max": 1.0,
+      "por_fold": {
+        "0": 0.9821428571428572,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0
+      },
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "regla": "n_icmp_echo <= 23.00",
+      "exactitud_balanceada_fold0": 0.9821428571428572,
+      "exactitud_balanceada_media": 0.9955357142857143,
+      "cumple": false
+    },
+    "mac_flooding": {
+      "exactitud_balanceada_max": 1.0,
+      "por_fold": {
+        "0": 1.0,
+        "1": 0.9666666666666667,
+        "2": 1.0,
+        "3": 0.9666666666666667
+      },
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "regla": "macs_destino_distintas <= 31.50",
+      "exactitud_balanceada_fold0": 1.0,
+      "exactitud_balanceada_media": 0.9833333333333334,
+      "cumple": false
+    },
+    "port_scan": {
+      "exactitud_balanceada_max": 0.989715445503647,
+      "por_fold": {
+        "0": 0.989715445503647,
+        "1": 0.9860064510553358,
+        "2": 0.9869911390024915,
+        "3": 0.9813715131022824
+      },
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 0.9864864864864865,
+      "fpr": 0.007055595479192526,
+      "regla": "syn_medio_abiertos_60s <= 3.50",
+      "exactitud_balanceada_fold0": 0.989715445503647,
+      "exactitud_balanceada_media": 0.9860211371659392,
+      "cumple": false
+    },
+    "syn_flood": {
+      "exactitud_balanceada_max": 1.0,
+      "por_fold": {
+        "0": 0.9814814814814814,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0
+      },
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "regla": "ips_origen_distintas <= 29.00",
+      "exactitud_balanceada_fold0": 0.9814814814814814,
+      "exactitud_balanceada_media": 0.9953703703703703,
+      "cumple": false
+    }
+  },
+  "reglas": [
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 135,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 135,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0033971385640556608,
+      "exactitud_balanceada": 0.9983014307179722,
+      "muestras_ataque_test": 49,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0018945580453387338,
+      "exactitud_balanceada": 0.9990527209773307,
+      "muestras_ataque_test": 49,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 0.9642857142857143,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9821428571428572,
+      "muestras_ataque_test": 28,
+      "regla": "n_icmp_echo <= 38.50"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 0.9642857142857143,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9821428571428572,
+      "muestras_ataque_test": 28,
+      "regla": "n_icmp_echo <= 38.50"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 22,
+      "regla": "macs_destino_distintas <= 31.50"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 1.0,
+      "fpr": 0.019272228392238844,
+      "exactitud_balanceada": 0.9903638858038806,
+      "muestras_ataque_test": 22,
+      "regla": "macs_destino_distintas <= 31.50"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 0.9594594594594594,
+      "fpr": 0.010322074867707585,
+      "exactitud_balanceada": 0.974568692295876,
+      "muestras_ataque_test": 74,
+      "regla": "syn_medio_abiertos_60s <= 3.50"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 0.9864864864864865,
+      "fpr": 0.007055595479192526,
+      "exactitud_balanceada": 0.989715445503647,
+      "muestras_ataque_test": 74,
+      "regla": "syn_medio_abiertos_60s <= 3.50"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 1,
+      "fold": 0,
+      "recall": 0.9629629629629629,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9814814814814814,
+      "muestras_ataque_test": 27,
+      "regla": "ips_origen_distintas <= 77.50"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 2,
+      "fold": 0,
+      "recall": 0.9629629629629629,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9814814814814814,
+      "muestras_ataque_test": 27,
+      "regla": "ips_origen_distintas <= 77.50"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 97,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 2,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 97,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.002916774695359087,
+      "exactitud_balanceada": 0.9985416126523204,
+      "muestras_ataque_test": 45,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 2,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0016204303863106041,
+      "exactitud_balanceada": 0.9991897848068447,
+      "muestras_ataque_test": 45,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 17,
+      "regla": "n_icmp_echo <= 23.00"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 2,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 17,
+      "regla": "n_icmp_echo <= 23.00"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 0.9333333333333333,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9666666666666667,
+      "muestras_ataque_test": 30,
+      "regla": "macs_destino_distintas <= 73.00"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 2,
+      "fold": 1,
+      "recall": 0.9333333333333333,
+      "fpr": 0.002074150894477573,
+      "exactitud_balanceada": 0.9656295912194279,
+      "muestras_ataque_test": 30,
+      "regla": "macs_destino_distintas <= 73.00"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 0.978494623655914,
+      "fpr": 0.010954109411459684,
+      "exactitud_balanceada": 0.9837702571222272,
+      "muestras_ataque_test": 93,
+      "regla": "syn_medio_abiertos_60s <= 3.50"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 2,
+      "fold": 1,
+      "recall": 0.978494623655914,
+      "fpr": 0.0064817215452424165,
+      "exactitud_balanceada": 0.9860064510553358,
+      "muestras_ataque_test": 93,
+      "regla": "syn_medio_abiertos_60s <= 3.50"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 1,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 25,
+      "regla": "ips_origen_distintas <= 29.00"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 2,
+      "fold": 1,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 25,
+      "regla": "ips_origen_distintas <= 29.00"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 1,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 29,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 29,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 1,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0016452780519907865,
+      "exactitud_balanceada": 0.9991773609740046,
+      "muestras_ataque_test": 47,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0011187890753537348,
+      "exactitud_balanceada": 0.9994406054623232,
+      "muestras_ataque_test": 47,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 1,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 12,
+      "regla": "n_icmp_echo <= 23.00"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 12,
+      "regla": "n_icmp_echo <= 23.00"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 1,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 21,
+      "regla": "macs_destino_distintas <= 31.50"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.026390259953932214,
+      "exactitud_balanceada": 0.9868048700230339,
+      "muestras_ataque_test": 21,
+      "regla": "macs_destino_distintas <= 31.50"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 1,
+      "fold": 2,
+      "recall": 0.9642857142857143,
+      "fpr": 0.014346824613359658,
+      "exactitud_balanceada": 0.9749694448361774,
+      "muestras_ataque_test": 112,
+      "regla": "syn_medio_abiertos_60s <= 3.50"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 0.9821428571428571,
+      "fpr": 0.0081605791378743,
+      "exactitud_balanceada": 0.9869911390024915,
+      "muestras_ataque_test": 112,
+      "regla": "syn_medio_abiertos_60s <= 3.50"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 1,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 26,
+      "regla": "ips_origen_distintas <= 29.00"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 2,
+      "fold": 2,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 26,
+      "regla": "ips_origen_distintas <= 29.00"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 1,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 94,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "profundidad": 2,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 94,
+      "regla": "arp_replies_no_solicitadas <= 1.00"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 1,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0012491781722550953,
+      "exactitud_balanceada": 0.9993754109138725,
+      "muestras_ataque_test": 45,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "profundidad": 2,
+      "fold": 3,
+      "recall": 0.8444444444444444,
+      "fpr": 0.0001972386587771203,
+      "exactitud_balanceada": 0.9221236028928337,
+      "muestras_ataque_test": 45,
+      "regla": "dns_multiples_respuestas_txid <= 1.50"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 1,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 28,
+      "regla": "n_icmp_echo <= 23.00"
+    },
+    {
+      "ataque": "icmp_flood",
+      "profundidad": 2,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 28,
+      "regla": "n_icmp_echo <= 23.00"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 1,
+      "fold": 3,
+      "recall": 0.9333333333333333,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9666666666666667,
+      "muestras_ataque_test": 30,
+      "regla": "macs_destino_distintas <= 31.00"
+    },
+    {
+      "ataque": "mac_flooding",
+      "profundidad": 2,
+      "fold": 3,
+      "recall": 0.9333333333333333,
+      "fpr": 0.0,
+      "exactitud_balanceada": 0.9666666666666667,
+      "muestras_ataque_test": 30,
+      "regla": "macs_destino_distintas <= 31.00"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 1,
+      "fold": 3,
+      "recall": 0.9702380952380952,
+      "fpr": 0.007495069033530572,
+      "exactitud_balanceada": 0.9813715131022824,
+      "muestras_ataque_test": 168,
+      "regla": "syn_medio_abiertos_60s <= 5.50"
+    },
+    {
+      "ataque": "port_scan",
+      "profundidad": 2,
+      "fold": 3,
+      "recall": 0.9880952380952381,
+      "fpr": 0.027679158448389217,
+      "exactitud_balanceada": 0.9802080398234244,
+      "muestras_ataque_test": 168,
+      "regla": "syn_medio_abiertos_60s <= 5.50"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 1,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 30,
+      "regla": "ips_origen_distintas <= 29.00"
+    },
+    {
+      "ataque": "syn_flood",
+      "profundidad": 2,
+      "fold": 3,
+      "recall": 1.0,
+      "fpr": 0.0,
+      "exactitud_balanceada": 1.0,
+      "muestras_ataque_test": 30,
+      "regla": "ips_origen_distintas <= 29.00"
+    }
+  ]
+}

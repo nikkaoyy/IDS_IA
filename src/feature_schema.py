@@ -103,9 +103,11 @@ COLUMNAS: Final[list[str]] = COLUMNAS_MODELO
 # Identificación de la fila: nunca entra al modelo.
 COLUMNAS_IDENTIDAD: Final[list[str]] = ["mac", "idx_ventana", "t0_us"]
 
-# Verdad terreno y trazabilidad, solo para evaluación.
+# Verdad terreno y trazabilidad, solo para evaluación. `variante` e `intensidad` (E1,
+# aditivas) permiten medir recall por técnica e intensidad; valen "" en filas benignas.
 COLUMNAS_TRAZA: Final[list[str]] = [
     "sesion", "tipo_ataque", "capa", "atacante", "episodio", "n_tramas_ataque", "grupo",
+    "variante", "intensidad",
 ]
 
 

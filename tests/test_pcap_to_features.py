@@ -34,6 +34,17 @@ def test_tramas_de_macs_efimeras_van_a_su_fila():
     assert df[ETIQUETA].tolist() == [0, 0, 1]
 
 
+def test_variante_e_intensidad_son_aditivas():
+    """E1: las filas heredan variante e intensidad del episodio; sin ellas, quedan vacías."""
+    viejo = p2f.etiquetar_ventanas(_filas(), _manifiesto([(1, "a"), (2, "a")]), k=2)
+    assert viejo["variante"].tolist() == ["", "", ""] and viejo["intensidad"].tolist() == ["", "", ""]
+    m = _manifiesto([(1, "a"), (2, "a"), (3, "b")]).assign(variante="ip_propia", intensidad="suave")
+    df = p2f.etiquetar_ventanas(_filas(), m, k=2)
+    assert df.loc[0, ["variante", "intensidad"]].tolist() == ["ip_propia", "suave"]
+    # Por debajo de K la fila es benigna, pero conserva el episodio para recalcular K.
+    assert df.loc[1, "tipo_ataque"] == "normal" and df.loc[1, "intensidad"] == "suave"
+
+
 def test_trama_de_ataque_sin_fila_es_error():
     with pytest.raises(ValueError, match="sin fila"):
         p2f.etiquetar_ventanas(_filas(), _manifiesto([(99_000_000, "a")]))
@@ -42,7 +53,8 @@ def test_trama_de_ataque_sin_fila_es_error():
 def test_procesar_sesion_cumple_contrato(sesion_corta):
     sesion, ruta = sesion_corta
     df = p2f.procesar_sesion(ruta, "s")
-    assert set(COLUMNAS_MODELO + [ETIQUETA, "sesion", "n_tramas_ataque"]) <= set(df.columns)
+    assert set(COLUMNAS_MODELO + [ETIQUETA, "sesion", "n_tramas_ataque", "variante", "intensidad"]) <= set(df.columns)
+    assert (df.loc[df[ETIQUETA] == 1, "intensidad"] != "").all()
     assert df[ETIQUETA].nunique() == 2
     ataque = sum(m is not None for _, _, m in sesion.tramas)
     assert df["n_tramas_ataque"].sum() == ataque
