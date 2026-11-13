@@ -2,7 +2,7 @@
   "archivo": "data/dataset_lab.csv",
   "sha256": "3f4d28bcd1d2fee5cd5aeab0ae31d5213262a097f7a051fe87b6e63f9e04eced",
   "bytes": 23497483,
-  "fecha_ficha": "2026-11-12T23:59:53",
+  "fecha_ficha": "2026-11-13T00:09:16",
   "fecha_generacion": "2026-11-12T23:53:41",
   "commit": "70cd3e66a2ac2e9f6d7e9d6785d3379951d54cd4",
   "comando": "python scripts/lab/generar_dataset_lab.py --sesiones 20",

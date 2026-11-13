@@ -6,8 +6,9 @@ El CSV no se versiona (pesa y se regenera); se versiona su ficha: tamaño, distr
 sesión y por clase, semillas, comando de generación y `sha256`. Con la ficha, quien
 regenere el dataset puede comprobar que obtuvo exactamente el mismo archivo.
 
-Las semillas y el comando salen del sidecar `<csv>.meta.json` que escribe
-`generar_dataset_lab.py`; sin él, las semillas se deducen del nombre de cada sesión.
+Las semillas, el comando y la fecha de generación (que da nombre a la ficha) salen del
+sidecar `<csv>.meta.json` que escribe `generar_dataset_lab.py`; sin él, las semillas se
+deducen del nombre de cada sesión y la ficha lleva la fecha del día.
 
 Uso:
     python scripts/lab/ficha_dataset.py data/dataset_lab.csv [--salida reports]
@@ -110,14 +111,15 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Escribe la ficha versionable de un dataset CSV.")
     p.add_argument("csv", type=Path)
     p.add_argument("--salida", type=Path, default=_RAIZ / "reports")
-    p.add_argument("--fecha", default=date.today().isoformat(), help="AAAA-MM-DD del nombre.")
+    p.add_argument("--fecha", help="AAAA-MM-DD del nombre (por defecto, la de generación del CSV).")
     args = p.parse_args(argv)
     if not args.csv.exists():
         print(f"No existe {args.csv}", file=sys.stderr)
         return 1
     ficha = construir_ficha(args.csv)
+    fecha = args.fecha or (ficha["fecha_generacion"] or date.today().isoformat())[:10]
     args.salida.mkdir(parents=True, exist_ok=True)
-    destino = args.salida / f"dataset_lab_{args.fecha}.json"
+    destino = args.salida / f"dataset_lab_{fecha}.json"
     destino.write_text(json.dumps(ficha, indent=2, ensure_ascii=False) + "\n")
     print(f"{destino}: {ficha['filas']} filas, sha256 {ficha['sha256']}")
     print(f"Etiquetas: {ficha['por_etiqueta']}")
