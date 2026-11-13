@@ -18,6 +18,7 @@ env/
 data/*.csv
 data/*.pcap
 data/pcap/
+data/pcap_holdout/
 data/*.parquet
 data/*.meta.json
 !data/.gitkeep
