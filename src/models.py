@@ -5,6 +5,7 @@ de la Fig. 1). Entrena, evalúa y persiste ambos modelos para su comparación
 """
 
 from __future__ import annotations
+import os
 from pathlib import Path
 from datetime import datetime
 import joblib
@@ -19,6 +20,12 @@ from .data import RANDOM_STATE
 from .feature_schema import COLUMNAS_MODELO, VERSION_ESQUEMA
 
 MODELOS_DIR = Path(__file__).resolve().parent.parent / "models"
+
+# Hilos de XGBoost. Con n_jobs=-1, un solo núcleo ocupado por otro proceso basta para que
+# la sincronización de OpenMP espere al hilo rezagado: medido en E2, 32 s frente a 1,5 s por
+# ajuste con 8 hilos (60 000 filas). El resultado no depende del número de hilos (predicciones
+# idénticas bit a bit con 4, 8, 12, 15 y 16 hilos).
+N_HILOS_XGB = max(1, min(8, (os.cpu_count() or 2) // 2))
 
 
 def entrenar_random_forest(X_train, y_train, semilla: int = RANDOM_STATE) -> RandomForestClassifier:
@@ -38,7 +45,7 @@ def entrenar_xgboost(X_train, y_train, semilla: int = RANDOM_STATE) -> XGBClassi
     modelo = XGBClassifier(
         n_estimators=200, max_depth=6, learning_rate=0.1,
         eval_metric="logloss", scale_pos_weight=scale_pos,
-        random_state=semilla, n_jobs=-1,
+        random_state=semilla, n_jobs=N_HILOS_XGB,
     )
     modelo.fit(X_train, y_train)
     return modelo

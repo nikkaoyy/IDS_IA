@@ -124,3 +124,15 @@ def test_ic_de_episodios_y_mediana():
     med = ev.ic_mediana_por_unidad([np.array([5.0]), np.array([10.0, 15.0]), np.array([])])
     assert med["n"] == 2 and med["valor"] == 10.0
     assert math.isnan(ev.ic_media_por_unidad(np.array([]))["valor"])
+
+
+def test_pr_auc_ponderada_coincide_con_sklearn():
+    from sklearn.metrics import average_precision_score
+    rng = np.random.default_rng(1)
+    y = (rng.random(500) < 0.1).astype(int)
+    prob = np.round(rng.random(500) * (1 + y), 2)  # con empates
+    orden = ev._orden_pr(prob)
+    for _ in range(10):
+        peso = rng.multinomial(500, np.ones(500) / 500).astype(float)  # con pesos cero
+        assert ev._pr_auc_ponderada(y, peso, *orden) == pytest.approx(
+            average_precision_score(y, prob, sample_weight=peso), abs=1e-12)

@@ -149,21 +149,32 @@ def umbral_para_objetivo(df: pd.DataFrame, prob: np.ndarray, objetivo_por_dispos
 
 
 # --------------------------------------------------------------------------- modelos
-def _ajustar_y_predecir(nombre: str, X_tr: pd.DataFrame, y_tr: np.ndarray, X_te: pd.DataFrame,  # noqa: N803
-                        semilla: int) -> np.ndarray:
-    """Pipeline de `src/preprocess.py` (escalador) + modelo; devuelve P(malicioso) en test."""
+def ajustar_modelo(nombre: str, X_tr: pd.DataFrame, y_tr: np.ndarray,  # noqa: N803
+                   semilla: int) -> Callable[[pd.DataFrame], np.ndarray]:
+    """Pipeline de `src/preprocess.py` (escalador) + modelo; devuelve la función X -> P(malicioso)."""
     escalador = ajustar_escalador(X_tr)
     modelo = ENTRENADORES[nombre](preprocesar(X_tr, escalador), y_tr, semilla=semilla)
-    return modelo.predict_proba(preprocesar(X_te, escalador))[:, 1]
+    return lambda X: modelo.predict_proba(preprocesar(X, escalador))[:, 1]  # noqa: N803
+
+
+def _ajustar_y_predecir(nombre: str, X_tr: pd.DataFrame, y_tr: np.ndarray, X_te: pd.DataFrame,  # noqa: N803
+                        semilla: int) -> np.ndarray:
+    """Ajusta en train y devuelve P(malicioso) en test."""
+    return ajustar_modelo(nombre, X_tr, y_tr, semilla)(X_te)
 
 
 @dataclass
 class PrediccionesFueraDeFold:
-    """Probabilidad y alarma de cada fila, predichas por el fold que la dejó fuera."""
+    """Probabilidad y alarma de cada fila, predichas por el fold que la dejó fuera.
+
+    `alarma` corresponde al objetivo principal (el primero); `alarmas_por_objetivo` guarda
+    la alarma de cada objetivo de falsas alarmas evaluado, con umbrales elegidos igual.
+    """
 
     prob: np.ndarray
     alarma: np.ndarray
     folds: list[dict] = field(default_factory=list)
+    alarmas_por_objetivo: dict[float, np.ndarray] = field(default_factory=dict)
 
 
 def predecir_fuera_de_fold(
@@ -172,20 +183,23 @@ def predecir_fuera_de_fold(
     semilla: int,
     n_folds: int,
     n_folds_internos: int,
-    objetivo_por_dispositivo_dia: float,
+    objetivo_por_dispositivo_dia: float | Sequence[float],
     columnas: Sequence[str] = COLUMNAS_MODELO,
     excluir_de_entrenamiento: pd.Series | None = None,
 ) -> PrediccionesFueraDeFold:
     """Validación anidada: umbral elegido dentro de cada fold externo, aplicado a su test.
 
-    `excluir_de_entrenamiento` (máscara booleana) quita filas del entrenamiento sin quitarlas
-    del test: es lo que usa leave-one-attack-out.
+    Con varios objetivos de falsas alarmas, cada uno recibe su propio umbral a partir de las
+    mismas predicciones internas; el primero es el principal. `excluir_de_entrenamiento`
+    (máscara booleana) quita filas del entrenamiento sin quitarlas del test: es lo que usa
+    leave-one-attack-out.
     """
+    objetivos = [float(o) for o in np.atleast_1d(objetivo_por_dispositivo_dia)]
     X = df[list(columnas)]  # noqa: N806
     y = df[ETIQUETA].to_numpy()
     excluir = np.zeros(len(df), dtype=bool) if excluir_de_entrenamiento is None else excluir_de_entrenamiento.to_numpy()
     prob = np.full(len(df), np.nan)
-    alarma = np.zeros(len(df), dtype=bool)
+    alarmas = {o: np.zeros(len(df), dtype=bool) for o in objetivos}
     folds: list[dict] = []
     for k, (idx_tr, idx_te) in enumerate(repartos_por_sesion(df, n_folds, semilla)):
         idx_tr = idx_tr[~excluir[idx_tr]]
@@ -194,16 +208,20 @@ def predecir_fuera_de_fold(
         for jdx_tr, jdx_te in repartos_por_sesion(interno, n_folds_internos, semilla):
             prob_interna[jdx_te] = _ajustar_y_predecir(
                 nombre_modelo, X.iloc[idx_tr[jdx_tr]], y[idx_tr[jdx_tr]], X.iloc[idx_tr[jdx_te]], semilla)
-        umbral = umbral_para_objetivo(interno, prob_interna, objetivo_por_dispositivo_dia)
+        umbrales = {o: umbral_para_objetivo(interno, prob_interna, o) for o in objetivos}
         prob[idx_te] = _ajustar_y_predecir(nombre_modelo, X.iloc[idx_tr], y[idx_tr], X.iloc[idx_te], semilla)
-        alarma[idx_te] = prob[idx_te] > umbral
+        for o, umbral in umbrales.items():
+            alarmas[o][idx_te] = prob[idx_te] > umbral
         folds.append({
             "fold": k,
-            "umbral": umbral,
-            "falsas_alarmas_dispositivo_dia_interna": falsas_alarmas_por_dispositivo_dia(interno, prob_interna > umbral),
+            "umbral": umbrales[objetivos[0]],
+            "umbrales_por_objetivo": {str(o): u for o, u in umbrales.items()},
+            "falsas_alarmas_dispositivo_dia_interna": falsas_alarmas_por_dispositivo_dia(
+                interno, prob_interna > umbrales[objetivos[0]]),
+            "sesiones_train": sorted(interno["sesion"].astype(str).unique()),
             "sesiones_test": sorted(df["sesion"].iloc[idx_te].astype(str).unique()),
         })
-    return PrediccionesFueraDeFold(prob, alarma, folds)
+    return PrediccionesFueraDeFold(prob, alarmas[objetivos[0]], folds, alarmas)
 
 
 # --------------------------------------------------------------------------- bootstrap
@@ -270,14 +288,36 @@ def ic_pr_auc_por_sesion(df: pd.DataFrame, probs: list[np.ndarray], n_replicas: 
     codigos, unicas = pd.factorize(sesiones)
     punto = float(np.mean([average_precision_score(y, p[validas]) for p in probs]))
     w = pesos_bootstrap(len(unicas), n_replicas, semilla)
+    ordenes = [_orden_pr(p[validas]) for p in probs]
     replicas = []
     for fila in w:
         peso = fila[codigos]
         if peso[y == 1].sum() == 0:
             replicas.append(math.nan)
             continue
-        replicas.append(np.mean([average_precision_score(y, p[validas], sample_weight=peso) for p in probs]))
+        replicas.append(np.mean([_pr_auc_ponderada(y, peso, *o) for o in ordenes]))
     return {"valor": punto, "ic95": _percentiles(np.array(replicas))}
+
+
+def _orden_pr(prob: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Orden descendente y último índice de cada valor distinto (umbrales de la curva PR)."""
+    orden = np.argsort(prob, kind="mergesort")[::-1]
+    p = prob[orden]
+    return orden, np.r_[np.flatnonzero(np.diff(p)), len(p) - 1]
+
+
+def _pr_auc_ponderada(y: np.ndarray, peso: np.ndarray, orden: np.ndarray, cortes: np.ndarray) -> float:
+    """`average_precision_score(y, prob, sample_weight=peso)` con el orden ya calculado.
+
+    Misma definición que sklearn (suma escalonada de precisión × Δrecall sobre los umbrales
+    distintos); evita reordenar en cada réplica del bootstrap.
+    """
+    w, yo = peso[orden].astype(float), y[orden]
+    tp = np.cumsum(w * yo)[cortes]
+    fp = np.cumsum(w * (1 - yo))[cortes]
+    precision = np.divide(tp, tp + fp, out=np.zeros_like(tp), where=(tp + fp) > 0)
+    recall = tp / tp[-1]
+    return float(np.sum(np.diff(np.r_[0.0, recall]) * precision))
 
 
 # --------------------------------------------------------------------------- resumen

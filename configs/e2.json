@@ -1,0 +1,43 @@
+{
+  "descripcion": "Configuración congelada de la evaluación E2 (OE2, OE3). La usan scripts/evaluar.py, scripts/ablaciones.py y scripts/evaluar_holdout.py.",
+  "dataset": "data/dataset_lab.csv",
+  "modelos": [
+    "random_forest",
+    "xgboost"
+  ],
+  "n_folds": 5,
+  "semillas": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "n_folds_internos": 3,
+  "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+  "objetivos_sensibilidad": [
+    0.25,
+    1.0,
+    4.0,
+    16.0
+  ],
+  "n_bootstrap": 1000,
+  "semilla_bootstrap": 42,
+  "salida": "reports/evaluacion_e2.json",
+  "ablaciones": {
+    "modelos": [
+      "random_forest",
+      "xgboost"
+    ],
+    "semillas": [
+      42
+    ],
+    "repeticiones_permutacion": 5,
+    "salida": "reports/ablaciones_e2.json"
+  },
+  "holdout": {
+    "dataset": "data/holdout_e2.csv",
+    "salida": "reports/holdout_e2.json",
+    "sello": "reports/.holdout_abierto"
+  }
+}
