@@ -16,6 +16,7 @@ from sklearn.metrics import (
 from xgboost import XGBClassifier
 
 from .data import RANDOM_STATE
+from .feature_schema import COLUMNAS_MODELO, VERSION_ESQUEMA
 
 MODELOS_DIR = Path(__file__).resolve().parent.parent / "models"
 
@@ -90,9 +91,33 @@ def guardar_artefacto_completo(modelo, scaler, columnas: list[str], nombre: str,
         "metadata": metadata or {},
         "timestamp": datetime.now().isoformat(),
         "version": "0.1.0",
+        "version_esquema": VERSION_ESQUEMA,
     }
     joblib.dump(artefacto, ruta)
     return ruta
+
+
+def validar_artefacto(artefacto: dict) -> dict:
+    """Comprueba que un artefacto corresponde al contrato vigente (inferencia, OE2).
+
+    Raises:
+        ValueError: Si faltan piezas o su esquema o columnas no coinciden.
+    """
+    faltantes = {"modelo", "scaler", "columnas", "version_esquema"} - set(artefacto)
+    if faltantes:
+        raise ValueError(f"Artefacto incompleto, faltan: {sorted(faltantes)}")
+    if artefacto["version_esquema"] != VERSION_ESQUEMA:
+        raise ValueError(
+            f"Esquema del artefacto {artefacto['version_esquema']} distinto de {VERSION_ESQUEMA}"
+        )
+    if list(artefacto["columnas"]) != COLUMNAS_MODELO:
+        raise ValueError("Las columnas del artefacto no coinciden con COLUMNAS_MODELO")
+    return artefacto
+
+
+def cargar_artefacto(nombre: str) -> dict:
+    """Carga y valida un artefacto autocontenido de `models/`."""
+    return validar_artefacto(joblib.load(MODELOS_DIR / f"{nombre}_artefacto.joblib"))
 
 
 def cargar_modelo(nombre: str):

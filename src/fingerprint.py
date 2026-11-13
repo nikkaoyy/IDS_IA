@@ -3,13 +3,13 @@ Módulo de extracción de huella digital de dispositivos (IEEE 802.3).
 
 Corresponde al bloque "Extracción de huella digital" del diagrama de
 arquitectura (Fig. 1 del documento del proyecto) y a la línea
-`h <- ExtraerHuella(t)` del Algoritmo 1 (pipeline de inferencia por trama).
+`h <- ExtraerHuella(t)` del Algoritmo 1. Da la huella cruda de una trama; lo que consume
+el modelo son las ventanas de `src/ventanas.py`.
 """
 
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 import time
-from .feature_schema import mapear_huella_a_vector_modelo
 
 
 @dataclass
@@ -24,10 +24,6 @@ class HuellaDigital:
 
     def to_dict(self) -> dict:
         return asdict(self)
-
-    def a_vector_modelo(self, defaults_flujo: dict | None = None) -> dict:
-        """Convierte la huella cruda al vector canónico esperado por el modelo."""
-        return mapear_huella_a_vector_modelo(self.to_dict(), defaults_flujo=defaults_flujo)
 
 
 class ExtractorHuellaDigital:
@@ -82,12 +78,3 @@ class ExtractorHuellaDigital:
             tiempo_entre_tramas_ms=tiempo_entre_tramas_ms,
             es_802_3=es_802_3,
         )
-
-
-def oui_a_entero(oui: str) -> int:
-    """Codifica el OUI (fabricante) como entero en rango [0, 49] para alimentar los modelos."""
-    try:
-        clean = oui.upper().replace(":", "").replace("-", "")[:6]
-        return int(clean, 16) % 50
-    except (ValueError, TypeError):
-        return 0

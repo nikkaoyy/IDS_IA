@@ -1,101 +1,67 @@
 #!/usr/bin/env python3
 """
-Orquestador del laboratorio (Fase 1 — §3.1 opción A): genera el dataset completo.
+Orquestador del laboratorio (etapa E1): sesiones -> pcap -> ventanas etiquetadas.
 
-Encadena todo el flujo reproducible de extremo a extremo:
-    1. Sintetiza un .pcap por escenario (benigno + ataques por capa) con
-       `scripts/lab/generar_trafico.py`.
-    2. Convierte cada .pcap a ventanas de características con `scripts/pcap_to_features.py`.
-    3. Ensambla y guarda el dataset etiquetado en `data/dataset_lab.parquet` (o CSV).
-
-El dataset resultante tiene etiqueta binaria (`etiqueta`), tipo de ataque (`tipo_ataque`),
-capa (`capa`) y clave de agrupación por dispositivo-ventana (`grupo`), lista para el
-estudio de ablación y la validación cruzada sin fuga (Fase 3).
+Cada sesión usa una semilla distinta y sustituye al antiguo pcap por clase. No requiere
+root ni toca interfaces. Las semillas desde `SEMILLA_BASE + SESIONES` quedan sin usar
+para el holdout de la etapa E2.
 
 Uso:
-    python scripts/lab/generar_dataset_lab.py                    # dataset completo por defecto
-    python scripts/lab/generar_dataset_lab.py --n 3000 --salida data/dataset_lab.csv
+    python scripts/lab/generar_dataset_lab.py [--sesiones 20] [--salida data/dataset_lab.csv]
 """
 from __future__ import annotations
 
 import argparse
 import logging
+import os
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 _RAIZ = Path(__file__).resolve().parent.parent.parent
 if str(_RAIZ) not in sys.path:
     sys.path.insert(0, str(_RAIZ))
 
+import pandas as pd  # noqa: E402
+
+from scripts import pcap_to_features  # noqa: E402
+from scripts.lab import generar_trafico  # noqa: E402
+from src.data import RANDOM_STATE  # noqa: E402
+
 logger = logging.getLogger("ids.lab.dataset")
 
-# Conteo base por escenario. Para 'benigno' es número de eventos (se reparte entre
-# dispositivos y ventanas); para los ataques es número de EPISODIOS (≈ventanas, ya que
-# cada episodio cae en su propia ventana temporal). El benigno domina, como en una red
-# real, pero sin dejar las clases de ataque sin muestras suficientes para CV.
-CONTEOS_BASE = {
-    "benigno": 4000,
-    "arp_spoofing": 300,
-    "mac_flooding": 300,
-    "syn_flood": 300,
-    "port_scan": 300,
-    "dns_spoofing": 300,
-}
+SESIONES = 20
+MAX_PROCESOS = 6  # cada sesión mantiene sus tramas en memoria
+SEMILLA_BASE = RANDOM_STATE * 1000
 
 
-def main(argv=None) -> int:
+def _procesar(args: tuple[int, str]) -> pd.DataFrame:
+    """Genera y extrae una sesión (se ejecuta en un proceso aparte)."""
+    indice, dir_pcap = args
+    nombre = f"sesion_{indice:03d}"
+    ruta = Path(dir_pcap) / f"{nombre}.pcap"
+    sesion = generar_trafico.generar_sesion(SEMILLA_BASE + indice)
+    generar_trafico.escribir_sesion(sesion, ruta)
+    return pcap_to_features.procesar_sesion(ruta, nombre)
+
+
+def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-    p = argparse.ArgumentParser(description="Genera el dataset completo del laboratorio virtual.")
-    p.add_argument("--escala", type=float, default=1.0, help="Factor multiplicador de los conteos base.")
-    p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--ventana", type=float, default=5.0, help="Ventana temporal en segundos.")
+    p = argparse.ArgumentParser(description="Genera el dataset del laboratorio por sesiones.")
+    p.add_argument("--sesiones", type=int, default=SESIONES)
     p.add_argument("--salida", default="data/dataset_lab.csv")
-    p.add_argument("--dir-pcap", default="data/pcap", help="Carpeta para los .pcap intermedios.")
+    p.add_argument("--dir-pcap", default="data/pcap")
     args = p.parse_args(argv)
 
-    import pandas as pd
-    from scapy.all import wrpcap
-
-    from scripts.lab import generar_trafico
-    from scripts import pcap_to_features
-
-    dir_pcap = Path(args.dir_pcap)
-    dir_pcap.mkdir(parents=True, exist_ok=True)
-
-    filas: list[dict] = []
-    for i, (escenario, base) in enumerate(CONTEOS_BASE.items()):
-        n = max(1, int(base * args.escala))
-        paquetes, etiqueta, capa = generar_trafico.generar(escenario, n, args.seed + i)
-        ruta_pcap = dir_pcap / f"{escenario}.pcap"
-        wrpcap(str(ruta_pcap), paquetes)
-        logger.info("Escenario '%s': %d tramas -> %s", escenario, len(paquetes), ruta_pcap)
-
-        filas.extend(
-            pcap_to_features.procesar_pcap(
-                ruta_pcap,
-                etiqueta=etiqueta,
-                tipo_ataque=escenario,
-                capa=capa,
-                ventana_s=args.ventana,
-            )
-        )
-
-    if not filas:
-        logger.error("No se generaron ventanas; abortando.")
-        return 1
-
-    df = pcap_to_features.construir_dataframe(filas)
-    salida = Path(args.salida)
-    salida.parent.mkdir(parents=True, exist_ok=True)
-    if salida.suffix == ".parquet":
-        df.to_parquet(salida, index=False)
-    else:
-        df.to_csv(salida, index=False)
-
-    logger.info("Dataset del laboratorio: %d filas, %d columnas -> %s", len(df), df.shape[1], salida)
+    Path(args.dir_pcap).mkdir(parents=True, exist_ok=True)
+    trabajos = [(i, args.dir_pcap) for i in range(args.sesiones)]
+    with ProcessPoolExecutor(max_workers=min(os.cpu_count() or 1, MAX_PROCESOS)) as grupo:
+        partes = list(grupo.map(_procesar, trabajos))
+    df = pd.concat(partes, ignore_index=True)
+    pcap_to_features.guardar(df, Path(args.salida))
+    logger.info("Dataset: %d filas, %d columnas -> %s", len(df), df.shape[1], args.salida)
     logger.info("Clases: %s", df["etiqueta"].value_counts().to_dict())
-    logger.info("Escenarios: %s", df["tipo_ataque"].value_counts().to_dict())
-    logger.info("Capas: %s", df["capa"].value_counts().to_dict())
+    logger.info("Tipos: %s", df["tipo_ataque"].value_counts().to_dict())
     return 0
 
 

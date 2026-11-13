@@ -1,67 +1,112 @@
 """
-Contrato unificado de características (Feature Schema) para el IDS IEEE 802.3.
+Contrato único de características (Feature Schema) del IDS IEEE 802.3.
 
-Resuelve el desacople técnico documentado en CONTEXT_UPGRADE.md (§3.1):
-Define de forma única y centralizada las columnas esperadas por:
-- El módulo de captura y extracción de huella (src/capture.py, src/fingerprint.py)
-- El módulo de generación y carga de datos (src/data.py)
-- El módulo de preprocesamiento (src/preprocess.py)
-- Los modelos y el pipeline de inferencia (src/models.py, src/pipeline.py)
+Define las columnas por ventana que producen `src/ventanas.py` (bloque "Extracción de
+huella digital" de la Fig. 1) y consumen el preprocesado y los modelos (OE2). No hay
+vectores por trama ni valores por defecto de flujo: una ventana trae todas sus columnas
+o se rechaza (etapa E0 de docs/PLAN_IMPLEMENTACION.md).
+
+Los campos sin datos (IAT y desviaciones con menos de dos muestras, o indicadores que
+requieren una `ConfigSegmento` no declarada) valen NaN: "sin dato" no equivale a cero.
+`oui_frecuente` y `oui_encoded` salieron del modelo: `OUI % 50` colisiona y no es ordinal.
 """
 
 from __future__ import annotations
+
 from typing import Final
+
 import pandas as pd
 
 # Nombre de la columna objetivo (1: malicioso, 0: legítimo)
 ETIQUETA: Final[str] = "etiqueta"
 
-# ==============================================================================
-# 1. CARACTERÍSTICAS DE CAPA 2 (HUELLA DIGITAL IEEE 802.3 / ETHERNET)
-# ==============================================================================
-FEATURES_HUELLA_802_3: Final[list[str]] = [
-    "longitud_trama",              # Longitud en bytes de la trama Ethernet/802.3
-    "tiempo_entre_tramas_ms",      # Delta de tiempo (IAT) entre tramas del mismo origen
-    "oui_frecuente",               # Identificador codificado del fabricante (primeros 3 octetos MAC)
-]
+# Se incrementa cuando cambia el contrato; lo valida `inferir_ventana`.
+VERSION_ESQUEMA: Final[str] = "2.0"
 
-# Características enriquecidas de capa 2 para agregación por ventana temporal (Fase 1+)
-FEATURES_HUELLA_VENTANA: Final[list[str]] = [
+FEATURES_CAPA2: Final[list[str]] = [
+    "n_tramas",
+    "bytes_totales",
     "longitud_trama_media",
     "longitud_trama_std",
     "iat_media_ms",
     "iat_std_ms",
+    "tasa_unicast",
+    "tasa_multicast",
     "tasa_broadcast",
-    "tasa_arp",
+    "macs_destino_distintas",
+    "pct_menor_64",            # longitud en el medio (captura + FCS de 4 octetos) < 64
+    "tasa_vlan",
+    "tasa_llc",
     "entropia_ethertype",
-    "oui_encoded",
 ]
 
-# ==============================================================================
-# 2. CARACTERÍSTICAS DE CAPA 3-4 (FLUJO Y TRANSPORTE)
-# ==============================================================================
-FEATURES_FLUJO: Final[list[str]] = [
-    "num_conexiones_por_min",       # Frecuencia de flujos / tasa de conexión
-    "tasa_syn",                     # Proporción de paquetes con bandera SYN activa
-    "entropia_puertos_destino",     # Medida de dispersión de puertos (indicador de escaneo)
+FEATURES_ARP: Final[list[str]] = [
+    "arp_requests",
+    "arp_replies",
+    "arp_replies_no_solicitadas",
+    "arp_gratuitos",
+    "arp_cambios_vinculo",     # IP ya vista con otra MAC
+    "arp_ether_distinto_hwsrc",
+    "arp_gateway_reclamado",   # NaN sin gateway declarado
 ]
 
-# ==============================================================================
-# 3. CONTRATO CANÓNICO DEL MODELO
-# ==============================================================================
-# Este es el conjunto exacto de columnas que los clasificadores (RF y XGBoost)
-# esperan recibir ordenadas durante el entrenamiento y la inferencia.
-COLUMNAS_MODELO: Final[list[str]] = [
-    "longitud_trama",
-    "tiempo_entre_tramas_ms",
-    "num_conexiones_por_min",
+FEATURES_TCP: Final[list[str]] = [
+    "n_syn",
     "tasa_syn",
+    "syn_medio_abiertos",
+    "ratio_syn_medio_abiertos",  # NaN sin SYN evaluables en la ventana
+    "n_rst",
+    "ips_origen_distintas",
+    "ips_destino_distintas",
+    "puertos_destino_distintos",
     "entropia_puertos_destino",
-    "oui_frecuente",
+    "conexiones_distintas",
+    "n_icmp_echo",
 ]
+
+FEATURES_DNS: Final[list[str]] = [
+    "dns_consultas",
+    "dns_respuestas",
+    "dns_respuestas_sin_consulta",
+    "dns_multiples_respuestas_txid",
+    "dns_resolver_no_autorizado",  # NaN sin resolvers declarados
+]
+
+# Ventana larga solapada (bajo y lento): 12 ventanas cortas = 60 s.
+FEATURES_LARGAS: Final[list[str]] = [
+    "n_tramas_60s",
+    "arp_replies_no_solicitadas_60s",
+    "arp_cambios_vinculo_60s",
+    "syn_medio_abiertos_60s",
+    "dns_respuestas_sin_consulta_60s",
+    "puertos_destino_distintos_60s",
+    "ips_destino_distintas_60s",
+]
+
+# Nivel de segmento: mismo valor en todas las filas de una ventana.
+FEATURES_GLOBALES: Final[list[str]] = [
+    "macs_nuevas_por_s",
+    "macs_activas",
+    "ratio_macs_una_trama",
+    "syn_sin_synack_max_destino",
+    "syn_medio_abiertos_max_destino",
+]
+
+# Orden canónico para entrenamiento e inferencia.
+COLUMNAS_MODELO: Final[list[str]] = (
+    FEATURES_CAPA2 + FEATURES_ARP + FEATURES_TCP + FEATURES_DNS + FEATURES_LARGAS + FEATURES_GLOBALES
+)
 
 # Alias para compatibilidad con código existente que use `COLUMNAS`
 COLUMNAS: Final[list[str]] = COLUMNAS_MODELO
+
+# Identificación de la fila: nunca entra al modelo.
+COLUMNAS_IDENTIDAD: Final[list[str]] = ["mac", "idx_ventana", "t0_us"]
+
+# Verdad terreno y trazabilidad, solo para evaluación.
+COLUMNAS_TRAZA: Final[list[str]] = [
+    "sesion", "tipo_ataque", "capa", "atacante", "episodio", "n_tramas_ataque", "grupo",
+]
 
 
 def validar_esquema(df: pd.DataFrame, incluir_etiqueta: bool = True) -> bool:
@@ -75,7 +120,7 @@ def validar_esquema(df: pd.DataFrame, incluir_etiqueta: bool = True) -> bool:
         True si el esquema es válido.
 
     Raises:
-        ValueError: Si faltan columnas requeridas o si hay tipos incompatibles.
+        ValueError: Si faltan columnas requeridas.
     """
     columnas_esperadas = set(COLUMNAS_MODELO)
     if incluir_etiqueta:
@@ -87,34 +132,3 @@ def validar_esquema(df: pd.DataFrame, incluir_etiqueta: bool = True) -> bool:
             f"El DataFrame no cumple el contrato de características. Columnas faltantes: {sorted(faltantes)}"
         )
     return True
-
-
-def mapear_huella_a_vector_modelo(huella_dict: dict, defaults_flujo: dict | None = None) -> dict:
-    """Mapea un diccionario de huella (producido por el extractor IEEE 802.3)
-
-    al formato esperado por el modelo, integrando estimaciones de capa 3-4 si no están
-    disponibles en la captura pura de enlace.
-    """
-    valores_flujo = defaults_flujo or {
-        "num_conexiones_por_min": 1,
-        "tasa_syn": 0.0,
-        "entropia_puertos_destino": 0.0,
-    }
-
-    # Si el OUI viene en string o no está codificado, aplicar codificación
-    oui_val = huella_dict.get("oui_frecuente")
-    if oui_val is None:
-        raw_oui = str(huella_dict.get("oui", "000000")).replace(":", "").replace("-", "")[:6]
-        try:
-            oui_val = int(raw_oui, 16) % 50
-        except ValueError:
-            oui_val = 0
-
-    return {
-        "longitud_trama": float(huella_dict.get("longitud_trama", 64)),
-        "tiempo_entre_tramas_ms": float(huella_dict.get("tiempo_entre_tramas_ms", 0.0)),
-        "num_conexiones_por_min": float(huella_dict.get("num_conexiones_por_min", valores_flujo["num_conexiones_por_min"])),
-        "tasa_syn": float(huella_dict.get("tasa_syn", valores_flujo["tasa_syn"])),
-        "entropia_puertos_destino": float(huella_dict.get("entropia_puertos_destino", valores_flujo["entropia_puertos_destino"])),
-        "oui_frecuente": int(oui_val),
-    }

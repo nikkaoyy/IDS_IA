@@ -14,20 +14,14 @@ no requiere privilegios. El propósito es construir datos para entrenar un IDS
 **defensivo** (OE1–OE3), no operar herramientas de ataque.
 
 ```bash
-# 1) Dataset completo de extremo a extremo (pcap -> features -> CSV):
+# Dataset completo: 20 sesiones de 15 min (timeline continuo, un pcap por sesión)
 python scripts/lab/generar_dataset_lab.py --salida data/dataset_lab.csv
 
-# Más volumen (escala todos los conteos):
-python scripts/lab/generar_dataset_lab.py --escala 2.0
+# Convertir sesiones ya generadas (lee .tramas.csv y .config.json junto al pcap)
+python scripts/pcap_to_features.py --pcap data/pcap/sesion_000.pcap --salida d.csv
 
-# 2) Un escenario suelto a pcap:
-python scripts/lab/generar_trafico.py --escenario syn_flood --n 300 --salida data/syn.pcap
-
-# 3) Convertir pcaps propios a features (etiquetas por pcap, en orden):
-python scripts/pcap_to_features.py \
-    --pcap data/benigno.pcap --etiqueta 0 --tipo normal       --capa ninguna \
-    --pcap data/syn.pcap     --etiqueta 1 --tipo syn_flood    --capa transporte \
-    --ventana 5 --salida data/dataset_lab.csv
+# Baseline de reglas por ataque
+python scripts/baseline_reglas.py
 ```
 
 ## Escenarios y capas (OE1)

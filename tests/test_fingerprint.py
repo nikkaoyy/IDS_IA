@@ -1,7 +1,6 @@
 """Pruebas unitarias para el extractor de huella IEEE 802.3 (src/fingerprint.py)."""
 
-from src.fingerprint import ExtractorHuellaDigital, oui_a_entero, HuellaDigital
-from src.feature_schema import COLUMNAS_MODELO
+from src.fingerprint import ExtractorHuellaDigital, HuellaDigital
 
 
 class MockPaqueteScapy:
@@ -63,20 +62,3 @@ def test_distincion_802_3_vs_ethernet_ii():
     h_eth2 = extractor.extraer(pkt_eth2)
     assert h_eth2.es_802_3 is False
     assert h_eth2.ethertype == 0x0800
-
-
-def test_conversion_a_vector_modelo():
-    extractor = ExtractorHuellaDigital()
-    pkt = MockPaqueteScapy(src="00:1A:2B:3C:4D:5E", length=500, time_val=50.0)
-    huella = extractor.extraer(pkt)
-    vector = huella.a_vector_modelo()
-
-    assert set(vector.keys()) == set(COLUMNAS_MODELO)
-    assert vector["longitud_trama"] == 500.0
-    assert vector["tiempo_entre_tramas_ms"] == 0.0
-    assert 0 <= vector["oui_frecuente"] < 50
-
-
-def test_oui_a_entero():
-    assert 0 <= oui_a_entero("001A2B") < 50
-    assert oui_a_entero("invalido") == 0

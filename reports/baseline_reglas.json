@@ -1,0 +1,98 @@
+[
+  {
+    "ataque": "arp_spoofing",
+    "profundidad": 1,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "muestras_ataque_test": 135,
+    "regla": "arp_replies_no_solicitadas <= 1.00"
+  },
+  {
+    "ataque": "arp_spoofing",
+    "profundidad": 2,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "muestras_ataque_test": 135,
+    "regla": "arp_replies_no_solicitadas <= 1.00"
+  },
+  {
+    "ataque": "dns_spoofing",
+    "profundidad": 1,
+    "recall": 1.0,
+    "fpr": 0.0033971385640556608,
+    "muestras_ataque_test": 49,
+    "regla": "dns_multiples_respuestas_txid <= 1.50"
+  },
+  {
+    "ataque": "dns_spoofing",
+    "profundidad": 2,
+    "recall": 1.0,
+    "fpr": 0.0018945580453387338,
+    "muestras_ataque_test": 49,
+    "regla": "dns_multiples_respuestas_txid <= 1.50"
+  },
+  {
+    "ataque": "icmp_flood",
+    "profundidad": 1,
+    "recall": 0.9642857142857143,
+    "fpr": 0.0,
+    "muestras_ataque_test": 28,
+    "regla": "n_icmp_echo <= 38.50"
+  },
+  {
+    "ataque": "icmp_flood",
+    "profundidad": 2,
+    "recall": 0.9642857142857143,
+    "fpr": 0.0,
+    "muestras_ataque_test": 28,
+    "regla": "n_icmp_echo <= 38.50"
+  },
+  {
+    "ataque": "mac_flooding",
+    "profundidad": 1,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "muestras_ataque_test": 22,
+    "regla": "macs_destino_distintas <= 31.50"
+  },
+  {
+    "ataque": "mac_flooding",
+    "profundidad": 2,
+    "recall": 1.0,
+    "fpr": 0.019272228392238844,
+    "muestras_ataque_test": 22,
+    "regla": "macs_destino_distintas <= 31.50"
+  },
+  {
+    "ataque": "port_scan",
+    "profundidad": 1,
+    "recall": 0.9594594594594594,
+    "fpr": 0.010322074867707585,
+    "muestras_ataque_test": 74,
+    "regla": "syn_medio_abiertos_60s <= 3.50"
+  },
+  {
+    "ataque": "port_scan",
+    "profundidad": 2,
+    "recall": 0.9864864864864865,
+    "fpr": 0.007055595479192526,
+    "muestras_ataque_test": 74,
+    "regla": "syn_medio_abiertos_60s <= 3.50"
+  },
+  {
+    "ataque": "syn_flood",
+    "profundidad": 1,
+    "recall": 0.9629629629629629,
+    "fpr": 0.0,
+    "muestras_ataque_test": 27,
+    "regla": "ips_origen_distintas <= 77.50"
+  },
+  {
+    "ataque": "syn_flood",
+    "profundidad": 2,
+    "recall": 0.9629629629629629,
+    "fpr": 0.0,
+    "muestras_ataque_test": 27,
+    "regla": "ips_origen_distintas <= 77.50"
+  }
+]
