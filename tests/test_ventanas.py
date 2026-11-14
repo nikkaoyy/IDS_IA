@@ -280,3 +280,36 @@ def test_trama_desde_paquete_lee_echo_y_cita_icmp():
     err.time = 1.0
     t = trama_desde_paquete(err)
     assert t.proto == "icmp" and t.icmp_cita == ("10.0.0.3", "10.0.0.20", "udp", 5000, 161)
+
+
+# --- Señales de pila (PEDIDO-E3A-1, bloque 1): se capturan, pero no entran al agregado ----
+
+def test_trama_desde_paquete_lee_senales_de_pila():
+    pkt = Ether(bytes(Ether(src=A, dst=B) / IP(src="10.0.0.3", dst="10.0.0.9", ttl=128, id=4321, flags="DF")
+                      / TCP(sport=4000, dport=443, flags="S", window=64240, seq=1000, ack=0,
+                            options=[("MSS", 1460), ("NOP", None), ("WScale", 8), ("SAckOK", b"")])))
+    pkt.time = 1.0
+    t = trama_desde_paquete(pkt)
+    assert (t.ip_ttl, t.ip_id, t.ip_df) == (128, 4321, True)
+    assert (t.tcp_window, t.tcp_seq, t.tcp_ack) == (64240, 1000, 0)
+    assert t.tcp_options == ("MSS", "NOP", "WScale", "SAckOK")
+
+
+def test_senales_de_pila_por_defecto_vacias():
+    assert _base(0.1).ip_ttl is None and _base(0.1).tcp_options is None
+    eco = Ether(src=A, dst=B) / IP(src="10.0.0.9", dst="10.0.0.3", ttl=64) / UDP(sport=1, dport=2)
+    eco.time = 1.0
+    t = trama_desde_paquete(eco)
+    assert t.ip_ttl == 64 and t.tcp_window is None and t.tcp_seq is None
+
+
+def test_las_senales_de_pila_no_cambian_las_ventanas():
+    """Mismas tramas con y sin señales de pila: mismas filas, columna a columna."""
+    from dataclasses import replace
+    tramas = [_base(0.1 * k, A if k % 2 else B, ip_src="10.0.0.3", ip_dst="10.0.0.9", proto="tcp",
+                    sport=4000 + k, dport=443, tcp_flags=0x02) for k in range(1, 40)]
+    con_pila = [replace(t, ip_ttl=128, ip_id=k, ip_df=True, tcp_window=8192, tcp_options=("MSS",),
+                        tcp_seq=k * 7, tcp_ack=0) for k, t in enumerate(tramas)]
+    a, b = extraer_ventanas(tramas, CONFIG), extraer_ventanas(con_pila, CONFIG)
+    assert pd.DataFrame(a).equals(pd.DataFrame(b))
+

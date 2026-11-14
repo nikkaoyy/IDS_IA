@@ -1,4 +1,4 @@
-SEGUIR — PEDIDO-ANOMALIAS-1 cerrado (docs/INFORME_ANOMALIAS.md); sigue PEDIDO-E3A-1, bloque 1 (señales de pila en Trama, sha256 del dataset sin cambios).
+SEGUIR — E3A bloque 1 hecho (sha256 idéntico); sigue E3A bloque 2 (src/identidad.py, ya escrito y probado: falta commit) y luego el bloque 3.
 
 # Progreso — PEDIDO-ANOMALIAS-1 y después PEDIDO-E3A-1
 
@@ -73,3 +73,15 @@ de 854 dispositivos, y `3c:52:82:cb:0c:43` es el más castigado en 4 de las 6 co
 
 | Paso | Qué | Commit |
 |---|---|---|
+| E1 | `Trama` gana `ip_ttl`, `ip_id`, `ip_df`, `tcp_window`, `tcp_options`, `tcp_seq`, `tcp_ack`; `trama_desde_paquete` los rellena; el agregado no los lee. Dataset regenerado con el parser extendido: **sha256 `7f06d099…a945`, idéntico** | ver `git log` |
+
+Notas del bloque 1:
+- Los `EOL` finales de las opciones TCP se descartan: son relleno de alineación, no una
+  elección de la pila.
+- El criterio se corrió con la salida en `$CLAUDE_JOB_DIR/tmp` en vez de `/tmp` (varios
+  trabajos comparten `/tmp`). Mismo comando y mismo resultado.
+- En el pcap congelado, el IP-ID vale 1 en todas las tramas IP (el valor por defecto de
+  Scapy), no hay opciones TCP y el SEQ del SYN también es por defecto en muchos casos. Solo
+  el TTL (64/128/255) y la ventana del SYN (8192/29200/64240) llevan información. Por eso el
+  bloque 3 necesita su propio generador.
+

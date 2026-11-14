@@ -79,6 +79,15 @@ class Trama:
     icmp_cita: tuple[str, str, str, int, int] | None = None
     dns_qr: int | None = None
     dns_id: int = 0
+    # Señales de pila (PEDIDO-E3A-1): describen al equipo, no una violación. Las usa
+    # `src/identidad.py`; el agregador de ventanas no las lee y no entran en el contrato.
+    ip_ttl: int | None = None
+    ip_id: int | None = None
+    ip_df: bool | None = None
+    tcp_window: int | None = None
+    tcp_options: tuple[str, ...] | None = None  # nombres en orden: MSS, SAckOK, Timestamp, NOP, WScale…
+    tcp_seq: int | None = None
+    tcp_ack: int | None = None
 
 
 def trama_desde_paquete(pkt) -> Trama | None:
@@ -123,10 +132,16 @@ def trama_desde_paquete(pkt) -> Trama | None:
     if ip is None:
         return trama
     trama.ip_src, trama.ip_dst = str(ip.src), str(ip.dst)
+    trama.ip_ttl, trama.ip_id, trama.ip_df = int(ip.ttl), int(ip.id), bool(int(ip.flags) & 0x2)
     tcp, udp, icmp = pkt.getlayer(TCP), pkt.getlayer(UDP), pkt.getlayer(ICMP)
     if tcp is not None:
         trama.proto = "tcp"
         trama.sport, trama.dport, trama.tcp_flags = int(tcp.sport), int(tcp.dport), int(tcp.flags)
+        trama.tcp_window, trama.tcp_seq, trama.tcp_ack = int(tcp.window), int(tcp.seq), int(tcp.ack)
+        nombres = [str(op[0] if isinstance(op, tuple) else op) for op in (tcp.options or [])]
+        while nombres and nombres[-1] == "EOL":  # relleno de alineación, no una elección de la pila
+            nombres.pop()
+        trama.tcp_options = tuple(nombres)
     elif udp is not None:
         trama.proto = "udp"
         trama.sport, trama.dport = int(udp.sport), int(udp.dport)
