@@ -1,79 +1,83 @@
-# PEDIDO-EXTRACTOR-1 — que el modelo detecte ataques y no la herramienta del generador
+# PEDIDO-EXTRACTOR-1 (v2) — que el modelo detecte el ataque y no un contador propietario
 
-Repo: `/home/nikka/Documentos/FRED/IDS`, rama `main`, base `7fb1019` (E2 cerrado).
-Se ejecuta **en bucle**: una iteración por vuelta, con estado en `PROGRESO-EXTRACTOR.md`.
-Este archivo manda; el prompt del bucle solo dice «avanza una iteración».
+Repo: `/home/nikka/Documentos/FRED/IDS`, rama `main`, base `f7b72f0` (iteración 0 del extractor).
+Reemplaza la v1: cambia el diagnóstico de partida, el diseño de las familias y el criterio de parada.
+Se sigue ejecutando en bucle, una iteración por vuelta, con el estado en `PROGRESO-EXTRACTOR.md`.
 
-## Por qué existe este pedido
+## Corrección de la premisa (medida en la iteración 0)
 
-E2 midió lo que había que medir y salió el problema: **leave-one-attack-out da 0,028 (RF) y 0,111 (XGB)** de recall por episodio sobre un tipo que no estaba en el entrenamiento, frente a 0,80 / 0,79 cuando sí estaba. Si se excluye `arp_spoofing`, su recall cae a **0,0** sobre 34 episodios (`reports/ablaciones_e2.json`).
+La v1 decía que el atajo era `longitud_trama_std` y que quitando la capa 2 el modelo miraría el ataque. **La medición lo desmiente:** sin `FEATURES_CAPA2` el LOAO queda en RF **0,044** [0,016–0,076] y XGB **0,116** [0,074–0,156], frente a 0,028 y 0,111 con todo. Quitar el artefacto de la herramienta no mueve nada.
 
-La causa mecánica también está medida: la característica que más pesa es **`longitud_trama_std`**, que describe cómo construye las tramas la herramienta del laboratorio, no lo que viola el ataque. Mientras eso siga así, cualquier cifra nueva sobre este dataset vuelve a medir el generador.
+La causa real, según el mismo diagnóstico: las características que separan bien son **contadores propios de un solo ataque**, y al excluir un tipo su contador no tiene un solo positivo en el entrenamiento. No hay nada que transferir. Por eso el problema no se arregla quitando features, sino **cambiando qué se cuenta**: contadores que varios ataques comparten.
 
-Esto se arregla en el extractor (`src/ventanas.py` + `src/feature_schema.py` + `src/pcap_to_features.py`), no en el modelo ni en el generador.
+Esto no invalida E2 ni la puerta de E1: la conclusión (detecta el catálogo) sigue en pie. Cambia el remedio.
 
-## Estado verificado (2026-11-13, sobre `7fb1019`)
+## Estado verificado
 
-- Contrato vigente: `VERSION_ESQUEMA = "2.0"`; familias `FEATURES_CAPA2` (14), `FEATURES_ARP` (7), `FEATURES_TCP` (11), `FEATURES_DNS` (5), `FEATURES_LARGAS` (7), `FEATURES_GLOBALES` (5).
+- Iteración 0 en `f7b72f0`: `reports/extractor_diagnostico.json` y `PROGRESO-EXTRACTOR.md` escritos; suite 93 passed + 5 xfailed.
+- Línea base semántica (sin capa 2) = el listón a batir: **RF 0,044**, **XGB 0,116** de LOAO medio por episodio.
 - Dataset de desarrollo: 20 sesiones, 78 988 ventanas, sha256 `3f4d28bc…eced`, regenerable en ~12 min.
-- **Holdout 20–29 gastado**: abierto una vez el 2026-11-13 (`reports/.holdout_abierto`, commit `e43a28f`). No se vuelve a tocar en este pedido. Todo lo que aquí se mida se mide sobre las sesiones de desarrollo.
-- Umbral operativo de referencia: ≤1 falsa alarma por dispositivo-día (validación anidada, `configs/e2.json`).
-- Entorno: `.venv/bin/python` (el `activate` está roto). La suite entera tarda ~4 min; sin los CSV se saltan 9 pruebas.
+- **Holdout 20–29 gastado** (`reports/.holdout_abierto`, commit `e43a28f`): no se abre en este pedido.
+- Entorno: `.venv/bin/python` (el `activate` está roto); suite completa ~4 min.
 
-## Reglas duras (una iteración que las rompa se revierte)
+## Reglas duras (sin cambios: una que se rompa se revierte)
 
-1. **El generador está congelado**: no se toca `scripts/lab/generar_trafico.py` ni `scripts/lab/generar_dataset_lab.py`. Cambiar el ataque para que se detecte mejor es hacer trampa; cambiar lo que *vemos* del ataque, no.
-2. **Ninguna característica entra porque suba una métrica.** Entra porque se puede decir en una frase qué viola el ataque y qué contador lo ve, y porque se comprobó en el pcap. Primero la justificación escrita en `PROGRESO-EXTRACTOR.md`, después la medida. Si la medida no mejora, se queda igual y se documenta la negativa.
-3. **Se lee el pcap, no el generador.** Para descubrir qué distingue un ataque del benigno, abre los `.pcap` de `data/pcap/` y compara tramas. Leer `generar_trafico.py` para copiar sus constantes reintroduce el sesgo que E2 destapó.
-4. **El marcador es LOAO, no la puerta de 0,85.** Cada iteración se evalúa con `scripts/ablaciones.py` y se reporta el recall por episodio del tipo excluido, media de los seis y por tipo.
-5. **El esquema sube a 3.0** cuando el contrato cambie, y el cambio va completo: `feature_schema.py`, extractor, dataset regenerado, ficha nueva y las cifras de E2 recalculadas sobre el dataset nuevo (las viejas quedan como históricas, no se borran).
-6. **El holdout no se abre.** Ni con `--romper-holdout-una-vez`. Si una conclusión necesita holdout, se anota como pendiente para sesiones ≥30.
-7. Un commit por iteración. `git status` limpio al cerrar cada una. Sin `git push`: lo hace Nico.
+1. **Generador congelado**: no se toca `scripts/lab/generar_trafico.py` ni `generar_dataset_lab.py`.
+2. **Ninguna característica entra por subir una métrica**: entra por lo que viola el ataque, justificada en `PROGRESO-EXTRACTOR.md` antes de medir. Si no mejora, `git revert` y la negativa queda documentada con su cifra.
+3. **Se lee el pcap, no el generador**, para descubrir qué distingue un ataque del benigno.
+4. El marcador es **LOAO medio y por tipo**, no la puerta de 0,85.
+5. Esquema a 3.0 completo cuando cambie el contrato (extracción, dataset regenerado, ficha, cifras de E2 recalculadas; las viejas quedan como históricas).
+6. **El holdout no se abre.** Nada de `--romper-holdout-una-vez`.
+7. Un commit por iteración, `git status` limpio, sin `git push`.
 
-## Protocolo de iteración (lo que ejecuta cada vuelta del bucle)
+## Nuevo diseño de familias: contadores compartidos
 
-Al empezar la vuelta, lee `PROGRESO-EXTRACTOR.md`. Si la primera línea dice `PARAR`, no hagas nada más y di por qué.
+Cada familia declara **antes de medirse** qué ataques debería cubrir (predicción falsable). Si no mueve el LOAO de esos tipos, la familia se retira y se anota como negativa. Cinco candidatas, una por iteración:
 
-Cada vuelta hace **exactamente una** de estas cosas, la primera que esté pendiente:
+| # | Familia | Qué viola | Ataques que debería cubrir (predicción) |
+|---|---|---|---|
+| 1 | **Respuestas sin petición previa**: respuesta de protocolo sin solicitud en la misma ventana o en la anterior, por tipo de protocolo | Un equipo legítimo no contesta lo que nadie preguntó | arp_spoofing, dns_spoofing, icmp_flood (`echo_reply`), sin importar cuál se excluya |
+| 2 | **Flujos iniciados que nunca se completan**: SYN sin SYN-ACK, ratio de conexiones medio abiertas por destino, RST temprano | Ningún flujo legítimo queda colgado a propósito | syn_flood, port_scan |
+| 3 | **Reclamación de rol**: alguien que no es el gateway/resolver responde con su rol, o una IP conocida aparece con MAC nueva | El rol de gateway y de resolver es único en la red | arp_spoofing, dns_spoofing |
+| 4 | **Abanico de identidad**: un origen hacia muchos destinos/puertos, y muchas MAC origen emitiendo a la vez, normalizado por tramas | Un equipo final conversa con pocos pares; un ataque de volumen multiplica pares | mac_flooding, port_scan, syn_flood |
+| 5 | **Tasa de eventos de control por encima de lo humano**: tramas de gestión/control por segundo frente al mismo equipo en ventanas tranquilas | Los protocolos de control son raros por naturaleza | los seis, sobre todo los de ráfaga |
 
-1. **Diagnóstico (iteración 0, obligatoria y única).** Sin tocar el modelo: mide la distribución de las features actuales por ataque y por benigno sobre el dataset de desarrollo, y escribe `reports/extractor_diagnostico.json` con: para cada ataque, las 3 features que más lo separan del benigno, y una columna nueva `depende_de_herramienta` (sí/no/mixta) con el motivo en una línea. Además, un experimento: entrena con **`FEATURES_CAPA2` fuera** (solo ARP, TCP, DNS, largas y globales) y mide LOAO. Ese número es la línea base semántica y se escribe en el progreso.
-2. **Una familia de features semánticas** de la lista de abajo, con su justificación escrita antes de medir, su extracción en `src/ventanas.py`, sus pruebas en `tests/test_ventanas.py`, el esquema a 3.0 si toca, dataset regenerado y LOAO medido. Si LOAO no sube, `git revert` del commit de features y se anota la negativa con la cifra.
-3. **Una limpieza de artefacto**: neutralizar una feature que dependa de la herramienta (probar a quitarla y mirar si el LOAO sube o el holdout de desarrollo empeora). Se documenta igual que una familia.
+Regla de diseño: si un contador sirve para **un solo** ataque, no entra en este pedido — se queda en el informe como diagnóstico de por qué el LOAO no sube.
 
-Nunca dos familias en la misma vuelta. Nunca reajustar hiperparámetros del modelo en este pedido: el modelo se queda como está salvo que una feature nueva lo obligue (NaN, tipo, escala) y eso se dice.
+## Protocolo de cada vuelta del bucle
 
-## Familias semánticas candidatas (una por iteración)
+Lee `PROGRESO-EXTRACTOR.md`; si la primera línea dice `PARAR`, no hagas nada y explica por qué. Después, una sola de estas:
 
-Cada una se justifica por lo que **viola** el ataque. Elige el orden por lo que veas en el pcap.
+1. **Siguiente familia compartida** de la tabla: predicción de cobertura escrita primero, extracción en `src/ventanas.py`, pruebas en `tests/test_ventanas.py`, esquema 3.0, dataset regenerado, **LOAO medido** y `reports/extractor_final.json` actualizado. Sin mejora → `git revert` + negativa anotada.
+2. **Limpieza de artefacto** de una feature que dependa de la herramienta (una por vuelta, como máximo dos en todo el pedido).
+3. **Cierre**: si se cumple el criterio de parada, escribe el informe y `PARAR`.
 
-- **ICMP por tipo.** Hoy solo hay `n_icmp_echo`: `icmp_flood` con `echo_reply` y `unreachable` (BlackNurse) es invisible. Contadores por tipo (echo request, echo reply, destination unreachable, time exceeded) y tasa por segundo.
-- **Flags TCP que el benigno no produce.** Conteo de tramas sin flags (Null), FIN sin ACK, SYN+FIN, Xmas, y `syn_sin_ack` por destino. Justificación: esos estados no existen en una conexión legítima de un equipo final.
-- **Presión sobre la tabla CAM.** MACs origen distintas por ventana, MACs origen nuevas por segundo, y repetición de una misma MAC origen emitiendo a muchos destinos. Justificación: `mac_flooding` desborda la tabla de conmutación, no solo cambia destinos.
-- **Vínculo IP↔MAC.** Ya hay `arp_cambios_vinculo`; falta la vista corta: cambios de vínculo en 5 s, número de MACs distintas anunciando la misma IP, y si la IP reclamada estaba activa en el tráfico previo.
-- **DNS sin respuesta legítima.** Respuesta con txid que no corresponde a una consulta pendiente, respuesta desde una IP que no es el resolver, y respuestas duplicadas por txid — ya hay contadores; falta el cociente consultas/respuestas por ventana y por equipo.
-- **SYN sin completar, por destino y por ventana.** `syn_medio_abiertos` existe; falta el máximo por destino y la tasa de SYNs con ACK ausente frente a conexiones completadas.
-- **Puertos destino tocados por un mismo origen** (abanico) frente a muchos orígenes tocando un mismo puerto (fuerza bruta).
+Nunca dos familias por vuelta. No se reajustan hiperparámetros.
 
-## Criterio de aceptación del pedido
+## Criterio de parada (corregido)
 
-Al terminar (o al parar), `reports/extractor_final.json` y una sección nueva en `docs/INFORME_EXTRACTOR.md` con:
+Se para cuando ocurra **lo primero** de:
 
-- LOAO por episodio: **media y por tipo**, antes y después, con IC bootstrap.
-- La lista de features vivas en 3.0, cada una con su justificación semántica en una línea y su fuente en el pcap.
-- Las features retiradas y por qué.
-- Las iteraciones que **no** mejoraron, con su cifra (las negativas son resultado, no fracaso).
-- Una respuesta explícita: ¿subió el LOAO lo suficiente para decir que el modelo mira el ataque y no la herramienta? Con la cifra delante.
+- **Transferencia lograda**: LOAO medio ≥ **0,19** en RF (parte de 0,044) o ≥ **0,27** en XGB (parte de 0,116), es decir +0,15 sobre la línea base; **o** al menos **3 de los 6 tipos** con recall por episodio ≥ 0,25 al quedar excluidos.
+- **Negativa demostrada**: dos familias compartidas seguidas no mueven el LOAO de ninguno de los tipos que declararon cubrir. Entonces se para, se escribe el resultado negativo con sus cifras y se cierra el pedido: eso también es un hallazgo del artículo.
+- **Cuatro horas** de trabajo.
 
-**Criterio de parada** (lo que escribe `PARAR` en el progreso): la media de LOAO por episodio sube ≥0,20 sobre la línea base semántica **y** ningún tipo queda por debajo de 0,30; o tres vueltas seguidas sin mejora; o cuatro horas de trabajo. Lo que se cumpla primero.
+El listón anterior («ningún tipo por debajo de 0,30») queda retirado: con contadores que hoy son propietarios, es inalcanzable por construcción y habría empujado a ajustar el generador.
+
+## Criterio de aceptación
+
+`reports/extractor_final.json` y `docs/INFORME_EXTRACTOR.md` con:
+
+- Tabla de **transferencia**: familia → tipos que declaró cubrir → recall por episodio de cada uno al quedar excluido, antes y después, con IC bootstrap.
+- LOAO medio por modelo, con IC, frente a la línea base semántica (0,044 / 0,116).
+- Features vivas en 3.0, cada una con su justificación semántica en una línea y su fuente en el pcap; y las retiradas con su motivo.
+- Las iteraciones que no mejoraron, con su cifra.
+- Una respuesta explícita: **¿se transfiere algo entre ataques?** Con la cifra; y si no se transfiere, qué dice eso del enfoque de huella 802.3 para ataques desconocidos.
 
 ## Qué NO se toca
 
-- `scripts/lab/*` (generador y orquestador), `configs/e2.json` salvo la ruta de salida, y el holdout.
-- `scripts/baseline_reglas.py` y la puerta de E1: siguen como referencia histórica.
-- `docs/INFORME_E1.md` y `docs/INFORME_E2.md`: se enmiendan con addendum si hace falta, no se reescriben.
-- E3, E4, E5, E6: no se adelantan. Este pedido es el extractor y nada más.
-- `data/*.csv`, `data/*.pcap`, sidecars: fuera de git. Sin `git push`.
+`scripts/lab/*`, el holdout, `scripts/baseline_reglas.py`, `configs/e2.json` (salvo rutas de salida), `docs/INFORME_E1.md` y `docs/INFORME_E2.md` (addendum, no reescritura), más E3–E6, que no se adelantan. `data/*.csv`, `data/*.pcap` y sidecars fuera de git. Sin `git push`.
 
-## Cierre de cada vuelta (lo que se reporta al bucle)
+## Reporte de cada vuelta
 
-Tres líneas: qué iteración se hizo, la cifra de LOAO que dejó, y qué sigue. Eso va al final de `PROGRESO-EXTRACTOR.md` y al chat. Nada de resúmenes largos: la cifra y el commit.
+Tres líneas: iteración hecha, cifra de LOAO que deja (media y los tipos que declaró cubrir), y qué sigue. Al final de `PROGRESO-EXTRACTOR.md` y al chat.

@@ -1,4 +1,4 @@
-SEGUIR — iteración 0 (diagnóstico) cerrada; siguiente: iteración 1, familia «ICMP por tipo».
+SEGUIR — iteración 1 en curso: familia compartida 1, «respuestas sin petición previa» (pedido v2).
 
 # Progreso — PEDIDO-EXTRACTOR-1
 
@@ -19,13 +19,16 @@ LOAO: recall por episodio del tipo excluido, media de los seis tipos con IC 95 %
 |---|---|---|---|
 | E2, todas las características (esquema 2.0) | 0,028 [0,006, 0,055] | 0,111 [0,067, 0,156] | `reports/extractor/loao_it0_completo.json` |
 | **Línea base semántica**: sin `FEATURES_CAPA2` (35 características) | **0,044 [0,016, 0,076]** | **0,116 [0,074, 0,156]** | `reports/extractor/loao_it0_sin_capa2.json` |
-| Objetivo de parada: línea base + 0,20, y ningún tipo < 0,30 | ≥ 0,244 | ≥ 0,316 | — |
+| Parada por transferencia (pedido v2): media ≥ línea base + 0,15, **o** 3 de 6 tipos ≥ 0,25 | ≥ 0,19 | ≥ 0,27 | — |
 
-El criterio de parada se aplica a **los dos modelos**: se da por cumplido cuando lo cumplen
-ambos.
+**Pedido v2 (desde la iteración 1).** Basta con que se cumpla en **un** modelo (RF *o*
+XGB), o que 3 de los 6 tipos superen 0,25 al quedar excluidos. También se para por
+negativa demostrada: dos familias compartidas seguidas que no mueven ninguno de los tipos
+que declararon cubrir. El listón «ningún tipo < 0,30» de la v1 queda retirado.
 
-Presupuesto: 4 h desde el inicio de la iteración 0 (2026-11-13 ≈ 19:05). Consumido al
-cerrar la iteración 0: ≈ 0 h 35 min.
+Presupuesto: 4 h desde el inicio de la iteración 0 (2026-11-13 ≈ 19:05), contadas de
+forma continua también para la v2. Consumido al cerrar la iteración 0: ≈ 0 h 35 min; al
+escribir la predicción de la iteración 1 (19:48): ≈ 0 h 43 min.
 
 LOAO por tipo en la línea base semántica (sin capa 2):
 
@@ -89,6 +92,48 @@ Las 3 características que más separan cada ataque del benigno, con su juicio:
 (Los números son AUC; < 0,5 significa que el ataque tiene valores *menores* que el benigno.)
 Para `icmp_flood` no separa nada propio de ICMP: sus tres primeras características miden lo
 que a la ventana atacante le *falta* (flujos TCP/UDP).
+
+## Iteración 1 — familia «respuestas sin petición previa» (predicción escrita antes de medir)
+
+**Qué viola.** Un equipo legítimo no contesta lo que nadie preguntó. Una respuesta de
+protocolo (ARP reply, respuesta DNS, ICMP echo reply o error ICMP) sin la petición
+correspondiente en los 5 s previos es una afirmación no pedida sobre la red.
+
+**Qué contador lo ve.** Un solo contador compartido por los cuatro protocolos, sin columna
+propia por protocolo:
+- `respuestas_no_solicitadas`: suma, en la ventana de 5 s, de
+  - ARP reply sin request (psrc, pdst) previo (lógica existente);
+  - respuesta DNS sin consulta con el mismo (ip, puerto, txid) (lógica existente);
+  - ICMP echo reply sin echo request con el mismo (ip origen↔destino, id, seq);
+  - error ICMP (tipo 3 o 11) cuyo datagrama citado no salió del destinatario del error
+    hacia ese par (ip, proto, puertos) en los 5 s previos.
+- `tasa_respuestas_no_solicitadas`: lo mismo, dividido entre las tramas de la ventana.
+- `respuestas_no_solicitadas_60s`: la suma en 60 s.
+
+**Comprobado en el pcap** (20 sesiones de desarrollo, `data/pcap/`):
+- Los 31 701 echo reply benignos tienen su request previo; los 29 204 de `icmp_flood`, ninguno.
+- Los 1 499 unreachable benignos citan un datagrama que su destinatario sí envió; los
+  10 250 de `icmp_flood` citan datagramas que nunca pasaron por el segmento.
+- En el dataset, `arp_replies_no_solicitadas` y `dns_respuestas_sin_consulta` valen 0 en el
+  100 % de las ventanas benignas limpias.
+
+**Cobertura declarada (predicción falsable).** Solo se ve una respuesta *sin* petición. Las
+variantes que responden a una petición real (carreras ARP y DNS, MITM DNS) o que envenenan
+por request o gratuito no quedan cubiertas: son de la familia 3.
+
+| Tipo | Variantes cubiertas (episodios) | Cota del recall LOAO por esta familia |
+|---|---|---|
+| icmp_flood | echo_reply (10) + unreachable (11) de 31 | 0,68 |
+| arp_spoofing | respuesta_gateway (3) + respuesta_host (7) de 34 | 0,29 |
+| dns_spoofing | kaminsky (3) de 30 | 0,10 |
+
+Predicción con el conjunto sin capa 2: al quedar excluidos, **`icmp_flood` sube ≥ +0,15 y
+`arp_spoofing` ≥ +0,10 en al menos un modelo**; `dns_spoofing` sube como mucho +0,10. Los
+otros tres tipos no deberían moverse por esta familia.
+
+**Decisión fijada de antemano.** La familia se queda si el LOAO medio sube en al menos un
+modelo **y** `icmp_flood` o `arp_spoofing` sube ≥ 0,10 al quedar excluido. Si no se cumple,
+`git revert` del commit de características y se anota la negativa con la cifra.
 
 ## Orden de las familias (por lo visto en el pcap)
 
