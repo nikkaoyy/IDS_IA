@@ -1,0 +1,10 @@
+{
+  "descripcion": "PEDIDO-E3A-1, bloque 3: perfil de pila (src/identidad.py) frente a clones ingenuo y de ritmo de scripts/lab/generar_clones.py. Sesiones propias con semilla base 77000; no comparten nada con el dataset de E2 ni con su holdout.",
+  "dir_pcap": "data/pcap_clones",
+  "inicio": 0,
+  "sesiones": 20,
+  "regenerar": true,
+  "n_bootstrap": 1000,
+  "semilla_bootstrap": 42,
+  "salida": "reports/identidad_e3a.json"
+}

@@ -1,4 +1,4 @@
-SEGUIR — E3A bloques 1 y 2 hechos; sigue el bloque 3 (generar_clones.py + evaluar_identidad.py ya escritos: correr, informe, ESTADO.md).
+PARAR — PEDIDO-ANOMALIAS-1 y PEDIDO-E3A-1 cerrados (docs/INFORME_ANOMALIAS.md, docs/INFORME_E3A.md, docs/ESTADO.md). Lo siguiente (E3B) necesita un pedido nuevo.
 
 # Progreso — PEDIDO-ANOMALIAS-1 y después PEDIDO-E3A-1
 
@@ -97,4 +97,28 @@ Decisiones del bloque 2, fijadas antes de ver ningún clon:
   Cambio hecho antes de generar o medir ningún clon.
 - Recuperación tras 3 ventanas limpias seguidas, que no se aprenden; tope de 96
   actualizaciones por día una vez confiable; historia de 120 ventanas.
+
+
+Registro previo del bloque 3 (antes de correr `evaluar_identidad.py`):
+- Generador `scripts/lab/generar_clones.py`: 12 equipos por sesión con pilas de cinco
+  familias (linux, windows, macos, android, iot), 4 episodios por sesión (2 por nivel) a
+  partir de 300 s, de 60–180 s, sobre víctimas distintas. El clon siempre tiene una pila
+  distinta de la de la víctima (familia elegida al azar entre las otras cuatro). Ingenuo:
+  su IP, sus tamaños y 15–40 conexiones/min. Ritmo: IP de la víctima y su misma tasa y
+  longitud media.
+- Expectativa del pedido: ingenuo casi siempre, ritmo bastante menos. **La mía, por
+  construcción:** el detector solo mira la pila y los dos niveles tienen pila distinta, así
+  que deberían detectarse de forma parecida. El de ritmo emite menos y debería tardar más.
+  Los pares de pila parecidos (linux→android: mismo TTL y mismas opciones salvo WScale)
+  son los candidatos a pasar.
+- 20 sesiones (semillas 77000–77019), 80 episodios.
+
+| E3 | `generar_clones.py`, `evaluar_identidad.py`, `configs/identidad.json`, `reports/identidad_e3a.*`, `docs/INFORME_E3A.md`, `docs/ESTADO.md`. Suite: 134 passed, 7 xfailed | ver `git log` |
+
+### Cierre de PEDIDO-E3A-1
+
+- Detección: ingenuo 0,975 [0,925, 1,000], ritmo 1,000 [1,000, 1,000] (40 episodios cada uno); el único fallo fue un episodio sobre una víctima aún no_confiable.
+- Latencia mediana: 4,2 s [3,0, 5,1] (ingenuo) y 10,0 s [6,6, 17,0] (ritmo); p90 de 6,7 s y 33,3 s.
+- Falsos positivos: 16,2 [9,4, 23,7] FA/disp-día; 42 de 43 por `ipid_salto_log2` (IP-ID por flujo medido entre flujos). En el análisis exploratorio sin IP-ID salen 0, optimista por construcción.
+- Para la parte B: clon de pila completa, señal de IP-ID por flujo rediseñada antes de medir, contaminación del 5 % y 20 %, víctima apagada y variación legítima de pila en el generador.
 

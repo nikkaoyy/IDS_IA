@@ -19,6 +19,7 @@ data/*.csv
 data/*.pcap
 data/pcap/
 data/pcap_holdout/
+data/pcap_clones/
 data/*.parquet
 data/*.meta.json
 !data/.gitkeep

@@ -1,0 +1,1716 @@
+{
+  "etapa": "PEDIDO-E3A-1",
+  "fecha": "2026-11-14T01:10:23",
+  "commit": "a496f2e09212ed73a16cb1b61e3887a882bb28bd",
+  "arbol_con_cambios": true,
+  "config_archivo": "configs/identidad.json",
+  "config": {
+    "descripcion": "PEDIDO-E3A-1, bloque 3: perfil de pila (src/identidad.py) frente a clones ingenuo y de ritmo de scripts/lab/generar_clones.py. Sesiones propias con semilla base 77000; no comparten nada con el dataset de E2 ni con su holdout.",
+    "dir_pcap": "data/pcap_clones",
+    "inicio": 0,
+    "sesiones": 20,
+    "regenerar": true,
+    "n_bootstrap": 1000,
+    "semilla_bootstrap": 42,
+    "salida": "reports/identidad_e3a.json"
+  },
+  "generador": {
+    "script": "scripts/lab/generar_clones.py",
+    "semilla_base": 77000,
+    "pilas": {
+      "linux": {
+        "ttl": 64,
+        "window": 64240,
+        "ipid": "por_flujo",
+        "mdns": false
+      },
+      "windows": {
+        "ttl": 128,
+        "window": 64240,
+        "ipid": "global",
+        "mdns": false
+      },
+      "macos": {
+        "ttl": 64,
+        "window": 65535,
+        "ipid": "aleatorio",
+        "mdns": true
+      },
+      "android": {
+        "ttl": 64,
+        "window": 65535,
+        "ipid": "cero",
+        "mdns": true
+      },
+      "iot": {
+        "ttl": 255,
+        "window": 5840,
+        "ipid": "global",
+        "mdns": true
+      }
+    },
+    "sesiones": [
+      {
+        "sesion": "clones_000",
+        "semilla": 77000
+      },
+      {
+        "sesion": "clones_001",
+        "semilla": 77001
+      },
+      {
+        "sesion": "clones_002",
+        "semilla": 77002
+      },
+      {
+        "sesion": "clones_003",
+        "semilla": 77003
+      },
+      {
+        "sesion": "clones_004",
+        "semilla": 77004
+      },
+      {
+        "sesion": "clones_005",
+        "semilla": 77005
+      },
+      {
+        "sesion": "clones_006",
+        "semilla": 77006
+      },
+      {
+        "sesion": "clones_007",
+        "semilla": 77007
+      },
+      {
+        "sesion": "clones_008",
+        "semilla": 77008
+      },
+      {
+        "sesion": "clones_009",
+        "semilla": 77009
+      },
+      {
+        "sesion": "clones_010",
+        "semilla": 77010
+      },
+      {
+        "sesion": "clones_011",
+        "semilla": 77011
+      },
+      {
+        "sesion": "clones_012",
+        "semilla": 77012
+      },
+      {
+        "sesion": "clones_013",
+        "semilla": 77013
+      },
+      {
+        "sesion": "clones_014",
+        "semilla": 77014
+      },
+      {
+        "sesion": "clones_015",
+        "semilla": 77015
+      },
+      {
+        "sesion": "clones_016",
+        "semilla": 77016
+      },
+      {
+        "sesion": "clones_017",
+        "semilla": 77017
+      },
+      {
+        "sesion": "clones_018",
+        "semilla": 77018
+      },
+      {
+        "sesion": "clones_019",
+        "semilla": 77019
+      }
+    ]
+  },
+  "decisiones_previas": {
+    "min_ventanas_perfil": 12,
+    "umbral_desviacion": 6.0,
+    "z_firma_nueva": 10.0,
+    "min_apariciones_valor": 2,
+    "ventanas_limpias_para_recuperar": 3,
+    "tope_actualizaciones_dia": 96,
+    "historia_max": 120
+  },
+  "resumen": {
+    "por_nivel": {
+      "ingenuo": {
+        "episodios": 40,
+        "deteccion": {
+          "valor": 0.975,
+          "ic95": [
+            0.925,
+            1.0
+          ],
+          "n": 40
+        },
+        "deteccion_acusables": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 39
+        },
+        "no_acusables": 1,
+        "latencia_s_mediana": {
+          "valor": 4.244970493461096,
+          "ic95": [
+            2.987747120458039,
+            5.143558896623517
+          ],
+          "n": 39
+        },
+        "latencia_s_p90": {
+          "valor": 6.728887880173768,
+          "ic95": [
+            5.669884895518727,
+            21.770093020862305
+          ],
+          "n": 39
+        },
+        "por_par_de_pilas": {
+          "android→iot": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "android→macos": {
+            "episodios": 3,
+            "detectados": 3
+          },
+          "android→windows": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "iot→android": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "iot→linux": {
+            "episodios": 3,
+            "detectados": 3
+          },
+          "iot→macos": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "iot→windows": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "linux→android": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "linux→iot": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "linux→macos": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "linux→windows": {
+            "episodios": 3,
+            "detectados": 3
+          },
+          "macos→android": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "macos→iot": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "macos→linux": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "macos→windows": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "windows→android": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "windows→iot": {
+            "episodios": 3,
+            "detectados": 2
+          },
+          "windows→linux": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "windows→macos": {
+            "episodios": 1,
+            "detectados": 1
+          }
+        }
+      },
+      "ritmo": {
+        "episodios": 40,
+        "deteccion": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 40
+        },
+        "deteccion_acusables": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 39
+        },
+        "no_acusables": 1,
+        "latencia_s_mediana": {
+          "valor": 10.022541196509422,
+          "ic95": [
+            6.573596129376028,
+            17.037490227309718
+          ],
+          "n": 40
+        },
+        "latencia_s_p90": {
+          "valor": 33.33165642208261,
+          "ic95": [
+            22.21290853751327,
+            51.64359261149764
+          ],
+          "n": 40
+        },
+        "por_par_de_pilas": {
+          "android→iot": {
+            "episodios": 5,
+            "detectados": 5
+          },
+          "android→macos": {
+            "episodios": 3,
+            "detectados": 3
+          },
+          "android→windows": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "iot→android": {
+            "episodios": 3,
+            "detectados": 3
+          },
+          "iot→linux": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "iot→macos": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "iot→windows": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "linux→iot": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "linux→macos": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "linux→windows": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "macos→android": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "macos→windows": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "windows→android": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "windows→iot": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "windows→linux": {
+            "episodios": 1,
+            "detectados": 1
+          },
+          "windows→macos": {
+            "episodios": 2,
+            "detectados": 2
+          }
+        }
+      }
+    },
+    "legitimos": {
+      "falsas_alarmas_por_dispositivo_dia": {
+        "valor": 16.18929341787045,
+        "ic95": [
+          9.414836321980891,
+          23.67493995458145
+        ]
+      },
+      "falsas_alarmas_totales": 43,
+      "fraccion_dispositivos_con_falsa_alarma": {
+        "valor": 0.09230769230769231,
+        "ic95": [
+          0.06153846153846154,
+          0.12307692307692308
+        ]
+      },
+      "fraccion_dispositivos_nunca_confiables": {
+        "valor": 0.0038461538461538464,
+        "ic95": [
+          0.0,
+          0.011538461538461539
+        ]
+      },
+      "fraccion_ventanas_no_confiable": {
+        "valor": 0.1392719653038351,
+        "ic95": [
+          0.1346339237017172,
+          0.14425052076650244
+        ]
+      },
+      "dispositivos": 260,
+      "dispositivo_dias": 2.6560763888888888,
+      "peores": [
+        {
+          "sesion": "clones_006",
+          "mac": "02:05:04:0d:12:dc",
+          "falsas_alarmas": 5,
+          "segundos": 895.0,
+          "victima": false
+        },
+        {
+          "sesion": "clones_000",
+          "mac": "02:ac:2b:f1:d5:27",
+          "falsas_alarmas": 4,
+          "segundos": 900.0,
+          "victima": false
+        },
+        {
+          "sesion": "clones_012",
+          "mac": "02:32:32:cf:af:5e",
+          "falsas_alarmas": 3,
+          "segundos": 905.0,
+          "victima": false
+        },
+        {
+          "sesion": "clones_012",
+          "mac": "02:7b:99:b7:23:d1",
+          "falsas_alarmas": 3,
+          "segundos": 905.0,
+          "victima": false
+        },
+        {
+          "sesion": "clones_016",
+          "mac": "02:8e:e1:1c:e5:2c",
+          "falsas_alarmas": 3,
+          "segundos": 895.0,
+          "victima": true
+        }
+      ]
+    }
+  },
+  "episodios": [
+    {
+      "sesion": "clones_000",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:90:72:59:77:b9",
+      "pila_victima": "macos",
+      "pila_clon": "iot",
+      "inicio_s": 313.24228522247097,
+      "fin_s": 480.268026542994,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 1.7577147775290314,
+      "ventanas": 33,
+      "ventanas_con_alarma": 31
+    },
+    {
+      "sesion": "clones_000",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:db:61:4d:56:9d",
+      "pila_victima": "linux",
+      "pila_clon": "macos",
+      "inicio_s": 441.42565697881196,
+      "fin_s": 506.3055538083498,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 8.574343021188042,
+      "ventanas": 12,
+      "ventanas_con_alarma": 12
+    },
+    {
+      "sesion": "clones_000",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:2e:51:c2:06:07",
+      "pila_victima": "android",
+      "pila_clon": "iot",
+      "inicio_s": 592.3950311850786,
+      "fin_s": 703.8312862833902,
+      "ip_clon": "10.20.0.21",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 12.604968814921449,
+      "ventanas": 18,
+      "ventanas_con_alarma": 10
+    },
+    {
+      "sesion": "clones_000",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:ff:98:d0:9c:e4",
+      "pila_victima": "windows",
+      "pila_clon": "macos",
+      "inicio_s": 728.7122558066434,
+      "fin_s": 841.2188341598348,
+      "ip_clon": "10.20.0.25",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 1.287744193356616,
+      "ventanas": 17,
+      "ventanas_con_alarma": 11
+    },
+    {
+      "sesion": "clones_001",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:2d:25:a4:7d:30",
+      "pila_victima": "iot",
+      "pila_clon": "android",
+      "inicio_s": 304.55645691697765,
+      "fin_s": 377.0846979766172,
+      "ip_clon": "10.20.0.24",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 20.443543083022348,
+      "ventanas": 12,
+      "ventanas_con_alarma": 4
+    },
+    {
+      "sesion": "clones_001",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:93:81:74:2a:9b",
+      "pila_victima": "linux",
+      "pila_clon": "android",
+      "inicio_s": 458.2299069791377,
+      "fin_s": 533.7803228399122,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 21.770093020862305,
+      "ventanas": 16,
+      "ventanas_con_alarma": 3
+    },
+    {
+      "sesion": "clones_001",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:ca:e6:83:a3:c7",
+      "pila_victima": "android",
+      "pila_clon": "macos",
+      "inicio_s": 599.7315844176437,
+      "fin_s": 676.9124906772228,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.268415582356283,
+      "ventanas": 16,
+      "ventanas_con_alarma": 15
+    },
+    {
+      "sesion": "clones_001",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:24:db:a7:99:b0",
+      "pila_victima": "android",
+      "pila_clon": "iot",
+      "inicio_s": 735.1382492575704,
+      "fin_s": 853.0567683011773,
+      "ip_clon": "10.20.0.27",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.861750742429649,
+      "ventanas": 18,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_002",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:d1:d3:fc:a1:77",
+      "pila_victima": "windows",
+      "pila_clon": "android",
+      "inicio_s": 315.8745992407366,
+      "fin_s": 465.7443277303688,
+      "ip_clon": "10.20.0.21",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.125400759263414,
+      "ventanas": 29,
+      "ventanas_con_alarma": 22
+    },
+    {
+      "sesion": "clones_002",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:3f:8d:dc:3d:4f",
+      "pila_victima": "iot",
+      "pila_clon": "macos",
+      "inicio_s": 449.82913605367634,
+      "fin_s": 568.9149609397361,
+      "ip_clon": "10.20.0.24",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 10.170863946323664,
+      "ventanas": 19,
+      "ventanas_con_alarma": 12
+    },
+    {
+      "sesion": "clones_002",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:04:ed:fb:64:cc",
+      "pila_victima": "linux",
+      "pila_clon": "windows",
+      "inicio_s": 598.7324759050798,
+      "fin_s": 729.9682653906422,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 6.267524094920191,
+      "ventanas": 23,
+      "ventanas_con_alarma": 23
+    },
+    {
+      "sesion": "clones_002",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:ff:cc:58:6d:32",
+      "pila_victima": "macos",
+      "pila_clon": "iot",
+      "inicio_s": 732.3416608378407,
+      "fin_s": 810.0265094394124,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.6583391621593364,
+      "ventanas": 17,
+      "ventanas_con_alarma": 16
+    },
+    {
+      "sesion": "clones_003",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:6e:17:0c:41:a8",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 309.8106696250712,
+      "fin_s": 403.94443940111,
+      "ip_clon": "10.20.0.24",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 30.189330374928772,
+      "ventanas": 11,
+      "ventanas_con_alarma": 7
+    },
+    {
+      "sesion": "clones_003",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:9c:a1:3a:13:87",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 440.33081242384606,
+      "fin_s": 563.7602391546466,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 9.669187576153945,
+      "ventanas": 23,
+      "ventanas_con_alarma": 21
+    },
+    {
+      "sesion": "clones_003",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:aa:bc:ad:10:43",
+      "pila_victima": "windows",
+      "pila_clon": "android",
+      "inicio_s": 586.4647804646088,
+      "fin_s": 688.1652863056195,
+      "ip_clon": "10.20.0.22",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.5352195353912066,
+      "ventanas": 14,
+      "ventanas_con_alarma": 12
+    },
+    {
+      "sesion": "clones_003",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:03:a0:2b:2e:57",
+      "pila_victima": "linux",
+      "pila_clon": "iot",
+      "inicio_s": 736.2598219116479,
+      "fin_s": 797.6224243816928,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.7401780883520814,
+      "ventanas": 13,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_004",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:82:db:d3:62:3a",
+      "pila_victima": "android",
+      "pila_clon": "macos",
+      "inicio_s": 310.02763367576586,
+      "fin_s": 394.8519672271674,
+      "ip_clon": "10.20.0.28",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 19.972366324234144,
+      "ventanas": 11,
+      "ventanas_con_alarma": 2
+    },
+    {
+      "sesion": "clones_004",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:de:ae:be:98:62",
+      "pila_victima": "macos",
+      "pila_clon": "linux",
+      "inicio_s": 452.343910448379,
+      "fin_s": 574.5554538816822,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.656089551620994,
+      "ventanas": 23,
+      "ventanas_con_alarma": 21
+    },
+    {
+      "sesion": "clones_004",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:33:8e:d2:3d:6c",
+      "pila_victima": "windows",
+      "pila_clon": "android",
+      "inicio_s": 582.0175313796689,
+      "fin_s": 664.7382706111393,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.982468620331133,
+      "ventanas": 16,
+      "ventanas_con_alarma": 16
+    },
+    {
+      "sesion": "clones_004",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:4c:5f:0f:c4:44",
+      "pila_victima": "iot",
+      "pila_clon": "windows",
+      "inicio_s": 727.9625097726903,
+      "fin_s": 847.8587532991052,
+      "ip_clon": "10.20.0.21",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 17.037490227309718,
+      "ventanas": 14,
+      "ventanas_con_alarma": 8
+    },
+    {
+      "sesion": "clones_005",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:ea:e9:75:46:88",
+      "pila_victima": "windows",
+      "pila_clon": "iot",
+      "inicio_s": 311.7585047288643,
+      "fin_s": 373.68152159817197,
+      "ip_clon": "10.20.0.120",
+      "acusable": false,
+      "detectado": false,
+      "latencia_s": null,
+      "ventanas": 12,
+      "ventanas_con_alarma": 0
+    },
+    {
+      "sesion": "clones_005",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:ad:03:d4:54:14",
+      "pila_victima": "linux",
+      "pila_clon": "iot",
+      "inicio_s": 445.4998964235992,
+      "fin_s": 554.4584899942738,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.500103576400818,
+      "ventanas": 21,
+      "ventanas_con_alarma": 21
+    },
+    {
+      "sesion": "clones_005",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:6a:90:63:52:77",
+      "pila_victima": "macos",
+      "pila_clon": "android",
+      "inicio_s": 592.3044618294472,
+      "fin_s": 696.733417298534,
+      "ip_clon": "10.20.0.27",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 7.6955381705528225,
+      "ventanas": 11,
+      "ventanas_con_alarma": 7
+    },
+    {
+      "sesion": "clones_005",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:4f:7f:c1:0b:b0",
+      "pila_victima": "iot",
+      "pila_clon": "android",
+      "inicio_s": 730.648892747513,
+      "fin_s": 855.4985510959648,
+      "ip_clon": "10.20.0.31",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.351107252487054,
+      "ventanas": 19,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_006",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:fa:2f:a4:93:ad",
+      "pila_victima": "iot",
+      "pila_clon": "linux",
+      "inicio_s": 314.75045245795036,
+      "fin_s": 383.11123676134827,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.2495475420496405,
+      "ventanas": 14,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_006",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:29:65:bc:7f:f4",
+      "pila_victima": "iot",
+      "pila_clon": "windows",
+      "inicio_s": 441.76693656635723,
+      "fin_s": 612.4951396953411,
+      "ip_clon": "10.20.0.23",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 33.23306343364277,
+      "ventanas": 22,
+      "ventanas_con_alarma": 9
+    },
+    {
+      "sesion": "clones_006",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:47:f1:23:a5:a7",
+      "pila_victima": "windows",
+      "pila_clon": "linux",
+      "inicio_s": 598.9531267890162,
+      "fin_s": 727.5168828247171,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 6.04687321098379,
+      "ventanas": 24,
+      "ventanas_con_alarma": 24
+    },
+    {
+      "sesion": "clones_006",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:1d:8d:4f:74:b4",
+      "pila_victima": "android",
+      "pila_clon": "iot",
+      "inicio_s": 738.9949349904517,
+      "fin_s": 918.45802916736,
+      "ip_clon": "10.20.0.22",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 6.005065009548275,
+      "ventanas": 19,
+      "ventanas_con_alarma": 6
+    },
+    {
+      "sesion": "clones_007",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:4d:47:0d:73:da",
+      "pila_victima": "android",
+      "pila_clon": "windows",
+      "inicio_s": 305.83026928723996,
+      "fin_s": 411.92823751718674,
+      "ip_clon": "10.20.0.31",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 84.16973071276004,
+      "ventanas": 6,
+      "ventanas_con_alarma": 1
+    },
+    {
+      "sesion": "clones_007",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:7e:11:c1:ec:0d",
+      "pila_victima": "macos",
+      "pila_clon": "iot",
+      "inicio_s": 456.5417474272353,
+      "fin_s": 520.5154130232843,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.4582525727647067,
+      "ventanas": 14,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_007",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:36:c5:a1:ac:a2",
+      "pila_victima": "macos",
+      "pila_clon": "iot",
+      "inicio_s": 581.1214638357031,
+      "fin_s": 746.6175163642772,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.878536164296861,
+      "ventanas": 33,
+      "ventanas_con_alarma": 32
+    },
+    {
+      "sesion": "clones_007",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:bb:f5:e9:93:44",
+      "pila_victima": "linux",
+      "pila_clon": "iot",
+      "inicio_s": 727.6549746478345,
+      "fin_s": 798.7528916363113,
+      "ip_clon": "10.20.0.21",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.3450253521655213,
+      "ventanas": 4,
+      "ventanas_con_alarma": 3
+    },
+    {
+      "sesion": "clones_008",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:e9:02:22:1f:6f",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 306.3902732313309,
+      "fin_s": 377.83488249634206,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.609726768669077,
+      "ventanas": 14,
+      "ventanas_con_alarma": 14
+    },
+    {
+      "sesion": "clones_008",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:23:c3:e0:8c:73",
+      "pila_victima": "linux",
+      "pila_clon": "windows",
+      "inicio_s": 457.6106673753733,
+      "fin_s": 588.1598106992101,
+      "ip_clon": "10.20.0.25",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 7.389332624626718,
+      "ventanas": 14,
+      "ventanas_con_alarma": 6
+    },
+    {
+      "sesion": "clones_008",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:07:49:a5:e0:c2",
+      "pila_victima": "windows",
+      "pila_clon": "iot",
+      "inicio_s": 584.0159870704656,
+      "fin_s": 712.7131039626552,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.984012929534401,
+      "ventanas": 26,
+      "ventanas_con_alarma": 26
+    },
+    {
+      "sesion": "clones_008",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:2d:11:4b:3d:d7",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 731.7237458165381,
+      "fin_s": 800.8954530441297,
+      "ip_clon": "10.20.0.24",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 8.276254183461901,
+      "ventanas": 11,
+      "ventanas_con_alarma": 7
+    },
+    {
+      "sesion": "clones_009",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:6d:95:b5:26:52",
+      "pila_victima": "linux",
+      "pila_clon": "android",
+      "inicio_s": 302.87317440153885,
+      "fin_s": 454.36840868256854,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 22.126825598461153,
+      "ventanas": 31,
+      "ventanas_con_alarma": 4
+    },
+    {
+      "sesion": "clones_009",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:3d:92:ce:1f:3c",
+      "pila_victima": "linux",
+      "pila_clon": "iot",
+      "inicio_s": 459.4086471129852,
+      "fin_s": 525.4373545911446,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.591352887014807,
+      "ventanas": 13,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_009",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:01:42:8a:1c:a8",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 594.8591417327308,
+      "fin_s": 768.8242258867084,
+      "ip_clon": "10.20.0.25",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.140858267269209,
+      "ventanas": 34,
+      "ventanas_con_alarma": 24
+    },
+    {
+      "sesion": "clones_009",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:2b:b5:76:d3:df",
+      "pila_victima": "windows",
+      "pila_clon": "linux",
+      "inicio_s": 720.7810066819588,
+      "fin_s": 838.9715156688258,
+      "ip_clon": "10.20.0.20",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 34.21899331804116,
+      "ventanas": 10,
+      "ventanas_con_alarma": 7
+    },
+    {
+      "sesion": "clones_010",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:e8:da:1c:ed:a3",
+      "pila_victima": "android",
+      "pila_clon": "macos",
+      "inicio_s": 301.6411237765626,
+      "fin_s": 379.16303473380253,
+      "ip_clon": "10.20.0.24",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 28.35887622343739,
+      "ventanas": 11,
+      "ventanas_con_alarma": 4
+    },
+    {
+      "sesion": "clones_010",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:aa:7f:4a:0f:46",
+      "pila_victima": "windows",
+      "pila_clon": "android",
+      "inicio_s": 447.7870914624867,
+      "fin_s": 571.414402300977,
+      "ip_clon": "10.20.0.23",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 22.21290853751327,
+      "ventanas": 18,
+      "ventanas_con_alarma": 12
+    },
+    {
+      "sesion": "clones_010",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:05:43:a4:6e:b7",
+      "pila_victima": "iot",
+      "pila_clon": "windows",
+      "inicio_s": 595.5287325723177,
+      "fin_s": 678.2685959158723,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.471267427682278,
+      "ventanas": 16,
+      "ventanas_con_alarma": 15
+    },
+    {
+      "sesion": "clones_010",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:3e:bb:1f:4a:d5",
+      "pila_victima": "windows",
+      "pila_clon": "iot",
+      "inicio_s": 720.7550295065389,
+      "fin_s": 802.1410475338799,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.244970493461096,
+      "ventanas": 17,
+      "ventanas_con_alarma": 16
+    },
+    {
+      "sesion": "clones_011",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:da:87:64:3b:56",
+      "pila_victima": "iot",
+      "pila_clon": "linux",
+      "inicio_s": 309.8809855052068,
+      "fin_s": 439.57072848046323,
+      "ip_clon": "10.20.0.23",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 40.11901449479319,
+      "ventanas": 15,
+      "ventanas_con_alarma": 8
+    },
+    {
+      "sesion": "clones_011",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:d4:5e:c1:c9:91",
+      "pila_victima": "linux",
+      "pila_clon": "iot",
+      "inicio_s": 440.637639783356,
+      "fin_s": 585.560569427734,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.362360216643992,
+      "ventanas": 26,
+      "ventanas_con_alarma": 25
+    },
+    {
+      "sesion": "clones_011",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:e5:0e:89:67:5d",
+      "pila_victima": "iot",
+      "pila_clon": "windows",
+      "inicio_s": 592.8578727507962,
+      "fin_s": 666.7312335385391,
+      "ip_clon": "10.20.0.29",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 7.1421272492037815,
+      "ventanas": 14,
+      "ventanas_con_alarma": 7
+    },
+    {
+      "sesion": "clones_011",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:14:09:e7:e7:da",
+      "pila_victima": "iot",
+      "pila_clon": "linux",
+      "inicio_s": 739.2280733370726,
+      "fin_s": 891.5807641091639,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 0.7719266629273989,
+      "ventanas": 30,
+      "ventanas_con_alarma": 30
+    },
+    {
+      "sesion": "clones_012",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:fc:35:63:60:66",
+      "pila_victima": "iot",
+      "pila_clon": "macos",
+      "inicio_s": 305.4418676589359,
+      "fin_s": 407.62405644951946,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.558132341064095,
+      "ventanas": 20,
+      "ventanas_con_alarma": 19
+    },
+    {
+      "sesion": "clones_012",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:76:21:c8:60:83",
+      "pila_victima": "iot",
+      "pila_clon": "macos",
+      "inicio_s": 459.7136458090555,
+      "fin_s": 556.1428134802325,
+      "ip_clon": "10.20.0.25",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 20.286354190944508,
+      "ventanas": 13,
+      "ventanas_con_alarma": 3
+    },
+    {
+      "sesion": "clones_012",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:60:46:44:62:aa",
+      "pila_victima": "linux",
+      "pila_clon": "windows",
+      "inicio_s": 581.7055290211543,
+      "fin_s": 689.9616971104645,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.294470978845652,
+      "ventanas": 18,
+      "ventanas_con_alarma": 17
+    },
+    {
+      "sesion": "clones_012",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:ff:b2:c5:f1:03",
+      "pila_victima": "windows",
+      "pila_clon": "iot",
+      "inicio_s": 730.1257815533048,
+      "fin_s": 835.8595824640581,
+      "ip_clon": "10.20.0.29",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 9.874218446695181,
+      "ventanas": 13,
+      "ventanas_con_alarma": 10
+    },
+    {
+      "sesion": "clones_013",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:3c:d8:c9:dc:45",
+      "pila_victima": "windows",
+      "pila_clon": "android",
+      "inicio_s": 316.92355964296604,
+      "fin_s": 488.18784987702116,
+      "ip_clon": "10.20.0.30",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.0764403570339596,
+      "ventanas": 25,
+      "ventanas_con_alarma": 16
+    },
+    {
+      "sesion": "clones_013",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:38:f7:79:54:60",
+      "pila_victima": "macos",
+      "pila_clon": "linux",
+      "inicio_s": 442.87525002590786,
+      "fin_s": 532.251094167825,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.12474997409214,
+      "ventanas": 18,
+      "ventanas_con_alarma": 14
+    },
+    {
+      "sesion": "clones_013",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:37:aa:63:55:af",
+      "pila_victima": "android",
+      "pila_clon": "macos",
+      "inicio_s": 586.299503669664,
+      "fin_s": 672.8158444236078,
+      "ip_clon": "10.20.0.24",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 8.700496330336023,
+      "ventanas": 7,
+      "ventanas_con_alarma": 3
+    },
+    {
+      "sesion": "clones_013",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:51:da:4c:45:f3",
+      "pila_victima": "windows",
+      "pila_clon": "macos",
+      "inicio_s": 739.8564411033765,
+      "fin_s": 908.4892724132295,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.143558896623517,
+      "ventanas": 31,
+      "ventanas_con_alarma": 29
+    },
+    {
+      "sesion": "clones_014",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:6a:9c:0d:a7:94",
+      "pila_victima": "iot",
+      "pila_clon": "windows",
+      "inicio_s": 308.28814911045635,
+      "fin_s": 453.0634211940313,
+      "ip_clon": "10.20.0.30",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 21.711850889543655,
+      "ventanas": 19,
+      "ventanas_con_alarma": 7
+    },
+    {
+      "sesion": "clones_014",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:38:c9:21:fc:9d",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 452.1359323274031,
+      "fin_s": 600.651319174041,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.8640676725968888,
+      "ventanas": 29,
+      "ventanas_con_alarma": 29
+    },
+    {
+      "sesion": "clones_014",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:d0:e5:98:bb:76",
+      "pila_victima": "android",
+      "pila_clon": "iot",
+      "inicio_s": 585.5583634182046,
+      "fin_s": 685.6504299354482,
+      "ip_clon": "10.20.0.26",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.441636581795365,
+      "ventanas": 9,
+      "ventanas_con_alarma": 2
+    },
+    {
+      "sesion": "clones_014",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:c2:e1:02:09:ce",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 738.0428041954455,
+      "fin_s": 866.5808285412329,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 1.9571958045545443,
+      "ventanas": 26,
+      "ventanas_con_alarma": 24
+    },
+    {
+      "sesion": "clones_015",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:b9:87:b7:21:5a",
+      "pila_victima": "android",
+      "pila_clon": "iot",
+      "inicio_s": 304.83176680634375,
+      "fin_s": 439.9225821273448,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 5.168233193656249,
+      "ventanas": 26,
+      "ventanas_con_alarma": 25
+    },
+    {
+      "sesion": "clones_015",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:48:2d:fc:ab:85",
+      "pila_victima": "android",
+      "pila_clon": "iot",
+      "inicio_s": 448.215499457487,
+      "fin_s": 624.0078869398109,
+      "ip_clon": "10.20.0.28",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 1.7845005425130012,
+      "ventanas": 29,
+      "ventanas_con_alarma": 20
+    },
+    {
+      "sesion": "clones_015",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:02:36:82:3b:0b",
+      "pila_victima": "windows",
+      "pila_clon": "android",
+      "inicio_s": 582.0264994649642,
+      "fin_s": 643.2963941397427,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.9735005350357824,
+      "ventanas": 13,
+      "ventanas_con_alarma": 12
+    },
+    {
+      "sesion": "clones_015",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:a0:41:3b:e9:31",
+      "pila_victima": "iot",
+      "pila_clon": "macos",
+      "inicio_s": 721.7522640474692,
+      "fin_s": 848.842740503082,
+      "ip_clon": "10.20.0.30",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 3.2477359525307747,
+      "ventanas": 23,
+      "ventanas_con_alarma": 15
+    },
+    {
+      "sesion": "clones_016",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:8e:e1:1c:e5:2c",
+      "pila_victima": "linux",
+      "pila_clon": "macos",
+      "inicio_s": 308.35483740152364,
+      "fin_s": 463.9295712229384,
+      "ip_clon": "10.20.0.29",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 11.645162598476361,
+      "ventanas": 26,
+      "ventanas_con_alarma": 18
+    },
+    {
+      "sesion": "clones_016",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:37:03:bc:f3:b3",
+      "pila_victima": "iot",
+      "pila_clon": "macos",
+      "inicio_s": 448.95392692164137,
+      "fin_s": 620.253456939063,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 6.046073078358631,
+      "ventanas": 32,
+      "ventanas_con_alarma": 28
+    },
+    {
+      "sesion": "clones_016",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:3e:c8:38:cd:b3",
+      "pila_victima": "android",
+      "pila_clon": "macos",
+      "inicio_s": 593.965721637871,
+      "fin_s": 661.8688107382023,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 6.034278362129044,
+      "ventanas": 13,
+      "ventanas_con_alarma": 11
+    },
+    {
+      "sesion": "clones_016",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:3e:e0:a3:8b:13",
+      "pila_victima": "linux",
+      "pila_clon": "windows",
+      "inicio_s": 737.1408772645982,
+      "fin_s": 850.4651873408153,
+      "ip_clon": "10.20.0.22",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.8591227354017974,
+      "ventanas": 6,
+      "ventanas_con_alarma": 2
+    },
+    {
+      "sesion": "clones_017",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:33:d1:96:38:3d",
+      "pila_victima": "linux",
+      "pila_clon": "windows",
+      "inicio_s": 314.23754030581824,
+      "fin_s": 416.74205751799565,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 0.7624596941817572,
+      "ventanas": 22,
+      "ventanas_con_alarma": 22
+    },
+    {
+      "sesion": "clones_017",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:93:24:ff:83:e2",
+      "pila_victima": "windows",
+      "pila_clon": "macos",
+      "inicio_s": 447.2417522035695,
+      "fin_s": 583.2448607126047,
+      "ip_clon": "10.20.0.27",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 17.75824779643051,
+      "ventanas": 19,
+      "ventanas_con_alarma": 12
+    },
+    {
+      "sesion": "clones_017",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:1b:48:f0:93:c2",
+      "pila_victima": "iot",
+      "pila_clon": "android",
+      "inicio_s": 582.012252879542,
+      "fin_s": 721.605006795979,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.987747120458039,
+      "ventanas": 27,
+      "ventanas_con_alarma": 20
+    },
+    {
+      "sesion": "clones_017",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:f3:2a:bd:4a:65",
+      "pila_victima": "iot",
+      "pila_clon": "macos",
+      "inicio_s": 733.3564073885024,
+      "fin_s": 832.3766181813024,
+      "ip_clon": "10.20.0.25",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 51.64359261149764,
+      "ventanas": 7,
+      "ventanas_con_alarma": 3
+    },
+    {
+      "sesion": "clones_018",
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:fd:b0:76:b1:76",
+      "pila_victima": "linux",
+      "pila_clon": "iot",
+      "inicio_s": 311.6928780191082,
+      "fin_s": 380.01236464214423,
+      "ip_clon": "10.20.0.21",
+      "acusable": false,
+      "detectado": true,
+      "latencia_s": 28.307121980891793,
+      "ventanas": 6,
+      "ventanas_con_alarma": 4
+    },
+    {
+      "sesion": "clones_018",
+      "episodio": 1,
+      "nivel": "ingenuo",
+      "mac_victima": "02:12:2a:32:02:c9",
+      "pila_victima": "macos",
+      "pila_clon": "android",
+      "inicio_s": 453.3177070959838,
+      "fin_s": 592.1028516052007,
+      "ip_clon": "10.20.0.121",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 1.682292904016208,
+      "ventanas": 29,
+      "ventanas_con_alarma": 27
+    },
+    {
+      "sesion": "clones_018",
+      "episodio": 2,
+      "nivel": "ritmo",
+      "mac_victima": "02:9b:5f:3c:4a:60",
+      "pila_victima": "windows",
+      "pila_clon": "iot",
+      "inicio_s": 597.9986118252192,
+      "fin_s": 741.7511044743399,
+      "ip_clon": "10.20.0.28",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.0013881747808,
+      "ventanas": 17,
+      "ventanas_con_alarma": 13
+    },
+    {
+      "sesion": "clones_018",
+      "episodio": 3,
+      "nivel": "ingenuo",
+      "mac_victima": "02:48:0c:6a:65:8e",
+      "pila_victima": "android",
+      "pila_clon": "macos",
+      "inicio_s": 732.6138847841582,
+      "fin_s": 867.1096519213834,
+      "ip_clon": "10.20.0.123",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 2.3861152158417553,
+      "ventanas": 28,
+      "ventanas_con_alarma": 27
+    },
+    {
+      "sesion": "clones_019",
+      "episodio": 0,
+      "nivel": "ingenuo",
+      "mac_victima": "02:56:fb:64:57:79",
+      "pila_victima": "iot",
+      "pila_clon": "linux",
+      "inicio_s": 310.0050847577171,
+      "fin_s": 444.4023330183252,
+      "ip_clon": "10.20.0.120",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 4.9949152422829,
+      "ventanas": 22,
+      "ventanas_con_alarma": 20
+    },
+    {
+      "sesion": "clones_019",
+      "episodio": 1,
+      "nivel": "ritmo",
+      "mac_victima": "02:c5:16:e0:5b:67",
+      "pila_victima": "iot",
+      "pila_clon": "android",
+      "inicio_s": 443.6812673886529,
+      "fin_s": 573.9779232438884,
+      "ip_clon": "10.20.0.22",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 11.318732611347116,
+      "ventanas": 20,
+      "ventanas_con_alarma": 10
+    },
+    {
+      "sesion": "clones_019",
+      "episodio": 2,
+      "nivel": "ingenuo",
+      "mac_victima": "02:c6:9e:b1:9a:2a",
+      "pila_victima": "android",
+      "pila_clon": "windows",
+      "inicio_s": 584.6318576968079,
+      "fin_s": 735.8925003117065,
+      "ip_clon": "10.20.0.122",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 0.368142303192144,
+      "ventanas": 28,
+      "ventanas_con_alarma": 28
+    },
+    {
+      "sesion": "clones_019",
+      "episodio": 3,
+      "nivel": "ritmo",
+      "mac_victima": "02:cd:35:85:a2:ee",
+      "pila_victima": "macos",
+      "pila_clon": "windows",
+      "inicio_s": 736.0156476404636,
+      "fin_s": 858.5991956470432,
+      "ip_clon": "10.20.0.29",
+      "acusable": true,
+      "detectado": true,
+      "latencia_s": 13.984352359536388,
+      "ventanas": 19,
+      "ventanas_con_alarma": 9
+    }
+  ]
+}
