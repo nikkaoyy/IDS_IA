@@ -1,6 +1,6 @@
 # E3B — cifras
 
-Generado por `scripts/evaluar_identidad.py --partes b` el 2026-11-14T02:40:59 en el commit `8c433ce771b68e880959c3f88a02f57aedfe0a55` (árbol con cambios).
+Generado por `scripts/evaluar_identidad.py --partes b` el 2026-11-14T02:48:58 en el commit `0d8061e324e3848046f43bc05d51efce60b3cf96` (árbol con cambios).
 
 ## Bloque 1 — IP-ID por equipo (descartado) frente a por flujo
 

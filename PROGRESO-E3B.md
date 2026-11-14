@@ -1,4 +1,4 @@
-SEGUIR — bloque 4 hecho; sigue el cierre (informe, ESTADO, aceptación).
+PARAR — PEDIDO-E3B-1 cerrado: cuatro bloques y cierre (docs/INFORME_E3B.md, docs/ESTADO.md).
 
 # Progreso — PEDIDO-E3B-1
 
