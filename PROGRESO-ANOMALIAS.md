@@ -1,4 +1,4 @@
-SEGUIR — E3A bloque 1 hecho (sha256 idéntico); sigue E3A bloque 2 (src/identidad.py, ya escrito y probado: falta commit) y luego el bloque 3.
+SEGUIR — E3A bloques 1 y 2 hechos; sigue el bloque 3 (generar_clones.py + evaluar_identidad.py ya escritos: correr, informe, ESTADO.md).
 
 # Progreso — PEDIDO-ANOMALIAS-1 y después PEDIDO-E3A-1
 
@@ -84,4 +84,17 @@ Notas del bloque 1:
   Scapy), no hay opciones TCP y el SEQ del SYN también es por defecto en muchos casos. Solo
   el TTL (64/128/255) y la ventana del SYN (8192/29200/64240) llevan información. Por eso el
   bloque 3 necesita su propio generador.
+| E2 | `src/identidad.py`: perfil por mediana/MAD, `MIN_VENTANAS_PERFIL = 12`, sin aprendizaje durante alertas, tope diario; `tests/test_identidad.py` (16 passed). Criterio: `test_ventanas.py` + `test_identidad.py` 36 passed | ver `git log` |
+
+Decisiones del bloque 2, fijadas antes de ver ningún clon:
+- `MIN_VENTANAS_PERFIL = 12` ventanas con señal de pila (un minuto de actividad). Con n = 12
+  la mediana aguanta 5 ventanas raras, y coincide con la ventana larga de 60 s del extractor.
+- Puntaje = máximo de |x − mediana| / max(1,4826·MAD, piso, 1 % de la mediana) entre señales
+  presentes; firma de opciones nueva = 10; alarma si > 6.
+- **TTL y ventana TCP se juzgan por valor distinto en la ventana**, no por su mediana: el clon
+  comparte MAC y ventana con la víctima, y una mediana lo escondería si es minoritario. Un
+  valor visto en ≥ 2 ventanas del perfil no cuenta (así se aprende el TTL 255 del mDNS).
+  Cambio hecho antes de generar o medir ningún clon.
+- Recuperación tras 3 ventanas limpias seguidas, que no se aprenden; tope de 96
+  actualizaciones por día una vez confiable; historia de 120 ventanas.
 
