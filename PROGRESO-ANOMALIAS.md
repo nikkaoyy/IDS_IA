@@ -1,4 +1,4 @@
-SEGUIR — bloques 1 y 2 hechos; sigue el bloque 3 (docs/INFORME_ANOMALIAS.md: comparación, deriva, por ataque y respuesta).
+SEGUIR — PEDIDO-ANOMALIAS-1 cerrado (docs/INFORME_ANOMALIAS.md); sigue PEDIDO-E3A-1, bloque 1 (señales de pila en Trama, sha256 del dataset sin cambios).
 
 # Progreso — PEDIDO-ANOMALIAS-1 y después PEDIDO-E3A-1
 
@@ -60,4 +60,16 @@ del IF).
 por sesión), así que no se puede medir si el detector castiga al mismo equipo día tras día.
 Sí se ve concentración dentro de la sesión: con LOF el 100 % de las falsas alarmas cae en 2
 de 854 dispositivos, y `3c:52:82:cb:0c:43` es el más castigado en 4 de las 6 corridas.
+| A3 | `docs/INFORME_ANOMALIAS.md`: comparación, deriva, por ataque y respuesta (no sirve a este presupuesto: 0,185 frente a 0,228 LOAO y 0,894) | ver `git log` |
 
+### Cierre de PEDIDO-ANOMALIAS-1
+
+- Gana IsolationForest sobre sin_capa2: recall por episodio 0,185 [0,132, 0,244] a 1,16 FA/disp-día (los IC de todos los modelos se solapan).
+- Frente al supervisado: 0,894 con el tipo en el entrenamiento y 0,228 en LOAO (IC solapado con 0,185); detecta ráfagas (0,476) y mac_flooding (0,559), pierde icmp_flood (0,000) y arp_spoofing (0,024).
+- Peor deriva: IF, `a4:83:e7:cf:70:df`, 1,4 FA en 15 min ≈ 135 FA/disp-día (18 % del total); con LOF, el 100 % de las FA en 2 de 854 equipos (peor: 435/día).
+- Para Nico: decidir si el artículo menciona el contraste; cualquier combinación (IF+LOF, regla de contador) exige sesiones nuevas; la deriva entre días necesita equipos persistentes.
+
+## PEDIDO-E3A-1
+
+| Paso | Qué | Commit |
+|---|---|---|
