@@ -1,4 +1,4 @@
-SEGUIR — bloque 3 hecho; sigue el bloque 4 (contaminación y ablación de defensas).
+SEGUIR — bloque 4 hecho; sigue el cierre (informe, ESTADO, aceptación).
 
 # Progreso — PEDIDO-E3B-1
 
@@ -205,3 +205,75 @@ puerta (`MIN_VENTANAS_CRUCE = 3`), sin reajustar.
 Pendiente para E4: juzgar los contadores **entre ventanas** (un contador global que retrocede de
 una ventana a otra delata a un segundo emisor aunque no coincidan en la misma ventana), los RST de
 la víctima en un switch real, y FA del vigilante con DHCP real.
+
+## Bloque 4 — contaminación y ablación de defensas (registrado antes de medir)
+
+Generador nuevo `scripts/lab/generar_contaminacion.py` (semillas 80000–80019). Doce equipos y
+ocho víctimas por sesión, dos por condición. Cada víctima recibe un episodio principal de nivel
+**ritmo** (MAC e IP de la víctima, su ritmo y tamaños, pila de otra familia), igual que en E3A
+y en el mismo hueco temporal (desde los 300 s). El clon de ritmo es el que el perfil podría
+absorber: la pila completa no tiene nada que absorber. Antes del episodio, según la condición:
+
+- `limpio`: nada.
+- `contaminado_5` / `contaminado_20`: el clon abre una conexión en el 5 % o el 20 % de las
+  ventanas de 5 s entre los 60 s y los 300 s, elegidas al azar. El perfil inicial ya tuvo tiempo
+  de formarse, y es donde actúan la congelación y el tope.
+- `continuo_20`: una conexión en el 20 % de las ventanas desde los 0 s hasta los 300 s, primer
+  minuto incluido. El perfil **nace** con el clon dentro.
+
+Cada ráfaga figura en el manifiesto como episodio `rafaga_<condición>`: no cuenta como FA y su
+detección se reporta aparte. Medidas por condición:
+
+- detección del episodio principal;
+- **cobertura**: fracción de ventanas del episodio con alarma;
+- **absorción**: al empezar el episodio, el perfil de la víctima ya exime el TTL o la ventana del
+  clon (≥ 2 apariciones) o ya contiene su firma de opciones;
+- FA.
+
+Ablación: `todas` (por defecto), `sin_congelar`, `sin_tope` (∞), `sin_no_confiable`
+(`min_ventanas = 1`) y `con_reperfilado` (24). Cada una sobre las sesiones de contaminación y
+sobre las de variación del bloque 2 (FA y `no_confiable`).
+
+**Regla para quedarse, fijada ahora:** una defensa se queda si apagarla empeora, en alguna
+condición, la detección o la cobertura del episodio principal en ≥ 0,05, la absorción en ≥ 0,05,
+o las FA en ≥ 1/disp-día. Si no cambia ninguna cifra, se declara sin efecto y se apaga por
+defecto, aunque la razón sea que el banco no la puede ejercitar (el tope de 96 al día casi no
+puede actuar en sesiones de 15 minutos). Eso se dirá.
+
+Lo que espero: `contaminado_5/20` no absorbe con la congelación puesta y sí sin ella;
+`continuo_20` absorbe a menudo (en las 12 ventanas que forman el perfil no hay congelación
+posible) y la detección cae; sin `no_confiable`, las FA se disparan; el tope no cambia nada.
+
+### Bloque 4 — resultado (`reports/identidad_e3b.json`, sección `contaminacion`)
+
+| Condición | Detección | Cobertura | Absorción | FA de la víctima (dueña) /disp-día |
+|---|---|---|---|---|
+| limpio | 0,950 [0,875, 1,000] | 0,558 | 0,000 | 2,5 (1 FA) |
+| contaminado 5 % | 0,975 [0,925, 1,000] | 0,576 | **0,225** | 0,0 |
+| contaminado 20 % | **0,825** [0,700, 0,925] | 0,462 | **0,800** | **146** (60 FA) |
+| continuo 20 % | **0,850** [0,750, 0,950] | 0,441 | **1,000** | **583** (238 FA) |
+
+Equipos que no son víctima: 0 FA en todas las condiciones.
+
+**El perfil absorbe el clon, y la congelación no lo impide cuando la contaminación llega antes de
+que el perfil sea confiable.** La regla de no aprender en alerta solo actúa una vez confiable.
+Las ráfagas que caen en la fase `no_confiable` se aprenden enteras, y dos bastan para eximir el
+TTL y la ventana del clon. Al 5 %, la absorción es de 0,225 (sin congelar sería 1,000); al 20 %,
+de 0,80; con el clon desde el primer minuto, de 1,00. Aun así, la detección solo cae de 0,95 a
+0,83–0,85. Lo que sigue delatando al clon son las señales que el perfil no eximió (IP-ID, firma
+de opciones cuando no se absorbió). La cobertura baja de 0,56 a 0,44.
+
+**Envenenamiento:** cuando el perfil nace contaminado, la acusada pasa a ser **la dueña
+legítima**. Con el 20 % continuo, su perfil de IP-ID es a veces el del clon (mediana 1,0 y
+MAD 0 en víctimas macOS, cuyo IP-ID es aleatorio). Desde ahí, su propio tráfico dispara: 583
+FA/disp-día sobre las víctimas, 0 sobre el resto. La congelación lo vuelve permanente, porque
+la dueña nunca puede reaprenderse.
+
+**Ablación (regla registrada: se queda si apagarla empeora una cifra en ≥ 0,05 o ≥ 1 FA/disp-día):**
+
+| Defensa | Al apagarla | Veredicto |
+|---|---|---|
+| sin aprendizaje en alerta | absorción al 5 %: 0,225 → 1,000; detección al 5 %: 0,975 → 0,825; cobertura −0,09 a −0,18. **Pero** FA con variación: 826 → 265, y de víctimas contaminadas: 583 → 135 | **queda**; es un compromiso, no una defensa gratis |
+| `no_confiable` | FA: 112 → 1354 (contaminación), 826 → 3756 (variación), 9,7 → 853 (sin variación) | **queda** |
+| tope diario (96/día) | no cambia ninguna cifra (medido primero con el tope puesto; al reponerlo, cifras idénticas) | **se apaga** (`TOPE_ACTUALIZACIONES_DIA = inf`); en sesiones de 15 min casi no puede actuar, y en días habría que remedirlo |
+| reperfilado (24) | contaminación: nada; variación: 826 → 777; clones de E3A: FA 0,38 → 12,05 (bloque 2) | sigue **apagado** |

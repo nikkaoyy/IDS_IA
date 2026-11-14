@@ -45,9 +45,12 @@ Decisiones fijadas antes de medir:
 - Sin aprendizaje durante alertas: un equipo `sospechoso` no actualiza el perfil. Vuelve a
   `confiable` tras `VENTANAS_LIMPIAS_PARA_RECUPERAR` ventanas seguidas sin alarma, que
   tampoco se aprenden.
-- Actualización limitada: como mucho una ventana por llamada, `TOPE_ACTUALIZACIONES_DIA`
-  por día una vez confiable, y una historia de `HISTORIA_MAX` ventanas. El perfil deriva
-  despacio a propósito.
+- Actualización limitada: como mucho una ventana por llamada y una historia de `HISTORIA_MAX`
+  ventanas. El perfil deriva despacio a propósito. El tope diario registrado en E3A
+  (`TOPE_REGISTRADO = 96` actualizaciones al día) **se apagó en E3B (bloque 4)**: en la ablación
+  no cambió ninguna cifra (detección, cobertura, absorción ni FA), y la regla registrada dice
+  que una defensa sin efecto no se queda. En sesiones de 15 minutos casi no puede actuar; en un
+  despliegue de días habría que volver a medirlo. Sigue disponible como `tope_diario`.
 - Reperfilado (PEDIDO-E3B-1, bloque 2): tras `REPERFILAR_REGISTRADO = 24` ventanas con
   alarma seguidas (dos minutos de contradicción continua), el equipo vuelve a
   `no_confiable` y rehace el perfil desde cero. Se registró como defensa por defecto para que
@@ -81,7 +84,8 @@ IPID_MODO: str = "flujo"  # "equipo": versión descartada de E3A, solo para comp
 UMBRAL_DESVIACION: float = 6.0
 Z_FIRMA_NUEVA: float = 10.0
 VENTANAS_LIMPIAS_PARA_RECUPERAR: int = 3
-TOPE_ACTUALIZACIONES_DIA: int = 96
+TOPE_REGISTRADO: int = 96  # valor de E3A; sin efecto medido en E3B
+TOPE_ACTUALIZACIONES_DIA: float = math.inf  # apagado tras la ablación de E3B (bloque 4)
 REPERFILAR_REGISTRADO: int = 24  # valor registrado en E3B (2 min de alarma continua); lava el clon
 REPERFILAR_TRAS_ALARMAS: float = math.inf  # apagado por defecto tras medirlo (ver docstring)
 HISTORIA_MAX: int = 120
@@ -306,8 +310,8 @@ class SeguidorIdentidad:
     estado. No acusa mientras el perfil sea `no_confiable`.
 
     Las tres defensas se pueden apagar para la ablación de PEDIDO-E3B-1 (bloque 4):
-    `congelar_en_alerta=False` aprende también las ventanas con alarma; `tope_diario=math.inf`
-    quita el tope; `min_ventanas=1` acusa desde la segunda ventana (sin `no_confiable`).
+    `congelar_en_alerta=False` aprende también las ventanas con alarma; `tope_diario=96`
+    repone el tope de E3A (apagado por defecto desde E3B); `min_ventanas=1` acusa desde la segunda ventana (sin `no_confiable`).
     `reperfilar_tras` (E3B, bloque 2): tras ese número de ventanas con alarma seguidas, el
     equipo vuelve a `no_confiable` y rehace el perfil; `math.inf` lo desactiva. `None` en
     cualquiera de ellos toma la constante del módulo.

@@ -49,6 +49,12 @@
             "regenerar": false
           }
         }
+      },
+      "contaminacion": {
+        "dir_pcap": "data/pcap_e3b",
+        "inicio": 0,
+        "sesiones": 20,
+        "regenerar": false
       }
     }
   }

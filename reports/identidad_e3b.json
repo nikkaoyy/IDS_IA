@@ -1,7 +1,7 @@
 {
   "etapa": "PEDIDO-E3B-1",
-  "fecha": "2026-11-14T02:16:29",
-  "commit": "211d2b625f9d00ef9e4ff8f733c53101b4e87c81",
+  "fecha": "2026-11-14T02:40:59",
+  "commit": "8c433ce771b68e880959c3f88a02f57aedfe0a55",
   "arbol_con_cambios": true,
   "config_archivo": "configs/identidad.json",
   "config": {
@@ -55,6 +55,12 @@
               "regenerar": false
             }
           }
+        },
+        "contaminacion": {
+          "dir_pcap": "data/pcap_e3b",
+          "inicio": 0,
+          "sesiones": 20,
+          "regenerar": false
         }
       }
     }
@@ -6914,6 +6920,4452 @@
       }
     }
   },
+  "contaminacion": {
+    "sesiones": [
+      "contaminacion_000",
+      "contaminacion_001",
+      "contaminacion_002",
+      "contaminacion_003",
+      "contaminacion_004",
+      "contaminacion_005",
+      "contaminacion_006",
+      "contaminacion_007",
+      "contaminacion_008",
+      "contaminacion_009",
+      "contaminacion_010",
+      "contaminacion_011",
+      "contaminacion_012",
+      "contaminacion_013",
+      "contaminacion_014",
+      "contaminacion_015",
+      "contaminacion_016",
+      "contaminacion_017",
+      "contaminacion_018",
+      "contaminacion_019"
+    ],
+    "condiciones": [
+      "limpio",
+      "contaminado_5",
+      "contaminado_20",
+      "continuo_20"
+    ],
+    "tabla": {
+      "contaminado_20": {
+        "episodios": 40,
+        "deteccion": {
+          "valor": 0.825,
+          "ic95": [
+            0.7,
+            0.925
+          ],
+          "n": 40
+        },
+        "deteccion_acusables": {
+          "valor": 0.825,
+          "ic95": [
+            0.7,
+            0.925
+          ],
+          "n": 40
+        },
+        "no_acusables": 0,
+        "latencia_s_mediana": {
+          "valor": 3.2499754160494376,
+          "ic95": [
+            2.4607321607074937,
+            4.603041979609429
+          ],
+          "n": 33
+        },
+        "latencia_s_p90": {
+          "valor": 19.304866626276887,
+          "ic95": [
+            6.3807360794686705,
+            72.1511568690006
+          ],
+          "n": 33
+        },
+        "cobertura": {
+          "valor": 0.4619773645039495,
+          "ic95": [
+            0.3796560137728616,
+            0.543956595622552
+          ],
+          "n": 40
+        },
+        "absorcion": {
+          "valor": 0.8,
+          "ic95": [
+            0.675,
+            0.9
+          ],
+          "n": 40
+        }
+      },
+      "contaminado_5": {
+        "episodios": 40,
+        "deteccion": {
+          "valor": 0.975,
+          "ic95": [
+            0.925,
+            1.0
+          ],
+          "n": 40
+        },
+        "deteccion_acusables": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 39
+        },
+        "no_acusables": 1,
+        "latencia_s_mediana": {
+          "valor": 2.994018199898335,
+          "ic95": [
+            2.1821854415879898,
+            3.6293092563755636
+          ],
+          "n": 39
+        },
+        "latencia_s_p90": {
+          "valor": 5.480861460475274,
+          "ic95": [
+            4.483146924446522,
+            6.08303067821987
+          ],
+          "n": 39
+        },
+        "cobertura": {
+          "valor": 0.5756883715929552,
+          "ic95": [
+            0.5076322256574527,
+            0.6352044628488126
+          ],
+          "n": 40
+        },
+        "absorcion": {
+          "valor": 0.225,
+          "ic95": [
+            0.1,
+            0.375
+          ],
+          "n": 40
+        }
+      },
+      "continuo_20": {
+        "episodios": 40,
+        "deteccion": {
+          "valor": 0.85,
+          "ic95": [
+            0.75,
+            0.95
+          ],
+          "n": 40
+        },
+        "deteccion_acusables": {
+          "valor": 0.85,
+          "ic95": [
+            0.75,
+            0.95
+          ],
+          "n": 40
+        },
+        "no_acusables": 0,
+        "latencia_s_mediana": {
+          "valor": 5.0831288646730854,
+          "ic95": [
+            3.6079747659784402,
+            9.454400774888368
+          ],
+          "n": 34
+        },
+        "latencia_s_p90": {
+          "valor": 29.73819919237996,
+          "ic95": [
+            15.962653472969418,
+            40.88240024562742
+          ],
+          "n": 34
+        },
+        "cobertura": {
+          "valor": 0.4410511895410676,
+          "ic95": [
+            0.3522436532294253,
+            0.5280132362604397
+          ],
+          "n": 40
+        },
+        "absorcion": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 40
+        }
+      },
+      "limpio": {
+        "episodios": 40,
+        "deteccion": {
+          "valor": 0.95,
+          "ic95": [
+            0.875,
+            1.0
+          ],
+          "n": 40
+        },
+        "deteccion_acusables": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 38
+        },
+        "no_acusables": 2,
+        "latencia_s_mediana": {
+          "valor": 3.5036514098676435,
+          "ic95": [
+            2.843847907495217,
+            4.186342767529254
+          ],
+          "n": 38
+        },
+        "latencia_s_p90": {
+          "valor": 4.880263900734298,
+          "ic95": [
+            4.58573027471627,
+            5.87029925254177
+          ],
+          "n": 38
+        },
+        "cobertura": {
+          "valor": 0.5581374906784671,
+          "ic95": [
+            0.4865808143402827,
+            0.6235468006881159
+          ],
+          "n": 40
+        },
+        "absorcion": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ],
+          "n": 40
+        }
+      },
+      "rafaga_contaminado_20": {
+        "episodios": 400,
+        "deteccion": {
+          "valor": 0.53,
+          "ic95": [
+            0.4875,
+            0.58
+          ],
+          "n": 400
+        },
+        "deteccion_acusables": {
+          "valor": 0.7386759581881533,
+          "ic95": [
+            0.6898954703832753,
+            0.7909407665505227
+          ],
+          "n": 287
+        },
+        "no_acusables": 113,
+        "latencia_s_mediana": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 212
+        },
+        "latencia_s_p90": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 212
+        },
+        "por_par_de_pilas": {
+          "android→iot": {
+            "episodios": 50,
+            "detectados": 38
+          },
+          "android→linux": {
+            "episodios": 20,
+            "detectados": 12
+          },
+          "android→macos": {
+            "episodios": 10,
+            "detectados": 8
+          },
+          "android→windows": {
+            "episodios": 20,
+            "detectados": 17
+          },
+          "iot→android": {
+            "episodios": 10,
+            "detectados": 7
+          },
+          "iot→linux": {
+            "episodios": 10,
+            "detectados": 9
+          },
+          "iot→macos": {
+            "episodios": 10,
+            "detectados": 9
+          },
+          "linux→iot": {
+            "episodios": 50,
+            "detectados": 0
+          },
+          "linux→macos": {
+            "episodios": 10,
+            "detectados": 5
+          },
+          "macos→android": {
+            "episodios": 30,
+            "detectados": 25
+          },
+          "macos→iot": {
+            "episodios": 10,
+            "detectados": 0
+          },
+          "macos→linux": {
+            "episodios": 30,
+            "detectados": 22
+          },
+          "macos→windows": {
+            "episodios": 20,
+            "detectados": 7
+          },
+          "windows→android": {
+            "episodios": 50,
+            "detectados": 29
+          },
+          "windows→iot": {
+            "episodios": 30,
+            "detectados": 1
+          },
+          "windows→linux": {
+            "episodios": 20,
+            "detectados": 9
+          },
+          "windows→macos": {
+            "episodios": 20,
+            "detectados": 14
+          }
+        },
+        "cobertura": {
+          "valor": 0.53,
+          "ic95": [
+            0.4875,
+            0.58
+          ],
+          "n": 400
+        }
+      },
+      "rafaga_contaminado_5": {
+        "episodios": 80,
+        "deteccion": {
+          "valor": 0.575,
+          "ic95": [
+            0.475,
+            0.6875
+          ],
+          "n": 80
+        },
+        "deteccion_acusables": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 46
+        },
+        "no_acusables": 34,
+        "latencia_s_mediana": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 46
+        },
+        "latencia_s_p90": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 46
+        },
+        "por_par_de_pilas": {
+          "android→iot": {
+            "episodios": 2,
+            "detectados": 1
+          },
+          "android→linux": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "android→macos": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "android→windows": {
+            "episodios": 4,
+            "detectados": 3
+          },
+          "iot→android": {
+            "episodios": 6,
+            "detectados": 5
+          },
+          "iot→linux": {
+            "episodios": 2,
+            "detectados": 2
+          },
+          "iot→windows": {
+            "episodios": 8,
+            "detectados": 4
+          },
+          "linux→android": {
+            "episodios": 4,
+            "detectados": 3
+          },
+          "linux→iot": {
+            "episodios": 6,
+            "detectados": 3
+          },
+          "linux→macos": {
+            "episodios": 6,
+            "detectados": 2
+          },
+          "linux→windows": {
+            "episodios": 2,
+            "detectados": 0
+          },
+          "macos→android": {
+            "episodios": 8,
+            "detectados": 5
+          },
+          "macos→linux": {
+            "episodios": 4,
+            "detectados": 2
+          },
+          "macos→windows": {
+            "episodios": 4,
+            "detectados": 3
+          },
+          "windows→android": {
+            "episodios": 8,
+            "detectados": 2
+          },
+          "windows→iot": {
+            "episodios": 4,
+            "detectados": 4
+          },
+          "windows→macos": {
+            "episodios": 6,
+            "detectados": 1
+          }
+        },
+        "cobertura": {
+          "valor": 0.575,
+          "ic95": [
+            0.475,
+            0.6875
+          ],
+          "n": 80
+        }
+      },
+      "rafaga_continuo_20": {
+        "episodios": 480,
+        "deteccion": {
+          "valor": 0.3333333333333333,
+          "ic95": [
+            0.2916145833333334,
+            0.375
+          ],
+          "n": 480
+        },
+        "deteccion_acusables": {
+          "valor": 0.6177606177606177,
+          "ic95": [
+            0.5598455598455598,
+            0.6756756756756757
+          ],
+          "n": 259
+        },
+        "no_acusables": 221,
+        "latencia_s_mediana": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 160
+        },
+        "latencia_s_p90": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 160
+        },
+        "por_par_de_pilas": {
+          "android→linux": {
+            "episodios": 24,
+            "detectados": 14
+          },
+          "android→macos": {
+            "episodios": 24,
+            "detectados": 10
+          },
+          "android→windows": {
+            "episodios": 12,
+            "detectados": 9
+          },
+          "iot→macos": {
+            "episodios": 36,
+            "detectados": 19
+          },
+          "iot→windows": {
+            "episodios": 24,
+            "detectados": 2
+          },
+          "linux→android": {
+            "episodios": 24,
+            "detectados": 13
+          },
+          "linux→iot": {
+            "episodios": 48,
+            "detectados": 0
+          },
+          "linux→macos": {
+            "episodios": 60,
+            "detectados": 31
+          },
+          "macos→android": {
+            "episodios": 36,
+            "detectados": 16
+          },
+          "macos→iot": {
+            "episodios": 36,
+            "detectados": 17
+          },
+          "macos→linux": {
+            "episodios": 48,
+            "detectados": 5
+          },
+          "macos→windows": {
+            "episodios": 12,
+            "detectados": 2
+          },
+          "windows→android": {
+            "episodios": 12,
+            "detectados": 7
+          },
+          "windows→iot": {
+            "episodios": 12,
+            "detectados": 3
+          },
+          "windows→linux": {
+            "episodios": 24,
+            "detectados": 0
+          },
+          "windows→macos": {
+            "episodios": 48,
+            "detectados": 12
+          }
+        },
+        "cobertura": {
+          "valor": 0.3333333333333333,
+          "ic95": [
+            0.2916145833333334,
+            0.375
+          ],
+          "n": 480
+        }
+      }
+    },
+    "ablacion": {
+      "todas": {
+        "parametros": {},
+        "contaminacion": {
+          "por_nivel": {
+            "contaminado_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.2499754160494376,
+                "ic95": [
+                  2.4607321607074937,
+                  4.603041979609429
+                ],
+                "n": 33
+              },
+              "latencia_s_p90": {
+                "valor": 19.304866626276887,
+                "ic95": [
+                  6.3807360794686705,
+                  72.1511568690006
+                ],
+                "n": 33
+              },
+              "cobertura": {
+                "valor": 0.4619773645039495,
+                "ic95": [
+                  0.3796560137728616,
+                  0.543956595622552
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.8,
+                "ic95": [
+                  0.675,
+                  0.9
+                ],
+                "n": 40
+              }
+            },
+            "contaminado_5": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.975,
+                "ic95": [
+                  0.925,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 39
+              },
+              "no_acusables": 1,
+              "latencia_s_mediana": {
+                "valor": 2.994018199898335,
+                "ic95": [
+                  2.1821854415879898,
+                  3.6293092563755636
+                ],
+                "n": 39
+              },
+              "latencia_s_p90": {
+                "valor": 5.480861460475274,
+                "ic95": [
+                  4.483146924446522,
+                  6.08303067821987
+                ],
+                "n": 39
+              },
+              "cobertura": {
+                "valor": 0.5756883715929552,
+                "ic95": [
+                  0.5076322256574527,
+                  0.6352044628488126
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.225,
+                "ic95": [
+                  0.1,
+                  0.375
+                ],
+                "n": 40
+              }
+            },
+            "continuo_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.85,
+                "ic95": [
+                  0.75,
+                  0.95
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.85,
+                "ic95": [
+                  0.75,
+                  0.95
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 5.0831288646730854,
+                "ic95": [
+                  3.6079747659784402,
+                  9.454400774888368
+                ],
+                "n": 34
+              },
+              "latencia_s_p90": {
+                "valor": 29.73819919237996,
+                "ic95": [
+                  15.962653472969418,
+                  40.88240024562742
+                ],
+                "n": 34
+              },
+              "cobertura": {
+                "valor": 0.4410511895410676,
+                "ic95": [
+                  0.3522436532294253,
+                  0.5280132362604397
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              }
+            },
+            "limpio": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.95,
+                "ic95": [
+                  0.875,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 38
+              },
+              "no_acusables": 2,
+              "latencia_s_mediana": {
+                "valor": 3.5036514098676435,
+                "ic95": [
+                  2.843847907495217,
+                  4.186342767529254
+                ],
+                "n": 38
+              },
+              "latencia_s_p90": {
+                "valor": 4.880263900734298,
+                "ic95": [
+                  4.58573027471627,
+                  5.87029925254177
+                ],
+                "n": 38
+              },
+              "cobertura": {
+                "valor": 0.5581374906784671,
+                "ic95": [
+                  0.4865808143402827,
+                  0.6235468006881159
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "n": 40
+              }
+            },
+            "rafaga_contaminado_20": {
+              "episodios": 400,
+              "deteccion": {
+                "valor": 0.53,
+                "ic95": [
+                  0.4875,
+                  0.58
+                ],
+                "n": 400
+              },
+              "deteccion_acusables": {
+                "valor": 0.7386759581881533,
+                "ic95": [
+                  0.6898954703832753,
+                  0.7909407665505227
+                ],
+                "n": 287
+              },
+              "no_acusables": 113,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 212
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 212
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 50,
+                  "detectados": 38
+                },
+                "android→linux": {
+                  "episodios": 20,
+                  "detectados": 12
+                },
+                "android→macos": {
+                  "episodios": 10,
+                  "detectados": 8
+                },
+                "android→windows": {
+                  "episodios": 20,
+                  "detectados": 17
+                },
+                "iot→android": {
+                  "episodios": 10,
+                  "detectados": 7
+                },
+                "iot→linux": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "linux→iot": {
+                  "episodios": 50,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 10,
+                  "detectados": 5
+                },
+                "macos→android": {
+                  "episodios": 30,
+                  "detectados": 25
+                },
+                "macos→iot": {
+                  "episodios": 10,
+                  "detectados": 0
+                },
+                "macos→linux": {
+                  "episodios": 30,
+                  "detectados": 22
+                },
+                "macos→windows": {
+                  "episodios": 20,
+                  "detectados": 7
+                },
+                "windows→android": {
+                  "episodios": 50,
+                  "detectados": 29
+                },
+                "windows→iot": {
+                  "episodios": 30,
+                  "detectados": 1
+                },
+                "windows→linux": {
+                  "episodios": 20,
+                  "detectados": 9
+                },
+                "windows→macos": {
+                  "episodios": 20,
+                  "detectados": 14
+                }
+              },
+              "cobertura": {
+                "valor": 0.53,
+                "ic95": [
+                  0.4875,
+                  0.58
+                ],
+                "n": 400
+              }
+            },
+            "rafaga_contaminado_5": {
+              "episodios": 80,
+              "deteccion": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 46
+              },
+              "no_acusables": 34,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 2,
+                  "detectados": 1
+                },
+                "android→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "android→macos": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "android→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "iot→android": {
+                  "episodios": 6,
+                  "detectados": 5
+                },
+                "iot→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "iot→windows": {
+                  "episodios": 8,
+                  "detectados": 4
+                },
+                "linux→android": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "linux→iot": {
+                  "episodios": 6,
+                  "detectados": 3
+                },
+                "linux→macos": {
+                  "episodios": 6,
+                  "detectados": 2
+                },
+                "linux→windows": {
+                  "episodios": 2,
+                  "detectados": 0
+                },
+                "macos→android": {
+                  "episodios": 8,
+                  "detectados": 5
+                },
+                "macos→linux": {
+                  "episodios": 4,
+                  "detectados": 2
+                },
+                "macos→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "windows→android": {
+                  "episodios": 8,
+                  "detectados": 2
+                },
+                "windows→iot": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "windows→macos": {
+                  "episodios": 6,
+                  "detectados": 1
+                }
+              },
+              "cobertura": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              }
+            },
+            "rafaga_continuo_20": {
+              "episodios": 480,
+              "deteccion": {
+                "valor": 0.3333333333333333,
+                "ic95": [
+                  0.2916145833333334,
+                  0.375
+                ],
+                "n": 480
+              },
+              "deteccion_acusables": {
+                "valor": 0.6177606177606177,
+                "ic95": [
+                  0.5598455598455598,
+                  0.6756756756756757
+                ],
+                "n": 259
+              },
+              "no_acusables": 221,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 160
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 160
+              },
+              "por_par_de_pilas": {
+                "android→linux": {
+                  "episodios": 24,
+                  "detectados": 14
+                },
+                "android→macos": {
+                  "episodios": 24,
+                  "detectados": 10
+                },
+                "android→windows": {
+                  "episodios": 12,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 36,
+                  "detectados": 19
+                },
+                "iot→windows": {
+                  "episodios": 24,
+                  "detectados": 2
+                },
+                "linux→android": {
+                  "episodios": 24,
+                  "detectados": 13
+                },
+                "linux→iot": {
+                  "episodios": 48,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 60,
+                  "detectados": 31
+                },
+                "macos→android": {
+                  "episodios": 36,
+                  "detectados": 16
+                },
+                "macos→iot": {
+                  "episodios": 36,
+                  "detectados": 17
+                },
+                "macos→linux": {
+                  "episodios": 48,
+                  "detectados": 5
+                },
+                "macos→windows": {
+                  "episodios": 12,
+                  "detectados": 2
+                },
+                "windows→android": {
+                  "episodios": 12,
+                  "detectados": 7
+                },
+                "windows→iot": {
+                  "episodios": 12,
+                  "detectados": 3
+                },
+                "windows→linux": {
+                  "episodios": 24,
+                  "detectados": 0
+                },
+                "windows→macos": {
+                  "episodios": 48,
+                  "detectados": 12
+                }
+              },
+              "cobertura": {
+                "valor": 0.3333333333333333,
+                "ic95": [
+                  0.2916145833333334,
+                  0.375
+                ],
+                "n": 480
+              }
+            }
+          },
+          "legitimos": {
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 112.4887330996495,
+              "ic95": [
+                74.75885920494783,
+                152.90510664416425
+              ]
+            },
+            "falsas_alarmas_totales": 299,
+            "fraccion_dispositivos_con_falsa_alarma": {
+              "valor": 0.06923076923076923,
+              "ic95": [
+                0.0460576923076924,
+                0.09230769230769231
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.1362099347525837,
+              "ic95": [
+                0.13194270647869435,
+                0.1411232373557031
+              ]
+            },
+            "dispositivos": 260,
+            "dispositivo_dias": 2.658043981481481,
+            "peores": [
+              {
+                "sesion": "contaminacion_005",
+                "mac": "02:b7:c5:98:20:79",
+                "falsas_alarmas": 30,
+                "segundos": 875.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_013",
+                "mac": "02:69:b1:62:f6:df",
+                "falsas_alarmas": 29,
+                "segundos": 890.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_017",
+                "mac": "02:de:a4:98:39:c8",
+                "falsas_alarmas": 26,
+                "segundos": 880.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_018",
+                "mac": "02:26:98:8d:9b:05",
+                "falsas_alarmas": 25,
+                "segundos": 865.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_007",
+                "mac": "02:bc:f0:13:3a:78",
+                "falsas_alarmas": 23,
+                "segundos": 900.0,
+                "victima": true
+              }
+            ],
+            "fa_por_grupo": {
+              "no_victima": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 100,
+                "falsas_alarmas": 0
+              },
+              "limpio": {
+                "valor": 2.460837368271147,
+                "ic95": [
+                  0.0,
+                  7.413233481626671
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 1
+              },
+              "contaminado_5": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 0
+              },
+              "contaminado_20": {
+                "valor": 146.35798983625074,
+                "ic95": [
+                  29.346060918439818,
+                  303.02412886722936
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 60
+              },
+              "continuo_20": {
+                "valor": 582.5269121813031,
+                "ic95": [
+                  323.44005475502456,
+                  868.953251063398
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 238
+              }
+            }
+          }
+        },
+        "variacion": {
+          "con_variacion": {
+            "dispositivos": 200,
+            "dispositivo_dias": 2.052662037037037,
+            "falsas_alarmas_ventanas": 1696,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 826.2441499859035,
+              "ic95": [
+                729.8838724404657,
+                919.4826100552623
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 362.943332393572,
+              "ic95": [
+                303.1320675883014,
+                418.184388357106
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.435,
+              "ic95": [
+                0.39,
+                0.48
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.12844465203176086,
+              "ic95": [
+                0.12402034498347039,
+                0.13318098265858958
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "tcp_window": 665,
+              "ttl": 662,
+              "ipid_salto_log2": 268,
+              "ipid_continuidad": 97,
+              "ipid_contadores": 4
+            }
+          },
+          "sin_variacion": {
+            "dispositivos": 60,
+            "dispositivo_dias": 0.6168981481481481,
+            "falsas_alarmas_ventanas": 6,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 9.726078799249532,
+              "ic95": [
+                0.0,
+                27.516697645749016
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 4.863039399624766,
+              "ic95": [
+                0.0,
+                12.9270563044474
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.03333333333333333,
+              "ic95": [
+                0.0,
+                0.08333333333333333
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.10124252185918085,
+              "ic95": [
+                0.0962751817141867,
+                0.10707332900713822
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ipid_contadores": 5,
+              "ipid_continuidad": 1
+            }
+          }
+        }
+      },
+      "sin_congelar": {
+        "parametros": {
+          "congelar_en_alerta": false
+        },
+        "contaminacion": {
+          "por_nivel": {
+            "contaminado_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.318417833163039,
+                "ic95": [
+                  2.4646026048772502,
+                  5.101190347210149
+                ],
+                "n": 33
+              },
+              "latencia_s_p90": {
+                "valor": 26.192500077074765,
+                "ic95": [
+                  6.207470627610658,
+                  88.58866719016407
+                ],
+                "n": 33
+              },
+              "cobertura": {
+                "valor": 0.3694276084034968,
+                "ic95": [
+                  0.2926846498060364,
+                  0.4558196792938946
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              }
+            },
+            "contaminado_5": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.8461538461538461,
+                "ic95": [
+                  0.717948717948718,
+                  0.9487179487179487
+                ],
+                "n": 39
+              },
+              "no_acusables": 1,
+              "latencia_s_mediana": {
+                "valor": 3.0718493470561725,
+                "ic95": [
+                  2.6031966953034953,
+                  3.765666895506797
+                ],
+                "n": 33
+              },
+              "latencia_s_p90": {
+                "valor": 5.897789502552962,
+                "ic95": [
+                  4.63326016541089,
+                  6.221154406263622
+                ],
+                "n": 33
+              },
+              "cobertura": {
+                "valor": 0.40074425043416306,
+                "ic95": [
+                  0.31809293864900084,
+                  0.48174747839385385
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              }
+            },
+            "continuo_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.825,
+                "ic95": [
+                  0.725,
+                  0.925
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.825,
+                "ic95": [
+                  0.725,
+                  0.925
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 4.378598480211167,
+                "ic95": [
+                  3.103161861361059,
+                  5.882400245627423
+                ],
+                "n": 33
+              },
+              "latencia_s_p90": {
+                "valor": 24.844572196883252,
+                "ic95": [
+                  9.347720275174098,
+                  28.60797476597844
+                ],
+                "n": 33
+              },
+              "cobertura": {
+                "valor": 0.3713009569068406,
+                "ic95": [
+                  0.2973963411769681,
+                  0.4485569978819118
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              }
+            },
+            "limpio": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.95,
+                "ic95": [
+                  0.875,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 38
+              },
+              "no_acusables": 2,
+              "latencia_s_mediana": {
+                "valor": 3.5036514098676435,
+                "ic95": [
+                  2.843847907495217,
+                  4.186342767529254
+                ],
+                "n": 38
+              },
+              "latencia_s_p90": {
+                "valor": 4.880263900734298,
+                "ic95": [
+                  4.58573027471627,
+                  5.87029925254177
+                ],
+                "n": 38
+              },
+              "cobertura": {
+                "valor": 0.44142862912057784,
+                "ic95": [
+                  0.37101732654934155,
+                  0.5052769052490556
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "n": 40
+              }
+            },
+            "rafaga_contaminado_20": {
+              "episodios": 400,
+              "deteccion": {
+                "valor": 0.475,
+                "ic95": [
+                  0.43,
+                  0.5200625
+                ],
+                "n": 400
+              },
+              "deteccion_acusables": {
+                "valor": 0.662020905923345,
+                "ic95": [
+                  0.6062717770034843,
+                  0.7142857142857143
+                ],
+                "n": 287
+              },
+              "no_acusables": 113,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 190
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 190
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 50,
+                  "detectados": 34
+                },
+                "android→linux": {
+                  "episodios": 20,
+                  "detectados": 12
+                },
+                "android→macos": {
+                  "episodios": 10,
+                  "detectados": 8
+                },
+                "android→windows": {
+                  "episodios": 20,
+                  "detectados": 17
+                },
+                "iot→android": {
+                  "episodios": 10,
+                  "detectados": 7
+                },
+                "iot→linux": {
+                  "episodios": 10,
+                  "detectados": 1
+                },
+                "iot→macos": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "linux→iot": {
+                  "episodios": 50,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 10,
+                  "detectados": 5
+                },
+                "macos→android": {
+                  "episodios": 30,
+                  "detectados": 25
+                },
+                "macos→iot": {
+                  "episodios": 10,
+                  "detectados": 0
+                },
+                "macos→linux": {
+                  "episodios": 30,
+                  "detectados": 22
+                },
+                "macos→windows": {
+                  "episodios": 20,
+                  "detectados": 4
+                },
+                "windows→android": {
+                  "episodios": 50,
+                  "detectados": 29
+                },
+                "windows→iot": {
+                  "episodios": 30,
+                  "detectados": 1
+                },
+                "windows→linux": {
+                  "episodios": 20,
+                  "detectados": 2
+                },
+                "windows→macos": {
+                  "episodios": 20,
+                  "detectados": 14
+                }
+              },
+              "cobertura": {
+                "valor": 0.475,
+                "ic95": [
+                  0.43,
+                  0.5200625
+                ],
+                "n": 400
+              }
+            },
+            "rafaga_contaminado_5": {
+              "episodios": 80,
+              "deteccion": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 46
+              },
+              "no_acusables": 34,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 2,
+                  "detectados": 1
+                },
+                "android→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "android→macos": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "android→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "iot→android": {
+                  "episodios": 6,
+                  "detectados": 5
+                },
+                "iot→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "iot→windows": {
+                  "episodios": 8,
+                  "detectados": 4
+                },
+                "linux→android": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "linux→iot": {
+                  "episodios": 6,
+                  "detectados": 3
+                },
+                "linux→macos": {
+                  "episodios": 6,
+                  "detectados": 2
+                },
+                "linux→windows": {
+                  "episodios": 2,
+                  "detectados": 0
+                },
+                "macos→android": {
+                  "episodios": 8,
+                  "detectados": 5
+                },
+                "macos→linux": {
+                  "episodios": 4,
+                  "detectados": 2
+                },
+                "macos→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "windows→android": {
+                  "episodios": 8,
+                  "detectados": 2
+                },
+                "windows→iot": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "windows→macos": {
+                  "episodios": 6,
+                  "detectados": 1
+                }
+              },
+              "cobertura": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              }
+            },
+            "rafaga_continuo_20": {
+              "episodios": 480,
+              "deteccion": {
+                "valor": 0.32083333333333336,
+                "ic95": [
+                  0.27708333333333335,
+                  0.36041666666666666
+                ],
+                "n": 480
+              },
+              "deteccion_acusables": {
+                "valor": 0.5945945945945946,
+                "ic95": [
+                  0.5404440154440155,
+                  0.6563706563706564
+                ],
+                "n": 259
+              },
+              "no_acusables": 221,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 154
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 154
+              },
+              "por_par_de_pilas": {
+                "android→linux": {
+                  "episodios": 24,
+                  "detectados": 14
+                },
+                "android→macos": {
+                  "episodios": 24,
+                  "detectados": 10
+                },
+                "android→windows": {
+                  "episodios": 12,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 36,
+                  "detectados": 19
+                },
+                "iot→windows": {
+                  "episodios": 24,
+                  "detectados": 2
+                },
+                "linux→android": {
+                  "episodios": 24,
+                  "detectados": 13
+                },
+                "linux→iot": {
+                  "episodios": 48,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 60,
+                  "detectados": 28
+                },
+                "macos→android": {
+                  "episodios": 36,
+                  "detectados": 16
+                },
+                "macos→iot": {
+                  "episodios": 36,
+                  "detectados": 17
+                },
+                "macos→linux": {
+                  "episodios": 48,
+                  "detectados": 3
+                },
+                "macos→windows": {
+                  "episodios": 12,
+                  "detectados": 2
+                },
+                "windows→android": {
+                  "episodios": 12,
+                  "detectados": 7
+                },
+                "windows→iot": {
+                  "episodios": 12,
+                  "detectados": 2
+                },
+                "windows→linux": {
+                  "episodios": 24,
+                  "detectados": 0
+                },
+                "windows→macos": {
+                  "episodios": 48,
+                  "detectados": 12
+                }
+              },
+              "cobertura": {
+                "valor": 0.32083333333333336,
+                "ic95": [
+                  0.27708333333333335,
+                  0.36041666666666666
+                ],
+                "n": 480
+              }
+            }
+          },
+          "legitimos": {
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 28.216237399577633,
+              "ic95": [
+                15.81536546041609,
+                43.259170923993366
+              ]
+            },
+            "falsas_alarmas_totales": 75,
+            "fraccion_dispositivos_con_falsa_alarma": {
+              "valor": 0.08076923076923077,
+              "ic95": [
+                0.05384615384615385,
+                0.1076923076923077
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.1362099347525837,
+              "ic95": [
+                0.13194270647869435,
+                0.1411232373557031
+              ]
+            },
+            "dispositivos": 260,
+            "dispositivo_dias": 2.658043981481481,
+            "peores": [
+              {
+                "sesion": "contaminacion_019",
+                "mac": "02:41:12:d6:a6:66",
+                "falsas_alarmas": 10,
+                "segundos": 880.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_007",
+                "mac": "02:11:89:96:45:be",
+                "falsas_alarmas": 8,
+                "segundos": 890.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_009",
+                "mac": "02:f6:ef:81:72:ae",
+                "falsas_alarmas": 7,
+                "segundos": 740.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_016",
+                "mac": "02:38:d4:cd:cd:f9",
+                "falsas_alarmas": 7,
+                "segundos": 895.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_011",
+                "mac": "02:c2:82:15:38:68",
+                "falsas_alarmas": 6,
+                "segundos": 835.0,
+                "victima": true
+              }
+            ],
+            "fa_por_grupo": {
+              "no_victima": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 100,
+                "falsas_alarmas": 0
+              },
+              "limpio": {
+                "valor": 2.460837368271147,
+                "ic95": [
+                  0.0,
+                  7.413233481626671
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 1
+              },
+              "contaminado_5": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 0
+              },
+              "contaminado_20": {
+                "valor": 46.346696781479395,
+                "ic95": [
+                  14.604565589368974,
+                  85.78753829575948
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 19
+              },
+              "continuo_20": {
+                "valor": 134.61756373937678,
+                "ic95": [
+                  56.27668510708643,
+                  230.469470576641
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 55
+              }
+            }
+          }
+        },
+        "variacion": {
+          "con_variacion": {
+            "dispositivos": 200,
+            "dispositivo_dias": 2.052662037037037,
+            "falsas_alarmas_ventanas": 544,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 265.02170848604453,
+              "ic95": [
+                210.12591651147295,
+                325.3966517041121
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 206.07386523822947,
+              "ic95": [
+                164.7882948960726,
+                247.7770744777391
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.435,
+              "ic95": [
+                0.39,
+                0.48
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.12844465203176086,
+              "ic95": [
+                0.12402034498347039,
+                0.13318098265858958
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ipid_salto_log2": 221,
+              "ipid_continuidad": 195,
+              "ttl": 60,
+              "tcp_window": 57,
+              "ipid_contadores": 11
+            }
+          },
+          "sin_variacion": {
+            "dispositivos": 60,
+            "dispositivo_dias": 0.6168981481481481,
+            "falsas_alarmas_ventanas": 2,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 3.2420262664165103,
+              "ic95": [
+                0.0,
+                8.09217966872412
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 3.2420262664165103,
+              "ic95": [
+                0.0,
+                8.09217966872412
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.03333333333333333,
+              "ic95": [
+                0.0,
+                0.08333333333333333
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.10124252185918085,
+              "ic95": [
+                0.0962751817141867,
+                0.10707332900713822
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ipid_continuidad": 1,
+              "ipid_contadores": 1
+            }
+          }
+        }
+      },
+      "sin_no_confiable": {
+        "parametros": {
+          "min_ventanas": 1
+        },
+        "contaminacion": {
+          "por_nivel": {
+            "contaminado_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 2.913143563281892,
+                "ic95": [
+                  2.22860333263975,
+                  3.7417849677706707
+                ],
+                "n": 40
+              },
+              "latencia_s_p90": {
+                "valor": 7.360069178631109,
+                "ic95": [
+                  5.053671392736284,
+                  34.11253158507958
+                ],
+                "n": 40
+              },
+              "cobertura": {
+                "valor": 0.7026498168503149,
+                "ic95": [
+                  0.6377334242504559,
+                  0.7564856746876141
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.05,
+                "ic95": [
+                  0.0,
+                  0.125
+                ],
+                "n": 40
+              }
+            },
+            "contaminado_5": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.0329337734772537,
+                "ic95": [
+                  2.3747660656223104,
+                  3.6293092563755636
+                ],
+                "n": 40
+              },
+              "latencia_s_p90": {
+                "valor": 5.465283170273454,
+                "ic95": [
+                  4.584751842805668,
+                  6.08303067821987
+                ],
+                "n": 40
+              },
+              "cobertura": {
+                "valor": 0.6833411587530364,
+                "ic95": [
+                  0.628793387886442,
+                  0.732076700572969
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "n": 40
+              }
+            },
+            "continuo_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.9805611723259062,
+                "ic95": [
+                  3.0869425226821647,
+                  4.987934463749923
+                ],
+                "n": 40
+              },
+              "latencia_s_p90": {
+                "valor": 11.413246886024941,
+                "ic95": [
+                  5.691724996317248,
+                  26.92276617737332
+                ],
+                "n": 40
+              },
+              "cobertura": {
+                "valor": 0.6791361927990518,
+                "ic95": [
+                  0.6345802523168459,
+                  0.7233453905822627
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.2,
+                "ic95": [
+                  0.075,
+                  0.325
+                ],
+                "n": 40
+              }
+            },
+            "limpio": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.815415502450435,
+                "ic95": [
+                  2.9091156573484227,
+                  4.298460489099227
+                ],
+                "n": 40
+              },
+              "latencia_s_p90": {
+                "valor": 5.882381768111947,
+                "ic95": [
+                  4.7555506296067565,
+                  7.8708255490415695
+                ],
+                "n": 40
+              },
+              "cobertura": {
+                "valor": 0.6812392850193918,
+                "ic95": [
+                  0.6220184749946501,
+                  0.7363954618027732
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "n": 40
+              }
+            },
+            "rafaga_contaminado_20": {
+              "episodios": 400,
+              "deteccion": {
+                "valor": 0.9225,
+                "ic95": [
+                  0.8974375,
+                  0.9475
+                ],
+                "n": 400
+              },
+              "deteccion_acusables": {
+                "valor": 0.9225,
+                "ic95": [
+                  0.8974375,
+                  0.9475
+                ],
+                "n": 400
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 369
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 369
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 50,
+                  "detectados": 27
+                },
+                "android→linux": {
+                  "episodios": 20,
+                  "detectados": 20
+                },
+                "android→macos": {
+                  "episodios": 10,
+                  "detectados": 10
+                },
+                "android→windows": {
+                  "episodios": 20,
+                  "detectados": 20
+                },
+                "iot→android": {
+                  "episodios": 10,
+                  "detectados": 10
+                },
+                "iot→linux": {
+                  "episodios": 10,
+                  "detectados": 10
+                },
+                "iot→macos": {
+                  "episodios": 10,
+                  "detectados": 10
+                },
+                "linux→iot": {
+                  "episodios": 50,
+                  "detectados": 50
+                },
+                "linux→macos": {
+                  "episodios": 10,
+                  "detectados": 10
+                },
+                "macos→android": {
+                  "episodios": 30,
+                  "detectados": 30
+                },
+                "macos→iot": {
+                  "episodios": 10,
+                  "detectados": 2
+                },
+                "macos→linux": {
+                  "episodios": 30,
+                  "detectados": 30
+                },
+                "macos→windows": {
+                  "episodios": 20,
+                  "detectados": 20
+                },
+                "windows→android": {
+                  "episodios": 50,
+                  "detectados": 50
+                },
+                "windows→iot": {
+                  "episodios": 30,
+                  "detectados": 30
+                },
+                "windows→linux": {
+                  "episodios": 20,
+                  "detectados": 20
+                },
+                "windows→macos": {
+                  "episodios": 20,
+                  "detectados": 20
+                }
+              },
+              "cobertura": {
+                "valor": 0.9225,
+                "ic95": [
+                  0.8974375,
+                  0.9475
+                ],
+                "n": 400
+              }
+            },
+            "rafaga_contaminado_5": {
+              "episodios": 80,
+              "deteccion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 80
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 80
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 80
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 80
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "android→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "android→macos": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "android→windows": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "iot→android": {
+                  "episodios": 6,
+                  "detectados": 6
+                },
+                "iot→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "iot→windows": {
+                  "episodios": 8,
+                  "detectados": 8
+                },
+                "linux→android": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "linux→iot": {
+                  "episodios": 6,
+                  "detectados": 6
+                },
+                "linux→macos": {
+                  "episodios": 6,
+                  "detectados": 6
+                },
+                "linux→windows": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "macos→android": {
+                  "episodios": 8,
+                  "detectados": 8
+                },
+                "macos→linux": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "macos→windows": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "windows→android": {
+                  "episodios": 8,
+                  "detectados": 8
+                },
+                "windows→iot": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "windows→macos": {
+                  "episodios": 6,
+                  "detectados": 6
+                }
+              },
+              "cobertura": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 80
+              }
+            },
+            "rafaga_continuo_20": {
+              "episodios": 480,
+              "deteccion": {
+                "valor": 0.7604166666666666,
+                "ic95": [
+                  0.7229166666666667,
+                  0.8
+                ],
+                "n": 480
+              },
+              "deteccion_acusables": {
+                "valor": 0.7849462365591398,
+                "ic95": [
+                  0.7483870967741936,
+                  0.821505376344086
+                ],
+                "n": 465
+              },
+              "no_acusables": 15,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 365
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 365
+              },
+              "por_par_de_pilas": {
+                "android→linux": {
+                  "episodios": 24,
+                  "detectados": 18
+                },
+                "android→macos": {
+                  "episodios": 24,
+                  "detectados": 24
+                },
+                "android→windows": {
+                  "episodios": 12,
+                  "detectados": 12
+                },
+                "iot→macos": {
+                  "episodios": 36,
+                  "detectados": 26
+                },
+                "iot→windows": {
+                  "episodios": 24,
+                  "detectados": 24
+                },
+                "linux→android": {
+                  "episodios": 24,
+                  "detectados": 24
+                },
+                "linux→iot": {
+                  "episodios": 48,
+                  "detectados": 36
+                },
+                "linux→macos": {
+                  "episodios": 60,
+                  "detectados": 36
+                },
+                "macos→android": {
+                  "episodios": 36,
+                  "detectados": 32
+                },
+                "macos→iot": {
+                  "episodios": 36,
+                  "detectados": 24
+                },
+                "macos→linux": {
+                  "episodios": 48,
+                  "detectados": 32
+                },
+                "macos→windows": {
+                  "episodios": 12,
+                  "detectados": 12
+                },
+                "windows→android": {
+                  "episodios": 12,
+                  "detectados": 12
+                },
+                "windows→iot": {
+                  "episodios": 12,
+                  "detectados": 12
+                },
+                "windows→linux": {
+                  "episodios": 24,
+                  "detectados": 15
+                },
+                "windows→macos": {
+                  "episodios": 48,
+                  "detectados": 26
+                }
+              },
+              "cobertura": {
+                "valor": 0.7604166666666666,
+                "ic95": [
+                  0.7229166666666667,
+                  0.8
+                ],
+                "n": 480
+              }
+            }
+          },
+          "legitimos": {
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 1354.3793951797263,
+              "ic95": [
+                1168.939845829829,
+                1535.7502774074337
+              ]
+            },
+            "falsas_alarmas_totales": 3600,
+            "fraccion_dispositivos_con_falsa_alarma": {
+              "valor": 0.4346153846153846,
+              "ic95": [
+                0.38076923076923075,
+                0.4846153846153846
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "dispositivos": 260,
+            "dispositivo_dias": 2.658043981481481,
+            "peores": [
+              {
+                "sesion": "contaminacion_002",
+                "mac": "02:e0:e4:4c:f5:3d",
+                "falsas_alarmas": 112,
+                "segundos": 900.0,
+                "victima": false
+              },
+              {
+                "sesion": "contaminacion_003",
+                "mac": "02:28:d4:a0:f5:74",
+                "falsas_alarmas": 97,
+                "segundos": 890.0,
+                "victima": false
+              },
+              {
+                "sesion": "contaminacion_004",
+                "mac": "02:fe:50:60:84:7c",
+                "falsas_alarmas": 90,
+                "segundos": 895.0,
+                "victima": false
+              },
+              {
+                "sesion": "contaminacion_017",
+                "mac": "02:55:2a:02:1e:b9",
+                "falsas_alarmas": 69,
+                "segundos": 895.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_001",
+                "mac": "02:bd:74:a8:16:a2",
+                "falsas_alarmas": 65,
+                "segundos": 900.0,
+                "victima": true
+              }
+            ],
+            "fa_por_grupo": {
+              "no_victima": {
+                "valor": 1386.033576394777,
+                "ic95": [
+                  1135.660361266646,
+                  1649.9538884572698
+                ],
+                "dispositivos": 100,
+                "falsas_alarmas": 1419
+              },
+              "limpio": {
+                "valor": 1087.6901167758472,
+                "ic95": [
+                  608.1726046841733,
+                  1592.7705601590205
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 442
+              },
+              "contaminado_5": {
+                "valor": 945.3435114503817,
+                "ic95": [
+                  584.5131914955185,
+                  1275.3664120511198
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 387
+              },
+              "contaminado_20": {
+                "valor": 1200.135516657256,
+                "ic95": [
+                  705.1517582769625,
+                  1740.5823423616514
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 492
+              },
+              "continuo_20": {
+                "valor": 2104.929178470255,
+                "ic95": [
+                  1462.5130841310443,
+                  2811.9770135248336
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 860
+              }
+            }
+          }
+        },
+        "variacion": {
+          "con_variacion": {
+            "dispositivos": 200,
+            "dispositivo_dias": 2.052662037037037,
+            "falsas_alarmas_ventanas": 7709,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 3755.610938821539,
+              "ic95": [
+                3460.5622475459772,
+                4009.327832375417
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 1417.6712714970397,
+              "ic95": [
+                1296.8788938962175,
+                1533.474034045297
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.8,
+              "ic95": [
+                0.755,
+                0.845
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ttl": 7150,
+              "tcp_window": 480,
+              "ipid_salto_log2": 52,
+              "ipid_continuidad": 27
+            }
+          },
+          "sin_variacion": {
+            "dispositivos": 60,
+            "dispositivo_dias": 0.6168981481481481,
+            "falsas_alarmas_ventanas": 526,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 852.6529080675422,
+              "ic95": [
+                568.9691436186022,
+                1194.3894816407785
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 568.9756097560976,
+              "ic95": [
+                376.73682000656174,
+                774.6743943938862
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.26666666666666666,
+              "ic95": [
+                0.18333333333333332,
+                0.35
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ttl": 525,
+              "ipid_continuidad": 1
+            }
+          }
+        }
+      },
+      "con_tope": {
+        "parametros": {
+          "tope_diario": 96
+        },
+        "contaminacion": {
+          "por_nivel": {
+            "contaminado_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.2499754160494376,
+                "ic95": [
+                  2.4607321607074937,
+                  4.603041979609429
+                ],
+                "n": 33
+              },
+              "latencia_s_p90": {
+                "valor": 19.304866626276887,
+                "ic95": [
+                  6.3807360794686705,
+                  72.1511568690006
+                ],
+                "n": 33
+              },
+              "cobertura": {
+                "valor": 0.4619773645039495,
+                "ic95": [
+                  0.3796560137728616,
+                  0.543956595622552
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.8,
+                "ic95": [
+                  0.675,
+                  0.9
+                ],
+                "n": 40
+              }
+            },
+            "contaminado_5": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.975,
+                "ic95": [
+                  0.925,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 39
+              },
+              "no_acusables": 1,
+              "latencia_s_mediana": {
+                "valor": 2.994018199898335,
+                "ic95": [
+                  2.1821854415879898,
+                  3.6293092563755636
+                ],
+                "n": 39
+              },
+              "latencia_s_p90": {
+                "valor": 5.480861460475274,
+                "ic95": [
+                  4.483146924446522,
+                  6.08303067821987
+                ],
+                "n": 39
+              },
+              "cobertura": {
+                "valor": 0.5756883715929552,
+                "ic95": [
+                  0.5076322256574527,
+                  0.6352044628488126
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.225,
+                "ic95": [
+                  0.1,
+                  0.375
+                ],
+                "n": 40
+              }
+            },
+            "continuo_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.85,
+                "ic95": [
+                  0.75,
+                  0.95
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.85,
+                "ic95": [
+                  0.75,
+                  0.95
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 5.0831288646730854,
+                "ic95": [
+                  3.6079747659784402,
+                  9.454400774888368
+                ],
+                "n": 34
+              },
+              "latencia_s_p90": {
+                "valor": 29.73819919237996,
+                "ic95": [
+                  15.962653472969418,
+                  40.88240024562742
+                ],
+                "n": 34
+              },
+              "cobertura": {
+                "valor": 0.4410511895410676,
+                "ic95": [
+                  0.3522436532294253,
+                  0.5280132362604397
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              }
+            },
+            "limpio": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.95,
+                "ic95": [
+                  0.875,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 38
+              },
+              "no_acusables": 2,
+              "latencia_s_mediana": {
+                "valor": 3.5036514098676435,
+                "ic95": [
+                  2.843847907495217,
+                  4.186342767529254
+                ],
+                "n": 38
+              },
+              "latencia_s_p90": {
+                "valor": 4.880263900734298,
+                "ic95": [
+                  4.58573027471627,
+                  5.87029925254177
+                ],
+                "n": 38
+              },
+              "cobertura": {
+                "valor": 0.5581374906784671,
+                "ic95": [
+                  0.4865808143402827,
+                  0.6235468006881159
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "n": 40
+              }
+            },
+            "rafaga_contaminado_20": {
+              "episodios": 400,
+              "deteccion": {
+                "valor": 0.53,
+                "ic95": [
+                  0.4875,
+                  0.58
+                ],
+                "n": 400
+              },
+              "deteccion_acusables": {
+                "valor": 0.7386759581881533,
+                "ic95": [
+                  0.6898954703832753,
+                  0.7909407665505227
+                ],
+                "n": 287
+              },
+              "no_acusables": 113,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 212
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 212
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 50,
+                  "detectados": 38
+                },
+                "android→linux": {
+                  "episodios": 20,
+                  "detectados": 12
+                },
+                "android→macos": {
+                  "episodios": 10,
+                  "detectados": 8
+                },
+                "android→windows": {
+                  "episodios": 20,
+                  "detectados": 17
+                },
+                "iot→android": {
+                  "episodios": 10,
+                  "detectados": 7
+                },
+                "iot→linux": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "linux→iot": {
+                  "episodios": 50,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 10,
+                  "detectados": 5
+                },
+                "macos→android": {
+                  "episodios": 30,
+                  "detectados": 25
+                },
+                "macos→iot": {
+                  "episodios": 10,
+                  "detectados": 0
+                },
+                "macos→linux": {
+                  "episodios": 30,
+                  "detectados": 22
+                },
+                "macos→windows": {
+                  "episodios": 20,
+                  "detectados": 7
+                },
+                "windows→android": {
+                  "episodios": 50,
+                  "detectados": 29
+                },
+                "windows→iot": {
+                  "episodios": 30,
+                  "detectados": 1
+                },
+                "windows→linux": {
+                  "episodios": 20,
+                  "detectados": 9
+                },
+                "windows→macos": {
+                  "episodios": 20,
+                  "detectados": 14
+                }
+              },
+              "cobertura": {
+                "valor": 0.53,
+                "ic95": [
+                  0.4875,
+                  0.58
+                ],
+                "n": 400
+              }
+            },
+            "rafaga_contaminado_5": {
+              "episodios": 80,
+              "deteccion": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 46
+              },
+              "no_acusables": 34,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 2,
+                  "detectados": 1
+                },
+                "android→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "android→macos": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "android→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "iot→android": {
+                  "episodios": 6,
+                  "detectados": 5
+                },
+                "iot→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "iot→windows": {
+                  "episodios": 8,
+                  "detectados": 4
+                },
+                "linux→android": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "linux→iot": {
+                  "episodios": 6,
+                  "detectados": 3
+                },
+                "linux→macos": {
+                  "episodios": 6,
+                  "detectados": 2
+                },
+                "linux→windows": {
+                  "episodios": 2,
+                  "detectados": 0
+                },
+                "macos→android": {
+                  "episodios": 8,
+                  "detectados": 5
+                },
+                "macos→linux": {
+                  "episodios": 4,
+                  "detectados": 2
+                },
+                "macos→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "windows→android": {
+                  "episodios": 8,
+                  "detectados": 2
+                },
+                "windows→iot": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "windows→macos": {
+                  "episodios": 6,
+                  "detectados": 1
+                }
+              },
+              "cobertura": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              }
+            },
+            "rafaga_continuo_20": {
+              "episodios": 480,
+              "deteccion": {
+                "valor": 0.3333333333333333,
+                "ic95": [
+                  0.2916145833333334,
+                  0.375
+                ],
+                "n": 480
+              },
+              "deteccion_acusables": {
+                "valor": 0.6177606177606177,
+                "ic95": [
+                  0.5598455598455598,
+                  0.6756756756756757
+                ],
+                "n": 259
+              },
+              "no_acusables": 221,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 160
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 160
+              },
+              "por_par_de_pilas": {
+                "android→linux": {
+                  "episodios": 24,
+                  "detectados": 14
+                },
+                "android→macos": {
+                  "episodios": 24,
+                  "detectados": 10
+                },
+                "android→windows": {
+                  "episodios": 12,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 36,
+                  "detectados": 19
+                },
+                "iot→windows": {
+                  "episodios": 24,
+                  "detectados": 2
+                },
+                "linux→android": {
+                  "episodios": 24,
+                  "detectados": 13
+                },
+                "linux→iot": {
+                  "episodios": 48,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 60,
+                  "detectados": 31
+                },
+                "macos→android": {
+                  "episodios": 36,
+                  "detectados": 16
+                },
+                "macos→iot": {
+                  "episodios": 36,
+                  "detectados": 17
+                },
+                "macos→linux": {
+                  "episodios": 48,
+                  "detectados": 5
+                },
+                "macos→windows": {
+                  "episodios": 12,
+                  "detectados": 2
+                },
+                "windows→android": {
+                  "episodios": 12,
+                  "detectados": 7
+                },
+                "windows→iot": {
+                  "episodios": 12,
+                  "detectados": 3
+                },
+                "windows→linux": {
+                  "episodios": 24,
+                  "detectados": 0
+                },
+                "windows→macos": {
+                  "episodios": 48,
+                  "detectados": 12
+                }
+              },
+              "cobertura": {
+                "valor": 0.3333333333333333,
+                "ic95": [
+                  0.2916145833333334,
+                  0.375
+                ],
+                "n": 480
+              }
+            }
+          },
+          "legitimos": {
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 112.4887330996495,
+              "ic95": [
+                74.75885920494783,
+                152.90510664416425
+              ]
+            },
+            "falsas_alarmas_totales": 299,
+            "fraccion_dispositivos_con_falsa_alarma": {
+              "valor": 0.06923076923076923,
+              "ic95": [
+                0.0460576923076924,
+                0.09230769230769231
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.1362099347525837,
+              "ic95": [
+                0.13194270647869435,
+                0.1411232373557031
+              ]
+            },
+            "dispositivos": 260,
+            "dispositivo_dias": 2.658043981481481,
+            "peores": [
+              {
+                "sesion": "contaminacion_005",
+                "mac": "02:b7:c5:98:20:79",
+                "falsas_alarmas": 30,
+                "segundos": 875.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_013",
+                "mac": "02:69:b1:62:f6:df",
+                "falsas_alarmas": 29,
+                "segundos": 890.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_017",
+                "mac": "02:de:a4:98:39:c8",
+                "falsas_alarmas": 26,
+                "segundos": 880.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_018",
+                "mac": "02:26:98:8d:9b:05",
+                "falsas_alarmas": 25,
+                "segundos": 865.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_007",
+                "mac": "02:bc:f0:13:3a:78",
+                "falsas_alarmas": 23,
+                "segundos": 900.0,
+                "victima": true
+              }
+            ],
+            "fa_por_grupo": {
+              "no_victima": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 100,
+                "falsas_alarmas": 0
+              },
+              "limpio": {
+                "valor": 2.460837368271147,
+                "ic95": [
+                  0.0,
+                  7.413233481626671
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 1
+              },
+              "contaminado_5": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 0
+              },
+              "contaminado_20": {
+                "valor": 146.35798983625074,
+                "ic95": [
+                  29.346060918439818,
+                  303.02412886722936
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 60
+              },
+              "continuo_20": {
+                "valor": 582.5269121813031,
+                "ic95": [
+                  323.44005475502456,
+                  868.953251063398
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 238
+              }
+            }
+          }
+        },
+        "variacion": {
+          "con_variacion": {
+            "dispositivos": 200,
+            "dispositivo_dias": 2.052662037037037,
+            "falsas_alarmas_ventanas": 1696,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 826.2441499859035,
+              "ic95": [
+                729.8838724404657,
+                919.4826100552623
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 362.943332393572,
+              "ic95": [
+                303.1320675883014,
+                418.184388357106
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.435,
+              "ic95": [
+                0.39,
+                0.48
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.12844465203176086,
+              "ic95": [
+                0.12402034498347039,
+                0.13318098265858958
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "tcp_window": 665,
+              "ttl": 662,
+              "ipid_salto_log2": 268,
+              "ipid_continuidad": 97,
+              "ipid_contadores": 4
+            }
+          },
+          "sin_variacion": {
+            "dispositivos": 60,
+            "dispositivo_dias": 0.6168981481481481,
+            "falsas_alarmas_ventanas": 6,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 9.726078799249532,
+              "ic95": [
+                0.0,
+                27.516697645749016
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 4.863039399624766,
+              "ic95": [
+                0.0,
+                12.9270563044474
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.03333333333333333,
+              "ic95": [
+                0.0,
+                0.08333333333333333
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.10124252185918085,
+              "ic95": [
+                0.0962751817141867,
+                0.10707332900713822
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ipid_contadores": 5,
+              "ipid_continuidad": 1
+            }
+          }
+        }
+      },
+      "con_reperfilado": {
+        "parametros": {
+          "reperfilar_tras": 24
+        },
+        "contaminacion": {
+          "por_nivel": {
+            "contaminado_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.825,
+                "ic95": [
+                  0.7,
+                  0.925
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 3.2499754160494376,
+                "ic95": [
+                  2.4607321607074937,
+                  4.603041979609429
+                ],
+                "n": 33
+              },
+              "latencia_s_p90": {
+                "valor": 19.304866626276887,
+                "ic95": [
+                  6.3807360794686705,
+                  72.1511568690006
+                ],
+                "n": 33
+              },
+              "cobertura": {
+                "valor": 0.4619773645039495,
+                "ic95": [
+                  0.3796560137728616,
+                  0.543956595622552
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.8,
+                "ic95": [
+                  0.675,
+                  0.9
+                ],
+                "n": 40
+              }
+            },
+            "contaminado_5": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.975,
+                "ic95": [
+                  0.925,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 39
+              },
+              "no_acusables": 1,
+              "latencia_s_mediana": {
+                "valor": 2.994018199898335,
+                "ic95": [
+                  2.1821854415879898,
+                  3.6293092563755636
+                ],
+                "n": 39
+              },
+              "latencia_s_p90": {
+                "valor": 5.480861460475274,
+                "ic95": [
+                  4.483146924446522,
+                  6.08303067821987
+                ],
+                "n": 39
+              },
+              "cobertura": {
+                "valor": 0.5756883715929552,
+                "ic95": [
+                  0.5076322256574527,
+                  0.6352044628488126
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.225,
+                "ic95": [
+                  0.1,
+                  0.375
+                ],
+                "n": 40
+              }
+            },
+            "continuo_20": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.85,
+                "ic95": [
+                  0.75,
+                  0.95
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 0.85,
+                "ic95": [
+                  0.75,
+                  0.95
+                ],
+                "n": 40
+              },
+              "no_acusables": 0,
+              "latencia_s_mediana": {
+                "valor": 5.0831288646730854,
+                "ic95": [
+                  3.6079747659784402,
+                  9.454400774888368
+                ],
+                "n": 34
+              },
+              "latencia_s_p90": {
+                "valor": 29.73819919237996,
+                "ic95": [
+                  15.962653472969418,
+                  40.88240024562742
+                ],
+                "n": 34
+              },
+              "cobertura": {
+                "valor": 0.4410511895410676,
+                "ic95": [
+                  0.3522436532294253,
+                  0.5280132362604397
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 40
+              }
+            },
+            "limpio": {
+              "episodios": 40,
+              "deteccion": {
+                "valor": 0.95,
+                "ic95": [
+                  0.875,
+                  1.0
+                ],
+                "n": 40
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 38
+              },
+              "no_acusables": 2,
+              "latencia_s_mediana": {
+                "valor": 3.5036514098676435,
+                "ic95": [
+                  2.843847907495217,
+                  4.186342767529254
+                ],
+                "n": 38
+              },
+              "latencia_s_p90": {
+                "valor": 4.880263900734298,
+                "ic95": [
+                  4.58573027471627,
+                  5.87029925254177
+                ],
+                "n": 38
+              },
+              "cobertura": {
+                "valor": 0.5581374906784671,
+                "ic95": [
+                  0.4865808143402827,
+                  0.6235468006881159
+                ],
+                "n": 40
+              },
+              "absorcion": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "n": 40
+              }
+            },
+            "rafaga_contaminado_20": {
+              "episodios": 400,
+              "deteccion": {
+                "valor": 0.53,
+                "ic95": [
+                  0.4875,
+                  0.58
+                ],
+                "n": 400
+              },
+              "deteccion_acusables": {
+                "valor": 0.7386759581881533,
+                "ic95": [
+                  0.6898954703832753,
+                  0.7909407665505227
+                ],
+                "n": 287
+              },
+              "no_acusables": 113,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 212
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 212
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 50,
+                  "detectados": 38
+                },
+                "android→linux": {
+                  "episodios": 20,
+                  "detectados": 12
+                },
+                "android→macos": {
+                  "episodios": 10,
+                  "detectados": 8
+                },
+                "android→windows": {
+                  "episodios": 20,
+                  "detectados": 17
+                },
+                "iot→android": {
+                  "episodios": 10,
+                  "detectados": 7
+                },
+                "iot→linux": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 10,
+                  "detectados": 9
+                },
+                "linux→iot": {
+                  "episodios": 50,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 10,
+                  "detectados": 5
+                },
+                "macos→android": {
+                  "episodios": 30,
+                  "detectados": 25
+                },
+                "macos→iot": {
+                  "episodios": 10,
+                  "detectados": 0
+                },
+                "macos→linux": {
+                  "episodios": 30,
+                  "detectados": 22
+                },
+                "macos→windows": {
+                  "episodios": 20,
+                  "detectados": 7
+                },
+                "windows→android": {
+                  "episodios": 50,
+                  "detectados": 29
+                },
+                "windows→iot": {
+                  "episodios": 30,
+                  "detectados": 1
+                },
+                "windows→linux": {
+                  "episodios": 20,
+                  "detectados": 9
+                },
+                "windows→macos": {
+                  "episodios": 20,
+                  "detectados": 14
+                }
+              },
+              "cobertura": {
+                "valor": 0.53,
+                "ic95": [
+                  0.4875,
+                  0.58
+                ],
+                "n": 400
+              }
+            },
+            "rafaga_contaminado_5": {
+              "episodios": 80,
+              "deteccion": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              },
+              "deteccion_acusables": {
+                "valor": 1.0,
+                "ic95": [
+                  1.0,
+                  1.0
+                ],
+                "n": 46
+              },
+              "no_acusables": 34,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 46
+              },
+              "por_par_de_pilas": {
+                "android→iot": {
+                  "episodios": 2,
+                  "detectados": 1
+                },
+                "android→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "android→macos": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "android→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "iot→android": {
+                  "episodios": 6,
+                  "detectados": 5
+                },
+                "iot→linux": {
+                  "episodios": 2,
+                  "detectados": 2
+                },
+                "iot→windows": {
+                  "episodios": 8,
+                  "detectados": 4
+                },
+                "linux→android": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "linux→iot": {
+                  "episodios": 6,
+                  "detectados": 3
+                },
+                "linux→macos": {
+                  "episodios": 6,
+                  "detectados": 2
+                },
+                "linux→windows": {
+                  "episodios": 2,
+                  "detectados": 0
+                },
+                "macos→android": {
+                  "episodios": 8,
+                  "detectados": 5
+                },
+                "macos→linux": {
+                  "episodios": 4,
+                  "detectados": 2
+                },
+                "macos→windows": {
+                  "episodios": 4,
+                  "detectados": 3
+                },
+                "windows→android": {
+                  "episodios": 8,
+                  "detectados": 2
+                },
+                "windows→iot": {
+                  "episodios": 4,
+                  "detectados": 4
+                },
+                "windows→macos": {
+                  "episodios": 6,
+                  "detectados": 1
+                }
+              },
+              "cobertura": {
+                "valor": 0.575,
+                "ic95": [
+                  0.475,
+                  0.6875
+                ],
+                "n": 80
+              }
+            },
+            "rafaga_continuo_20": {
+              "episodios": 480,
+              "deteccion": {
+                "valor": 0.3333333333333333,
+                "ic95": [
+                  0.2916145833333334,
+                  0.375
+                ],
+                "n": 480
+              },
+              "deteccion_acusables": {
+                "valor": 0.6177606177606177,
+                "ic95": [
+                  0.5598455598455598,
+                  0.6756756756756757
+                ],
+                "n": 259
+              },
+              "no_acusables": 221,
+              "latencia_s_mediana": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 160
+              },
+              "latencia_s_p90": {
+                "valor": 5.0,
+                "ic95": [
+                  5.0,
+                  5.0
+                ],
+                "n": 160
+              },
+              "por_par_de_pilas": {
+                "android→linux": {
+                  "episodios": 24,
+                  "detectados": 14
+                },
+                "android→macos": {
+                  "episodios": 24,
+                  "detectados": 10
+                },
+                "android→windows": {
+                  "episodios": 12,
+                  "detectados": 9
+                },
+                "iot→macos": {
+                  "episodios": 36,
+                  "detectados": 19
+                },
+                "iot→windows": {
+                  "episodios": 24,
+                  "detectados": 2
+                },
+                "linux→android": {
+                  "episodios": 24,
+                  "detectados": 13
+                },
+                "linux→iot": {
+                  "episodios": 48,
+                  "detectados": 0
+                },
+                "linux→macos": {
+                  "episodios": 60,
+                  "detectados": 31
+                },
+                "macos→android": {
+                  "episodios": 36,
+                  "detectados": 16
+                },
+                "macos→iot": {
+                  "episodios": 36,
+                  "detectados": 17
+                },
+                "macos→linux": {
+                  "episodios": 48,
+                  "detectados": 5
+                },
+                "macos→windows": {
+                  "episodios": 12,
+                  "detectados": 2
+                },
+                "windows→android": {
+                  "episodios": 12,
+                  "detectados": 7
+                },
+                "windows→iot": {
+                  "episodios": 12,
+                  "detectados": 3
+                },
+                "windows→linux": {
+                  "episodios": 24,
+                  "detectados": 0
+                },
+                "windows→macos": {
+                  "episodios": 48,
+                  "detectados": 12
+                }
+              },
+              "cobertura": {
+                "valor": 0.3333333333333333,
+                "ic95": [
+                  0.2916145833333334,
+                  0.375
+                ],
+                "n": 480
+              }
+            }
+          },
+          "legitimos": {
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 112.4887330996495,
+              "ic95": [
+                74.75885920494783,
+                152.90510664416425
+              ]
+            },
+            "falsas_alarmas_totales": 299,
+            "fraccion_dispositivos_con_falsa_alarma": {
+              "valor": 0.06923076923076923,
+              "ic95": [
+                0.0460576923076924,
+                0.09230769230769231
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.1362099347525837,
+              "ic95": [
+                0.13194270647869435,
+                0.1411232373557031
+              ]
+            },
+            "dispositivos": 260,
+            "dispositivo_dias": 2.658043981481481,
+            "peores": [
+              {
+                "sesion": "contaminacion_005",
+                "mac": "02:b7:c5:98:20:79",
+                "falsas_alarmas": 30,
+                "segundos": 875.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_013",
+                "mac": "02:69:b1:62:f6:df",
+                "falsas_alarmas": 29,
+                "segundos": 890.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_017",
+                "mac": "02:de:a4:98:39:c8",
+                "falsas_alarmas": 26,
+                "segundos": 880.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_018",
+                "mac": "02:26:98:8d:9b:05",
+                "falsas_alarmas": 25,
+                "segundos": 865.0,
+                "victima": true
+              },
+              {
+                "sesion": "contaminacion_007",
+                "mac": "02:bc:f0:13:3a:78",
+                "falsas_alarmas": 23,
+                "segundos": 900.0,
+                "victima": true
+              }
+            ],
+            "fa_por_grupo": {
+              "no_victima": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 100,
+                "falsas_alarmas": 0
+              },
+              "limpio": {
+                "valor": 2.460837368271147,
+                "ic95": [
+                  0.0,
+                  7.413233481626671
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 1
+              },
+              "contaminado_5": {
+                "valor": 0.0,
+                "ic95": [
+                  0.0,
+                  0.0
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 0
+              },
+              "contaminado_20": {
+                "valor": 146.35798983625074,
+                "ic95": [
+                  29.346060918439818,
+                  303.02412886722936
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 60
+              },
+              "continuo_20": {
+                "valor": 582.5269121813031,
+                "ic95": [
+                  323.44005475502456,
+                  868.953251063398
+                ],
+                "dispositivos": 40,
+                "falsas_alarmas": 238
+              }
+            }
+          }
+        },
+        "variacion": {
+          "con_variacion": {
+            "dispositivos": 200,
+            "dispositivo_dias": 2.052662037037037,
+            "falsas_alarmas_ventanas": 1594,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 776.5525796447702,
+              "ic95": [
+                697.5866482478643,
+                852.9883965088566
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 362.943332393572,
+              "ic95": [
+                303.1320675883014,
+                418.184388357106
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.435,
+              "ic95": [
+                0.39,
+                0.48
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.13194768799626344,
+              "ic95": [
+                0.12648466753384943,
+                0.13810954075481188
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 7,
+            "fa_por_senal": {
+              "tcp_window": 665,
+              "ttl": 560,
+              "ipid_salto_log2": 268,
+              "ipid_continuidad": 97,
+              "ipid_contadores": 4
+            }
+          },
+          "sin_variacion": {
+            "dispositivos": 60,
+            "dispositivo_dias": 0.6168981481481481,
+            "falsas_alarmas_ventanas": 6,
+            "fa_ventanas_por_dispositivo_dia": {
+              "valor": 9.726078799249532,
+              "ic95": [
+                0.0,
+                27.516697645749016
+              ]
+            },
+            "fa_eventos_por_dispositivo_dia": {
+              "valor": 4.863039399624766,
+              "ic95": [
+                0.0,
+                12.9270563044474
+              ]
+            },
+            "fraccion_dispositivos_con_fa": {
+              "valor": 0.03333333333333333,
+              "ic95": [
+                0.0,
+                0.08333333333333333
+              ]
+            },
+            "fraccion_ventanas_no_confiable": {
+              "valor": 0.10124252185918085,
+              "ic95": [
+                0.0962751817141867,
+                0.10707332900713822
+              ]
+            },
+            "fraccion_dispositivos_nunca_confiables": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "reperfilados": 0,
+            "fa_por_senal": {
+              "ipid_contadores": 5,
+              "ipid_continuidad": 1
+            }
+          }
+        }
+      }
+    },
+    "regla": {
+      "deteccion_cobertura_absorcion": 0.05,
+      "fa_dispositivo_dia": 1.0
+    },
+    "veredicto": {
+      "sin aprendizaje en alerta": {
+        "empeora_al_apagarla": [
+          "limpio: cobertura 0.558 → 0.441",
+          "contaminado_5: deteccion 0.975 → 0.825",
+          "contaminado_5: cobertura 0.576 → 0.401",
+          "contaminado_5: absorcion 0.225 → 1.000",
+          "contaminado_20: cobertura 0.462 → 0.369",
+          "contaminado_20: absorcion 0.800 → 1.000",
+          "continuo_20: cobertura 0.441 → 0.371"
+        ],
+        "queda": true
+      },
+      "no_confiable": {
+        "empeora_al_apagarla": [
+          "FA contaminación: 112.49 → 1354.38",
+          "FA con variación: 826.24 → 3755.61",
+          "FA sin variación: 9.73 → 852.65"
+        ],
+        "queda": true
+      },
+      "tope diario (apagado tras la ablación)": {
+        "empeora_al_encenderla": [],
+        "queda": "apagada"
+      },
+      "reperfilado (apagado en el bloque 2)": {
+        "empeora_al_encenderla": [],
+        "queda": "apagada"
+      }
+    }
+  },
   "resumen": {
     "ipid": {
       "fa_antes": 16.19,
@@ -6962,6 +11414,34 @@
         "e3b": 0.38
       },
       "confirmacion_pila_completa": 0.325
+    },
+    "contaminacion": {
+      "limpio": {
+        "deteccion": 0.95,
+        "cobertura": 0.558,
+        "absorcion": 0.0
+      },
+      "contaminado_5": {
+        "deteccion": 0.975,
+        "cobertura": 0.576,
+        "absorcion": 0.225
+      },
+      "contaminado_20": {
+        "deteccion": 0.825,
+        "cobertura": 0.462,
+        "absorcion": 0.8
+      },
+      "continuo_20": {
+        "deteccion": 0.85,
+        "cobertura": 0.441,
+        "absorcion": 1.0
+      }
+    },
+    "defensas": {
+      "sin aprendizaje en alerta": true,
+      "no_confiable": true,
+      "tope diario (apagado tras la ablación)": "apagada",
+      "reperfilado (apagado en el bloque 2)": "apagada"
     }
   }
 }

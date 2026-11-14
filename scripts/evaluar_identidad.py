@@ -44,6 +44,7 @@ import numpy as np  # noqa: E402
 
 from scripts.evaluar import commit_actual, escribir_json, fmt_ic, leer_config, ruta_proyecto  # noqa: E402
 from scripts.lab import generar_clones as gc  # noqa: E402
+from scripts.lab import generar_contaminacion as gco  # noqa: E402
 from scripts.lab import generar_suplantacion as gs  # noqa: E402
 from scripts.lab import generar_variacion as gv  # noqa: E402
 from src import evaluacion as ev  # noqa: E402
@@ -236,6 +237,8 @@ def markdown_b(informe: dict) -> str:
             lineas.append("")
     if "niveles" in informe:
         lineas += _md_niveles(informe["niveles"])
+    if "contaminacion" in informe:
+        lineas += _md_contaminacion(informe["contaminacion"])
     return "\n".join(lineas) + "\n"
 
 
@@ -264,6 +267,50 @@ def _md_niveles(nv: dict) -> list[str]:
             lineas += ["", "Pila completa por familia de la víctima: " + ", ".join(
                 f"{p} {x['detectados']}/{x['episodios']}" for p, x in pc["por_pila_victima"].items()) + "."]
         lineas.append("")
+    return lineas
+
+
+def _fmt_rafaga(rf: dict | None) -> str:
+    return f"{fmt_ic(rf['deteccion'])} ({rf['episodios']} ráfagas)" if rf else "—"
+
+
+def _md_contaminacion(co: dict) -> list[str]:
+    lineas = ["## Bloque 4 — contaminación del perfil (clon de ritmo, defensas por defecto)", "",
+              "| Condición | Episodios | Detección | Cobertura | Absorción | Latencia mediana (s) | Detección de ráfagas |",
+              "|---|---|---|---|---|---|---|"]
+    tabla = co["ablacion"]["todas"]["contaminacion"]["por_nivel"]
+    for c in co["condiciones"]:
+        v, rf = tabla[c], tabla.get(f"rafaga_{c}")
+        lineas.append(f"| {c} | {v['episodios']} | {fmt_ic(v['deteccion'])} | {fmt_ic(v['cobertura'])} | "
+                      f"{fmt_ic(v['absorcion'])} | {fmt_ic(v['latencia_s_mediana'], 1)} | "
+                      f"{_fmt_rafaga(rf)} |")
+    lineas += ["", "## Bloque 4 — ablación de defensas", "",
+               "| Configuración | Condición | Detección | Cobertura | Absorción | FA/disp-día (contaminación) | "
+               "FA/disp-día con variación | FA/disp-día sin variación | Ventanas no_confiable (variación) |",
+               "|---|---|---|---|---|---|---|---|---|"]
+    for clave, a in co["ablacion"].items():
+        fa = fmt_ic(a["contaminacion"]["legitimos"]["falsas_alarmas_por_dispositivo_dia"], 2)
+        cv, sv = a["variacion"]["con_variacion"], a["variacion"]["sin_variacion"]
+        for c in co["condiciones"]:
+            v = a["contaminacion"]["por_nivel"][c]
+            lineas.append(f"| {clave} | {c} | {fmt_ic(v['deteccion'])} | {fmt_ic(v['cobertura'])} | {fmt_ic(v['absorcion'])} | "
+                          f"{fa} | {fmt_ic(cv['fa_ventanas_por_dispositivo_dia'], 1)} | "
+                          f"{fmt_ic(sv['fa_ventanas_por_dispositivo_dia'], 1)} | {fmt_ic(cv['fraccion_ventanas_no_confiable'], 3)} |")
+    lineas += ["", "FA fuera de los episodios y las ráfagas, por grupo de dispositivos (FA/disp-día; la víctima "
+               "es la dueña legítima de la MAC):", "",
+               "| Configuración | " + " | ".join(["no víctimas", *co["condiciones"]]) + " |",
+               "|---|" + "---|" * (1 + len(co["condiciones"]))]
+    for clave, a in co["ablacion"].items():
+        g = a["contaminacion"]["legitimos"]["fa_por_grupo"]
+        lineas.append(f"| {clave} | " + " | ".join(
+            f"{fmt_ic(g[k], 1)} ({g[k]['falsas_alarmas']})" for k in ["no_victima", *co["condiciones"]]) + " |")
+    lineas += ["", f"Regla registrada: una defensa se queda si apagarla empeora detección, cobertura o absorción en "
+               f"≥ {co['regla']['deteccion_cobertura_absorcion']} o las FA en ≥ {co['regla']['fa_dispositivo_dia']}/disp-día.", ""]
+    for n, v in co["veredicto"].items():
+        cambios = v.get("empeora_al_apagarla", v.get("empeora_al_encenderla", []))
+        lineas.append(f"- **{n}**: {'queda' if v['queda'] is True else ('se apaga' if v['queda'] is False else v['queda'])}"
+                      f" — {'; '.join(cambios) if cambios else 'no cambia ninguna cifra'}.")
+    lineas.append("")
     return lineas
 
 
@@ -542,7 +589,150 @@ def seccion_niveles(cfg: dict, cfg_sec: dict, **seguidor) -> dict:
     return salida
 
 
-SECCIONES_B = {"ipid": seccion_ipid, "con_variacion": seccion_con_variacion, "niveles": seccion_niveles}
+ABLACION: dict[str, dict] = {
+    "todas": {},
+    "sin_congelar": {"congelar_en_alerta": False},
+    "sin_no_confiable": {"min_ventanas": 1},
+    "con_tope": {"tope_diario": idn.TOPE_REGISTRADO},
+    "con_reperfilado": {"reperfilar_tras": idn.REPERFILAR_REGISTRADO},
+}
+# Las que empiezan por `con_` están apagadas por defecto: el tope tras esta misma ablación (se
+# midió primero con el tope puesto y no cambió nada), el reperfilado tras el bloque 2.
+DEFENSAS: dict[str, str] = {"sin_congelar": "sin aprendizaje en alerta", "sin_no_confiable": "no_confiable",
+                            "con_tope": "tope diario (apagado tras la ablación)",
+                            "con_reperfilado": "reperfilado (apagado en el bloque 2)"}
+REGLA_DETECCION: float = 0.05
+REGLA_FA: float = 1.0
+
+
+def _absorbido(perfil: dict, pila_victima: str, pila_clon: str) -> bool:
+    """¿El perfil ya conoce todo lo que distingue la pila del clon de la de la víctima?"""
+    v, c = gc.PILAS[pila_victima], gc.PILAS[pila_clon]
+    pruebas = []
+    if c["ttl"] != v["ttl"]:
+        pruebas.append(perfil.get("ttl_valores", {}).get(c["ttl"], 0) >= idn.MIN_APARICIONES_VALOR)
+    if c["window"] != v["window"]:
+        pruebas.append(perfil.get("tcp_window_valores", {}).get(c["window"], 0) >= idn.MIN_APARICIONES_VALOR)
+    firma = tuple(o[0] for o in c["opciones"])
+    if firma != tuple(o[0] for o in v["opciones"]):
+        pruebas.append(firma in perfil.get("tcp_opciones", frozenset()))
+    return bool(pruebas) and all(pruebas)
+
+
+def _seguir_con_instantaneas(tramas, momentos: dict[str, list[int]], ventana_s: float = idn.VENTANA_S,
+                             **seguidor) -> tuple[dict[str, list[dict]], dict[tuple[str, int], dict]]:
+    """Como `seguir_sesion`, y además guarda el perfil de cada MAC justo antes de cada ventana pedida."""
+    por_mac: dict[str, dict[int, list]] = {}
+    for t in tramas:
+        por_mac.setdefault(t.mac_src, {}).setdefault(int(t.ts_us // (ventana_s * US)), []).append(t)
+    salida, fotos = {}, {}
+    for mac, ventanas in por_mac.items():
+        seg = idn.SeguidorIdentidad(**seguidor)
+        pendientes = sorted(momentos.get(mac, []))
+        filas = []
+        for k in sorted(ventanas):
+            while pendientes and pendientes[0] <= k:
+                fotos[(mac, pendientes.pop(0))] = dict(seg.perfil) if seg.historia else {}
+            estado_previo = seg.estado
+            r = seg.observar(ventanas[k], ts_us=int(k * ventana_s * US))
+            filas.append({"idx": k, "estado_previo": estado_previo, "estado": r["estado"], "puntaje": r["puntaje"],
+                          "alarma": bool(r["alarma"]), "reperfilado": bool(r.get("reperfilado", False)),
+                          "senal": max(r["por_senal"], key=r["por_senal"].get) if r["alarma"] else None})
+        salida[mac] = filas
+    return salida, fotos
+
+
+def _medir_contaminacion(sesiones, n_rep: int, semilla: int, **seguidor) -> dict:
+    episodios, dispositivos = [], []
+    for nombre, tramas, man in sesiones:
+        principales = [e for e in man["episodios"] if not e["nivel"].startswith("rafaga_")]
+        momentos: dict[str, list[int]] = {}
+        for e in principales:
+            momentos.setdefault(e["mac_victima"], []).append(int(e["inicio_s"] // idn.VENTANA_S))
+        seguimiento, fotos = _seguir_con_instantaneas(tramas, momentos, **seguidor)
+        r = evaluar_sesion(nombre, seguimiento, man)
+        for e in r["episodios"]:
+            e["cobertura"] = e["ventanas_con_alarma"] / e["ventanas"] if e["ventanas"] else 0.0
+            if not e["nivel"].startswith("rafaga_"):
+                foto = fotos.get((e["mac_victima"], int(e["inicio_s"] // idn.VENTANA_S)), {})
+                e["absorbido"] = _absorbido(foto, e["pila_victima"], e["pila_clon"])
+        condicion = {e["mac_victima"]: e["condicion"] for e in principales}
+        for d in r["dispositivos"]:
+            d["condicion"] = condicion.get(d["mac"], "no_victima")
+        episodios += r["episodios"]
+        dispositivos += r["dispositivos"]
+    res = resumir(episodios, dispositivos, n_rep, semilla)
+    sesiones_n = sorted({d["sesion"] for d in dispositivos})
+    res["legitimos"]["fa_por_grupo"] = {}
+    for g in ["no_victima", *gco.CONDICIONES]:
+        sub = [d for d in dispositivos if d["condicion"] == g]
+        num = np.array([[sum(d["falsas_alarmas"] for d in sub if d["sesion"] == s) for s in sesiones_n]])
+        dias = np.array([[sum(d["segundos"] for d in sub if d["sesion"] == s) / ev.SEGUNDOS_POR_DIA for s in sesiones_n]])
+        res["legitimos"]["fa_por_grupo"][g] = {**ev.ic_razon_por_sesion(num, dias, n_rep, semilla),
+                                               "dispositivos": len(sub), "falsas_alarmas": int(num.sum())}
+    for nivel, fila in res["por_nivel"].items():
+        ep = [e for e in episodios if e["nivel"] == nivel]
+        fila["cobertura"] = ev.ic_media_por_unidad(np.array([e["cobertura"] for e in ep], float), n_rep, semilla)
+        if not nivel.startswith("rafaga_"):
+            fila["absorcion"] = ev.ic_media_por_unidad(np.array([e["absorbido"] for e in ep], float), n_rep, semilla)
+            fila.pop("por_par_de_pilas", None)
+    return res
+
+
+def _veredicto(ablacion: dict) -> dict:
+    """Aplica la regla registrada: ¿apagar la defensa empeora alguna cifra lo bastante?"""
+    base = ablacion["todas"]
+    salida = {}
+    for clave, nombre in DEFENSAS.items():
+        a = ablacion[clave]
+        cambios = []
+        for cond in gco.CONDICIONES:
+            b0, b1 = base["contaminacion"]["por_nivel"][cond], a["contaminacion"]["por_nivel"][cond]
+            for m, signo in (("deteccion", -1), ("cobertura", -1), ("absorcion", 1)):
+                d = b1[m]["valor"] - b0[m]["valor"]
+                if signo * d >= REGLA_DETECCION:
+                    cambios.append(f"{cond}: {m} {b0[m]['valor']:.3f} → {b1[m]['valor']:.3f}")
+        for grupo, f0, f1 in (
+                ("contaminación", base["contaminacion"]["legitimos"]["falsas_alarmas_por_dispositivo_dia"],
+                 a["contaminacion"]["legitimos"]["falsas_alarmas_por_dispositivo_dia"]),
+                ("con variación", base["variacion"]["con_variacion"]["fa_ventanas_por_dispositivo_dia"],
+                 a["variacion"]["con_variacion"]["fa_ventanas_por_dispositivo_dia"]),
+                ("sin variación", base["variacion"]["sin_variacion"]["fa_ventanas_por_dispositivo_dia"],
+                 a["variacion"]["sin_variacion"]["fa_ventanas_por_dispositivo_dia"])):
+            if f1["valor"] - f0["valor"] >= REGLA_FA:
+                cambios.append(f"FA {grupo}: {f0['valor']:.2f} → {f1['valor']:.2f}")
+        if clave.startswith("con_"):  # defensa apagada: ¿encenderla cambia algo?
+            salida[nombre] = {"empeora_al_encenderla": cambios, "queda": "apagada"}
+        else:
+            salida[nombre] = {"empeora_al_apagarla": cambios, "queda": bool(cambios)}
+    return salida
+
+
+def seccion_contaminacion(cfg: dict, cfg_sec: dict) -> dict:
+    """Bloque 4: contaminación 0/5/20 % y continuo 20 %, con la ablación de defensas."""
+    n_rep, sem = int(cfg["n_bootstrap"]), int(cfg["semilla_bootstrap"])
+    sesiones = _sesiones_generadas(cfg_sec, "contaminacion", gco.generar_sesion, gco.SEMILLA_BASE_CONTAMINACION)
+    variacion = _sesiones_generadas(cfg["b"]["secciones"]["con_variacion"], "variacion", gv.generar_sesion,
+                                    gv.SEMILLA_BASE_VARIACION)
+    ablacion = {}
+    for clave, params in ABLACION.items():
+        disp = _dispositivos_por_variacion(variacion, **params)
+        ablacion[clave] = {
+            "parametros": {k: (str(v) if isinstance(v, float) and math.isinf(v) else v) for k, v in params.items()},
+            "contaminacion": _medir_contaminacion(sesiones, n_rep, sem, **params),
+            "variacion": {"con_variacion": tabla_legitimos([d for d in disp if d["variacion"] in gv.TIPOS], n_rep, sem),
+                          "sin_variacion": tabla_legitimos([d for d in disp if d["variacion"] in ("control", "gateway")],
+                                                           n_rep, sem)},
+        }
+        logger.info("ablación %s hecha", clave)
+    return {"sesiones": [s[0] for s in sesiones], "condiciones": list(gco.CONDICIONES),
+            "tabla": ablacion["todas"]["contaminacion"]["por_nivel"], "ablacion": ablacion,
+            "regla": {"deteccion_cobertura_absorcion": REGLA_DETECCION, "fa_dispositivo_dia": REGLA_FA},
+            "veredicto": _veredicto(ablacion)}
+
+
+SECCIONES_B = {"ipid": seccion_ipid, "con_variacion": seccion_con_variacion, "niveles": seccion_niveles,
+               "contaminacion": seccion_contaminacion}
 
 
 def resumen_b(informe: dict) -> dict:
@@ -572,6 +762,11 @@ def resumen_b(informe: dict) -> dict:
         if "confirmacion" in nv:
             r["niveles"]["confirmacion_pila_completa"] = round(
                 nv["confirmacion"]["e3b"]["por_nivel"]["pila_completa"]["deteccion"]["valor"], 3)
+    if "contaminacion" in informe:
+        co = informe["contaminacion"]
+        r["contaminacion"] = {c: {m: round(co["tabla"][c][m]["valor"], 3) for m in ("deteccion", "cobertura", "absorcion")}
+                              for c in co["condiciones"]}
+        r["defensas"] = {n: v["queda"] for n, v in co["veredicto"].items()}
     return r
 
 

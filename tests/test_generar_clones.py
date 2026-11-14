@@ -6,6 +6,7 @@ import hashlib
 from scapy.all import rdpcap
 
 from scripts.lab import generar_clones as gc
+from scripts.lab import generar_contaminacion as gco
 from scripts.lab import generar_suplantacion as gs
 from scripts.lab import generar_variacion as gv
 
@@ -80,3 +81,26 @@ def test_cada_nivel_de_suplantacion_hace_lo_que_dice():
                 assert not callada and e["mac_victima"] not in macs
             else:
                 assert e["mac_victima"] in macs
+
+
+def test_contaminacion_misma_semilla_mismo_pcap_byte_a_byte(tmp_path):
+    a, b = tmp_path / "a" / "c.pcap", tmp_path / "b" / "c.pcap"
+    gc.escribir_sesion(*gco.generar_sesion(gco.SEMILLA_BASE_CONTAMINACION + 5), a)
+    gc.escribir_sesion(*gco.generar_sesion(gco.SEMILLA_BASE_CONTAMINACION + 5), b)
+    assert _sha(a) == _sha(b)
+
+
+def test_cada_condicion_de_contaminacion_pone_sus_rafagas():
+    paquetes, man = gco.generar_sesion(gco.SEMILLA_BASE_CONTAMINACION)
+    principales = [e for e in man["episodios"] if not e["nivel"].startswith("rafaga_")]
+    assert sorted(e["nivel"] for e in principales) == sorted(c for c in gco.CONDICIONES for _ in range(gco.POR_CONDICION))
+    for e in principales:
+        fraccion, desde = gco.CONDICIONES[e["nivel"]]
+        n = int(round(fraccion * (gco.FIN_APRENDIZAJE_S - desde) / gco.VENTANA_S))
+        assert len(e["ventanas_contaminadas"]) == n
+        assert all(desde <= w * gco.VENTANA_S < gco.FIN_APRENDIZAJE_S for w in e["ventanas_contaminadas"])
+        ttl_clon = gc.PILAS[e["pila_clon"]]["ttl"]
+        for w in e["ventanas_contaminadas"]:
+            en_w = [p for p in paquetes if p.src == e["mac_victima"] and p.haslayer("TCP") and p["TCP"].flags == "S"
+                    and w * gco.VENTANA_S <= float(p.time) < (w + 1) * gco.VENTANA_S]
+            assert any(p["IP"].ttl == ttl_clon and p["TCP"].window == gc.PILAS[e["pila_clon"]]["window"] for p in en_w)
