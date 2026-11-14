@@ -1,0 +1,21 @@
+{
+  "descripcion": "PEDIDO-ANOMALIAS-1: detector entrenado solo con benigno. Mismo reparto por sesión, objetivo de falsas alarmas y bootstrap que E2. El primer conjunto es el principal (sin_capa2, el del marcador del extractor); completo es la segunda corrida, etiquetada.",
+  "dataset": "data/dataset_lab.csv",
+  "conjuntos": ["sin_capa2", "completo"],
+  "modelos": ["isolation_forest", "lof", "isolation_forest_pca"],
+  "n_folds": 5,
+  "n_folds_internos": 3,
+  "semillas": [42, 43, 44, 45, 46],
+  "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+  "n_bootstrap": 1000,
+  "semilla_bootstrap": 42,
+  "top_deriva": 5,
+  "salidas": {
+    "json": "reports/anomalias.json",
+    "md": "reports/anomalias.md"
+  },
+  "referencias_supervisado": {
+    "e2_xgboost_completo": "reports/evaluacion_e2.json",
+    "loao_sin_capa2": "reports/extractor/loao_it1_respuestas.json"
+  }
+}
