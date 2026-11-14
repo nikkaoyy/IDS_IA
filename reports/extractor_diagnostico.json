@@ -1,0 +1,4978 @@
+{
+  "pedido": "PEDIDO-EXTRACTOR-1",
+  "iteracion": 0,
+  "commit": "7fb1019b495aca498b41d5bc9e197608e08eccdb",
+  "arbol_con_cambios": true,
+  "dataset": {
+    "ruta": "data/dataset_lab.csv",
+    "sha256": "3f4d28bcd1d2fee5cd5aeab0ae31d5213262a097f7a051fe87b6e63f9e04eced",
+    "filas": 78988
+  },
+  "metodo": "AUC univariada (ventanas etiquetadas del tipo frente a benignas limpias); separacion = |AUC − 0,5| × 2. Top 3 por tipo.",
+  "top_por_ataque": {
+    "arp_spoofing": [
+      {
+        "caracteristica": "arp_cambios_vinculo_60s",
+        "auc": 0.9639452402395756,
+        "mediana_ataque": 4.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "Cuenta IPs cuyo vínculo IP→MAC cambia: es la suplantación misma, vista en el campo ARP sender, no en cómo se construye la trama."
+      },
+      {
+        "caracteristica": "longitud_trama_media",
+        "auc": 0.21484909747929937,
+        "mediana_ataque": 60.0,
+        "mediana_benigno": 79.90697674418605,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "ARP de ataque y benigno miden 60 B en el pcap (100 % ambos); la media baja porque la ventana atacante solo trae ARP, no por la trama."
+      },
+      {
+        "caracteristica": "arp_cambios_vinculo",
+        "auc": 0.7779995717027217,
+        "mediana_ataque": 1.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "Igual que la versión de 60 s, en la ventana de 5 s."
+      }
+    ],
+    "dns_spoofing": [
+      {
+        "caracteristica": "dns_respuestas",
+        "auc": 0.9716029117799112,
+        "mediana_ataque": 7.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Un equipo que no es el resolver emitiendo respuestas sí es la violación, pero el contador no distingue al resolver legítimo y su magnitud es el ritmo de la herramienta."
+      },
+      {
+        "caracteristica": "entropia_puertos_destino",
+        "auc": 0.8902496543769567,
+        "mediana_ataque": 2.75,
+        "mediana_benigno": 0.3712323266408756,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Respuestas a muchos puertos efímeros: refleja la estrategia de adivinar puertos de la herramienta; un spoofing dirigido a un solo cliente no la tendría."
+      },
+      {
+        "caracteristica": "puertos_destino_distintos_60s",
+        "auc": 0.877773863199776,
+        "mediana_ataque": 73.0,
+        "mediana_benigno": 8.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Misma causa que la entropía de puertos: estrategia de puertos de la herramienta."
+      }
+    ],
+    "icmp_flood": [
+      {
+        "caracteristica": "conexiones_distintas",
+        "auc": 0.28865349946824437,
+        "mediana_ataque": 0.0,
+        "mediana_benigno": 2.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Separa por ausencia de flujos TCP/UDP en la ventana atacante (vale 0), no por nada ICMP: ninguna característica actual mira el tipo ICMP."
+      },
+      {
+        "caracteristica": "puertos_destino_distintos",
+        "auc": 0.2894130471623463,
+        "mediana_ataque": 0.0,
+        "mediana_benigno": 2.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Como conexiones_distintas: separa por lo que la ventana atacante no tiene."
+      },
+      {
+        "caracteristica": "puertos_destino_distintos_60s",
+        "auc": 0.33042625409603094,
+        "mediana_ataque": 3.5,
+        "mediana_benigno": 8.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Como conexiones_distintas, en 60 s."
+      }
+    ],
+    "mac_flooding": [
+      {
+        "caracteristica": "n_tramas_60s",
+        "auc": 0.08059574937289277,
+        "mediana_ataque": 3.0,
+        "mediana_benigno": 131.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Cada MAC falsa emite muy pocas tramas (mediana 3 frente a 131): consecuencia del ataque (muchas MAC efímeras), pero la cifra exacta la fija la herramienta."
+      },
+      {
+        "caracteristica": "macs_nuevas_por_s",
+        "auc": 0.8771746888466456,
+        "mediana_ataque": 1.8,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "MACs origen nuevas por segundo: es la presión sobre la tabla CAM que define el ataque."
+      },
+      {
+        "caracteristica": "longitud_trama_media",
+        "auc": 0.13121085904911395,
+        "mediana_ataque": 60.0,
+        "mediana_benigno": 79.90697674418605,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "sí",
+        "motivo": "pcap: el UDP del ataque mide 60 B (100 %) frente a 90/75/286 B del UDP benigno; la herramienta emite tramas mínimas."
+      }
+    ],
+    "port_scan": [
+      {
+        "caracteristica": "puertos_destino_distintos_60s",
+        "auc": 0.7991335874946813,
+        "mediana_ataque": 28.0,
+        "mediana_benigno": 8.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "Tocar muchos puertos de un destino es la definición del barrido."
+      },
+      {
+        "caracteristica": "entropia_puertos_destino",
+        "auc": 0.7852768786604255,
+        "mediana_ataque": 1.584962500721156,
+        "mediana_benigno": 0.3712323266408756,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "Abanico de puertos destino: definición del barrido."
+      },
+      {
+        "caracteristica": "syn_medio_abiertos_60s",
+        "auc": 0.7641185149760956,
+        "mediana_ataque": 5.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "SYN sin completar el saludo: el barrido no abre conexiones."
+      }
+    ],
+    "syn_flood": [
+      {
+        "caracteristica": "syn_medio_abiertos",
+        "auc": 0.9922017874289402,
+        "mediana_ataque": 6.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "Conexiones medio abiertas: el estado que el ataque deja en la víctima."
+      },
+      {
+        "caracteristica": "syn_medio_abiertos_60s",
+        "auc": 0.9907425154598999,
+        "mediana_ataque": 66.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "no",
+        "motivo": "Igual, en 60 s."
+      },
+      {
+        "caracteristica": "tasa_syn",
+        "auc": 0.9796221166062352,
+        "mediana_ataque": 1.0,
+        "mediana_benigno": 0.0,
+        "fraccion_nan_ataque": 0.0,
+        "fraccion_nan_benigno": 0.0,
+        "depende_de_herramienta": "mixta",
+        "motivo": "Fracción de SYN en la ventana: alta por el ataque, pero vale 1 porque la MAC atacante no emite nada más (composición)."
+      }
+    ]
+  },
+  "criterio_depende_de_herramienta": "sí = difiere del benigno de su misma clase de protocolo en un campo que el protocolo no fija; mixta = separa por composición o volumen de la ventana; no = cuenta una violación de estado o vínculo.",
+  "artefactos_sin_caracteristica": [
+    "Ventana TCP 8192 en el 100 % de los TCP de ataque (SYN, nulo, FIN, Xmas) frente a 29200/64240 en el benigno.",
+    "TTL 64 en el 100 % del IP de ataque frente a 64/128 (y 48–50 de equipos remotos) en el benigno.",
+    "Respuestas DNS falsas de 112–128 B frente a 108–110 B en las legítimas.",
+    "UDP de mac_flooding de 60 B (trama mínima) frente a 75–1242 B en el UDP benigno."
+  ],
+  "violaciones_sin_contador": [
+    "TCP sin flags (503), FIN suelto (453) y FIN+PSH+URG (466) en port_scan; 0 en el benigno.",
+    "ICMP destination unreachable: 10 250 tramas de icmp_flood frente a 1 499 benignas; hoy solo se cuenta echo.",
+    "ICMP echo reply: 29 204 tramas de icmp_flood, que ningún contador mira (n_icmp_echo solo cuenta echo request).",
+    "UDP a puertos sin servicio en port_scan (883 tramas de 60 B)."
+  ],
+  "separacion_completa": {
+    "arp_spoofing": {
+      "ventanas": 456,
+      "caracteristicas": [
+        {
+          "caracteristica": "arp_cambios_vinculo_60s",
+          "auc": 0.9639452402395756,
+          "separacion": 0.9278904804791512,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 76.5
+        },
+        {
+          "caracteristica": "longitud_trama_media",
+          "auc": 0.21484909747929937,
+          "separacion": 0.5703018050414013,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 60.0,
+          "mediana_benigno": 79.90697674418605,
+          "p90_benigno": 853.3257575757577,
+          "p10_ataque": 60.0,
+          "p90_ataque": 74.54166666666666
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo",
+          "auc": 0.7779995717027217,
+          "separacion": 0.5559991434054434,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 14.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas",
+          "auc": 0.23223890739078304,
+          "separacion": 0.535522185218434,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "conexiones_distintas",
+          "auc": 0.2454639768242912,
+          "separacion": 0.5090720463514176,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos",
+          "auc": 0.24640135337585584,
+          "separacion": 0.5071972932482883,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "ips_origen_distintas",
+          "auc": 0.2693966294056502,
+          "separacion": 0.46120674118869964,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "arp_replies",
+          "auc": 0.7223695187080396,
+          "separacion": 0.4447390374160791,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 19.0
+        },
+        {
+          "caracteristica": "entropia_puertos_destino",
+          "auc": 0.29532247906350817,
+          "separacion": 0.40935504187298366,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.3712323266408756,
+          "p90_benigno": 2.3901758950815526,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.4689955935892812
+        },
+        {
+          "caracteristica": "ips_destino_distintas_60s",
+          "auc": 0.3164487775324029,
+          "separacion": 0.36710244493519417,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 7.0,
+          "p90_benigno": 16.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 8.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos_60s",
+          "auc": 0.3265534515245133,
+          "separacion": 0.34689309695097337,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 8.0,
+          "p90_benigno": 82.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 10.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas",
+          "auc": 0.6480263157894737,
+          "separacion": 0.29605263157894735,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 12.5
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas_60s",
+          "auc": 0.6475748709846676,
+          "separacion": 0.2951497419693352,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 66.0
+        },
+        {
+          "caracteristica": "arp_requests",
+          "auc": 0.6379485086521856,
+          "separacion": 0.2758970173043711,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 5.0
+        },
+        {
+          "caracteristica": "longitud_trama_std",
+          "auc": 0.3706810888306214,
+          "separacion": 0.2586378223387572,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.21823421535237097,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 79.70437834903151,
+          "p90_benigno": 644.3888605540676,
+          "p10_ataque": 0.0,
+          "p90_ataque": 68.80361709379113
+        },
+        {
+          "caracteristica": "tasa_syn",
+          "auc": 0.3706876505723169,
+          "separacion": 0.2586246988553662,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.125,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.05
+        },
+        {
+          "caracteristica": "arp_gateway_reclamado",
+          "auc": 0.6256136891599544,
+          "separacion": 0.2512273783199088,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 6.0
+        },
+        {
+          "caracteristica": "n_syn",
+          "auc": 0.3773084781815133,
+          "separacion": 0.24538304363697339,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 3.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "macs_activas",
+          "auc": 0.596320789097518,
+          "separacion": 0.1926415781950359,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 25.0,
+          "mediana_benigno": 23.0,
+          "p90_benigno": 34.0,
+          "p10_ataque": 19.0,
+          "p90_ataque": 34.5
+        },
+        {
+          "caracteristica": "ratio_syn_medio_abiertos",
+          "auc": 0.4044071408925081,
+          "separacion": 0.19118571821498376,
+          "fraccion_nan_ataque": 0.8070175438596491,
+          "fraccion_nan_benigno": 0.6202997669704783,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.2928571428571401
+        },
+        {
+          "caracteristica": "iat_std_ms",
+          "auc": 0.593522055072184,
+          "separacion": 0.18704411014436806,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.22132289066916702,
+          "mediana_ataque": 544.3397452048696,
+          "mediana_benigno": 593.872177600403,
+          "p90_benigno": 2927.4765410072323,
+          "p10_ataque": 174.43663606892304,
+          "p90_ataque": 1877.4373830713726
+        },
+        {
+          "caracteristica": "macs_nuevas_por_s",
+          "auc": 0.586366672303112,
+          "separacion": 0.17273334460622403,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.5
+        },
+        {
+          "caracteristica": "arp_gratuitos",
+          "auc": 0.5795393161419329,
+          "separacion": 0.15907863228386576,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "entropia_ethertype",
+          "auc": 0.5777715012853757,
+          "separacion": 0.15554300257075138,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.4394969869215134,
+          "p10_ataque": -0.0,
+          "p90_ataque": 0.9182958340544896
+        },
+        {
+          "caracteristica": "tasa_broadcast",
+          "auc": 0.5771750329175669,
+          "separacion": 0.15435006583513378,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0588235294117647,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "dns_consultas",
+          "auc": 0.4270595281206616,
+          "separacion": 0.14588094375867677,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "macs_destino_distintas",
+          "auc": 0.5547319864164084,
+          "separacion": 0.10946397283281684,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 11.0
+        },
+        {
+          "caracteristica": "tasa_multicast",
+          "auc": 0.45125179283716643,
+          "separacion": 0.09749641432566714,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.1666666666666666,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_60s",
+          "auc": 0.45853910592429115,
+          "separacion": 0.08292178815141771,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "dns_respuestas",
+          "auc": 0.46280372397286673,
+          "separacion": 0.07439255205426654,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_vlan",
+          "auc": 0.46499149029793574,
+          "separacion": 0.07001701940412852,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_max_destino",
+          "auc": 0.5347829460514765,
+          "separacion": 0.06956589210295294,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 9.0
+        },
+        {
+          "caracteristica": "n_tramas",
+          "auc": 0.5299147536014588,
+          "separacion": 0.059829507202917576,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 8.0,
+          "mediana_benigno": 9.0,
+          "p90_benigno": 57.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 33.0
+        },
+        {
+          "caracteristica": "n_icmp_echo",
+          "auc": 0.47041907878710476,
+          "separacion": 0.05916184242579048,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "iat_media_ms",
+          "auc": 0.4713496214510049,
+          "separacion": 0.05730075709799021,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.002964576754960495,
+          "mediana_ataque": 609.8218263888889,
+          "mediana_benigno": 593.8418888888889,
+          "p90_benigno": 9194.627200000004,
+          "p10_ataque": 147.00901341991343,
+          "p90_ataque": 2160.292
+        },
+        {
+          "caracteristica": "tasa_unicast",
+          "auc": 0.47227192413973446,
+          "separacion": 0.05545615172053109,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "tasa_llc",
+          "auc": 0.4751802876328889,
+          "separacion": 0.049639424734222226,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "bytes_totales",
+          "auc": 0.4770365045716894,
+          "separacion": 0.04592699085662122,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 487.0,
+          "mediana_benigno": 936.0,
+          "p90_benigno": 29889.60000000002,
+          "p10_ataque": 120.0,
+          "p90_ataque": 2610.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos",
+          "auc": 0.47802239870182733,
+          "separacion": 0.04395520259634533,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_tramas_60s",
+          "auc": 0.4801869419042138,
+          "separacion": 0.039626116191572414,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 92.0,
+          "mediana_benigno": 131.0,
+          "p90_benigno": 581.0,
+          "p10_ataque": 35.5,
+          "p90_ataque": 321.5
+        },
+        {
+          "caracteristica": "n_rst",
+          "auc": 0.4824911867039881,
+          "separacion": 0.03501762659202379,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_resolver_no_autorizado",
+          "auc": 0.48481690079686757,
+          "separacion": 0.030366198406264866,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ratio_macs_una_trama",
+          "auc": 0.5084483785059355,
+          "separacion": 0.01689675701187099,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.2272727272727272,
+          "mediana_benigno": 0.2272727272727272,
+          "p90_benigno": 0.4285714285714285,
+          "p10_ataque": 0.1052631578947368,
+          "p90_ataque": 0.49324324324324326
+        },
+        {
+          "caracteristica": "dns_multiples_respuestas_txid",
+          "auc": 0.4965551158483056,
+          "separacion": 0.006889768303388832,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_sin_synack_max_destino",
+          "auc": 0.5013791450552529,
+          "separacion": 0.002758290110505879,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta_60s",
+          "auc": 0.49988969016725726,
+          "separacion": 0.0002206196654854775,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "pct_menor_64",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_ether_distinto_hwsrc",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        }
+      ]
+    },
+    "dns_spoofing": {
+      "ventanas": 621,
+      "caracteristicas": [
+        {
+          "caracteristica": "dns_respuestas",
+          "auc": 0.9716029117799112,
+          "separacion": 0.9432058235598224,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 7.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 15.0
+        },
+        {
+          "caracteristica": "entropia_puertos_destino",
+          "auc": 0.8902496543769567,
+          "separacion": 0.7804993087539134,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.75,
+          "mediana_benigno": 0.3712323266408756,
+          "p90_benigno": 2.3901758950815526,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.807354922057604
+        },
+        {
+          "caracteristica": "puertos_destino_distintos_60s",
+          "auc": 0.877773863199776,
+          "separacion": 0.755547726399552,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 73.0,
+          "mediana_benigno": 8.0,
+          "p90_benigno": 82.0,
+          "p10_ataque": 24.0,
+          "p90_ataque": 131.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos",
+          "auc": 0.8541189320738117,
+          "separacion": 0.7082378641476235,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 7.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 3.0,
+          "p90_ataque": 14.0
+        },
+        {
+          "caracteristica": "conexiones_distintas",
+          "auc": 0.8475968299067898,
+          "separacion": 0.6951936598135795,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 7.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 3.0,
+          "p90_ataque": 14.0
+        },
+        {
+          "caracteristica": "longitud_trama_media",
+          "auc": 0.7492612760551747,
+          "separacion": 0.49852255211034935,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 110.28571428571428,
+          "mediana_benigno": 79.90697674418605,
+          "p90_benigno": 853.3257575757577,
+          "p10_ataque": 87.875,
+          "p90_ataque": 112.0
+        },
+        {
+          "caracteristica": "dns_resolver_no_autorizado",
+          "auc": 0.7331921776029163,
+          "separacion": 0.46638435520583266,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 5.0
+        },
+        {
+          "caracteristica": "dns_multiples_respuestas_txid",
+          "auc": 0.699486817253355,
+          "separacion": 0.3989736345067101,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas",
+          "auc": 0.6798520778004948,
+          "separacion": 0.3597041556009897,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 3.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 7.0
+        },
+        {
+          "caracteristica": "tasa_syn",
+          "auc": 0.3235849350074582,
+          "separacion": 0.35283012998508356,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.125,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_syn",
+          "auc": 0.3267703201625214,
+          "separacion": 0.3464593596749572,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 3.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ips_origen_distintas",
+          "auc": 0.6508306443646297,
+          "separacion": 0.30166128872925935,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "ratio_syn_medio_abiertos",
+          "auc": 0.349732095651681,
+          "separacion": 0.300535808696638,
+          "fraccion_nan_ataque": 0.9227053140096618,
+          "fraccion_nan_benigno": 0.6202997669704783,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "macs_destino_distintas",
+          "auc": 0.6345783290072029,
+          "separacion": 0.2691566580144058,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 3.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 7.0
+        },
+        {
+          "caracteristica": "tasa_unicast",
+          "auc": 0.6276560983496535,
+          "separacion": 0.25531219669930705,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "longitud_trama_std",
+          "auc": 0.3988734941392239,
+          "separacion": 0.2022530117215522,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.21823421535237097,
+          "mediana_ataque": 1.4600918230947435,
+          "mediana_benigno": 79.70437834903151,
+          "p90_benigno": 644.3888605540676,
+          "p10_ataque": 0.0,
+          "p90_ataque": 24.57234217570641
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_60s",
+          "auc": 0.4034870230406999,
+          "separacion": 0.19302595391860022,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "iat_std_ms",
+          "auc": 0.5963224771183145,
+          "separacion": 0.19264495423662908,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.22132289066916702,
+          "mediana_ataque": 508.5622360490584,
+          "mediana_benigno": 593.872177600403,
+          "p90_benigno": 2927.4765410072323,
+          "p10_ataque": 239.07318892057924,
+          "p90_ataque": 1687.6975264092875
+        },
+        {
+          "caracteristica": "entropia_ethertype",
+          "auc": 0.4077632054669625,
+          "separacion": 0.18447358906607503,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.4394969869215134,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_requests",
+          "auc": 0.40797949533828826,
+          "separacion": 0.1840410093234235,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies",
+          "auc": 0.41894856255607776,
+          "separacion": 0.16210287488784447,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas_60s",
+          "auc": 0.5758082454512793,
+          "separacion": 0.15161649090255858,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 9.0,
+          "mediana_benigno": 7.0,
+          "p90_benigno": 16.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 16.0
+        },
+        {
+          "caracteristica": "tasa_broadcast",
+          "auc": 0.4322832516700849,
+          "separacion": 0.13543349665983018,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0588235294117647,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_multicast",
+          "auc": 0.43420722345998825,
+          "separacion": 0.1315855530800235,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.1666666666666666,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_consultas",
+          "auc": 0.43423508957111795,
+          "separacion": 0.1315298208577641,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "ratio_macs_una_trama",
+          "auc": 0.44891691087260827,
+          "separacion": 0.10216617825478347,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.2,
+          "mediana_benigno": 0.2272727272727272,
+          "p90_benigno": 0.4285714285714285,
+          "p10_ataque": 0.0952380952380952,
+          "p90_ataque": 0.4324324324324324
+        },
+        {
+          "caracteristica": "tasa_vlan",
+          "auc": 0.4616866395630434,
+          "separacion": 0.0766267208739132,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_icmp_echo",
+          "auc": 0.4624142115123987,
+          "separacion": 0.0751715769752026,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "bytes_totales",
+          "auc": 0.5262558162735558,
+          "separacion": 0.05251163254711155,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 998.0,
+          "mediana_benigno": 936.0,
+          "p90_benigno": 29889.60000000002,
+          "p10_ataque": 299.0,
+          "p90_ataque": 1882.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_max_destino",
+          "auc": 0.4746317804271233,
+          "separacion": 0.05073643914575343,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "tasa_llc",
+          "auc": 0.4751802876328889,
+          "separacion": 0.049639424734222226,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo_60s",
+          "auc": 0.5239443057022968,
+          "separacion": 0.04788861140459355,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "n_tramas_60s",
+          "auc": 0.476226143861119,
+          "separacion": 0.047547712277762,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 113.0,
+          "mediana_benigno": 131.0,
+          "p90_benigno": 581.0,
+          "p10_ataque": 45.0,
+          "p90_ataque": 206.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos",
+          "auc": 0.4772546476066019,
+          "separacion": 0.04549070478679618,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_rst",
+          "auc": 0.5210610957714275,
+          "separacion": 0.0421221915428549,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "macs_nuevas_por_s",
+          "auc": 0.4789784496818966,
+          "separacion": 0.042043100636206754,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.4
+        },
+        {
+          "caracteristica": "iat_media_ms",
+          "auc": 0.4906984142273217,
+          "separacion": 0.018603171545356623,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.002964576754960495,
+          "mediana_ataque": 517.6694,
+          "mediana_benigno": 593.8418888888889,
+          "p90_benigno": 9194.627200000004,
+          "p10_ataque": 272.2343888888889,
+          "p90_ataque": 2058.603333333333
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta",
+          "auc": 0.5072463768115942,
+          "separacion": 0.01449275362318847,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta_60s",
+          "auc": 0.5071354452648184,
+          "separacion": 0.014270890529636704,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "macs_activas",
+          "auc": 0.4952188192482576,
+          "separacion": 0.009562361503484773,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 23.0,
+          "mediana_benigno": 23.0,
+          "p90_benigno": 34.0,
+          "p10_ataque": 18.0,
+          "p90_ataque": 34.0
+        },
+        {
+          "caracteristica": "n_tramas",
+          "auc": 0.5045138215134061,
+          "separacion": 0.009027643026812138,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 10.0,
+          "mediana_benigno": 9.0,
+          "p90_benigno": 57.0,
+          "p10_ataque": 3.0,
+          "p90_ataque": 18.0
+        },
+        {
+          "caracteristica": "arp_gratuitos",
+          "auc": 0.4958743611860554,
+          "separacion": 0.008251277627889242,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo",
+          "auc": 0.49738000824792483,
+          "separacion": 0.005239983504150336,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_sin_synack_max_destino",
+          "auc": 0.49895429920027806,
+          "separacion": 0.002091401599443876,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "arp_gateway_reclamado",
+          "auc": 0.501010585058884,
+          "separacion": 0.002021170117767923,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas_60s",
+          "auc": 0.4995794437626684,
+          "separacion": 0.0008411124746632304,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "pct_menor_64",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_ether_distinto_hwsrc",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        }
+      ]
+    },
+    "icmp_flood": {
+      "ventanas": 620,
+      "caracteristicas": [
+        {
+          "caracteristica": "conexiones_distintas",
+          "auc": 0.28865349946824437,
+          "separacion": 0.42269300106351126,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos",
+          "auc": 0.2894130471623463,
+          "separacion": 0.42117390567530744,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos_60s",
+          "auc": 0.33042625409603094,
+          "separacion": 0.33914749180793813,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 3.5,
+          "mediana_benigno": 8.0,
+          "p90_benigno": 82.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 17.100000000000023
+        },
+        {
+          "caracteristica": "entropia_puertos_destino",
+          "auc": 0.33071791907617293,
+          "separacion": 0.33856416184765414,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.3712323266408756,
+          "p90_benigno": 2.3901758950815526,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas_60s",
+          "auc": 0.3524380808224132,
+          "separacion": 0.29512383835517364,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 5.0,
+          "mediana_benigno": 7.0,
+          "p90_benigno": 16.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 8.0
+        },
+        {
+          "caracteristica": "ips_origen_distintas",
+          "auc": 0.6377986427442595,
+          "separacion": 0.2755972854885189,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "n_icmp_echo",
+          "auc": 0.6219734740436071,
+          "separacion": 0.2439469480872143,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 8.0
+        },
+        {
+          "caracteristica": "iat_media_ms",
+          "auc": 0.39390392502845595,
+          "separacion": 0.2121921499430881,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.002964576754960495,
+          "mediana_ataque": 529.7932777777778,
+          "mediana_benigno": 593.8418888888889,
+          "p90_benigno": 9194.627200000004,
+          "p10_ataque": 39.66796586051744,
+          "p90_ataque": 1581.2131
+        },
+        {
+          "caracteristica": "n_tramas",
+          "auc": 0.6060294776340142,
+          "separacion": 0.21205895526802832,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 10.0,
+          "mediana_benigno": 9.0,
+          "p90_benigno": 57.0,
+          "p10_ataque": 3.0,
+          "p90_ataque": 126.0
+        },
+        {
+          "caracteristica": "tasa_syn",
+          "auc": 0.40279756633379493,
+          "separacion": 0.19440486733241014,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.125,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.07519230769230772
+        },
+        {
+          "caracteristica": "tasa_unicast",
+          "auc": 0.5961043504329884,
+          "separacion": 0.19220870086597674,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.9933685941597404,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "n_syn",
+          "auc": 0.414779149039704,
+          "separacion": 0.17044170192059205,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 3.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "iat_std_ms",
+          "auc": 0.4182422661909703,
+          "separacion": 0.16351546761805935,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.22132289066916702,
+          "mediana_ataque": 233.55993926163853,
+          "mediana_benigno": 593.872177600403,
+          "p90_benigno": 2927.4765410072323,
+          "p10_ataque": 10.610303191844475,
+          "p90_ataque": 643.8213647501065
+        },
+        {
+          "caracteristica": "macs_destino_distintas",
+          "auc": 0.4224567578783683,
+          "separacion": 0.15508648424326343,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "arp_replies",
+          "auc": 0.4274820935560821,
+          "separacion": 0.14503581288783585,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "bytes_totales",
+          "auc": 0.5694846418021781,
+          "separacion": 0.13896928360435612,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 741.0,
+          "mediana_benigno": 936.0,
+          "p90_benigno": 29889.60000000002,
+          "p10_ataque": 270.0,
+          "p90_ataque": 10846.2
+        },
+        {
+          "caracteristica": "n_tramas_60s",
+          "auc": 0.5669005783704658,
+          "separacion": 0.13380115674093163,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 126.0,
+          "mediana_benigno": 131.0,
+          "p90_benigno": 581.0,
+          "p10_ataque": 40.0,
+          "p90_ataque": 1073.2000000000005
+        },
+        {
+          "caracteristica": "ratio_syn_medio_abiertos",
+          "auc": 0.4344298449479654,
+          "separacion": 0.13114031010406924,
+          "fraccion_nan_ataque": 0.7661290322580645,
+          "fraccion_nan_benigno": 0.6202997669704783,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "longitud_trama_std",
+          "auc": 0.4402817037353667,
+          "separacion": 0.11943659252926664,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.21823421535237097,
+          "mediana_ataque": 11.45190856619526,
+          "mediana_benigno": 79.70437834903151,
+          "p90_benigno": 644.3888605540676,
+          "p10_ataque": 0.0,
+          "p90_ataque": 73.95307446996766
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo_60s",
+          "auc": 0.5573492146873984,
+          "separacion": 0.1146984293747968,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_max_destino",
+          "auc": 0.4430782803942509,
+          "separacion": 0.1138434392114982,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 5.0
+        },
+        {
+          "caracteristica": "dns_consultas",
+          "auc": 0.4465687081250754,
+          "separacion": 0.10686258374984925,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "tasa_multicast",
+          "auc": 0.4512583883288639,
+          "separacion": 0.09748322334227222,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.1666666666666666,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_broadcast",
+          "auc": 0.4538638910103268,
+          "separacion": 0.09227221797934637,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0588235294117647,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "macs_activas",
+          "auc": 0.4545352241980631,
+          "separacion": 0.09092955160387384,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 22.0,
+          "mediana_benigno": 23.0,
+          "p90_benigno": 34.0,
+          "p10_ataque": 17.0,
+          "p90_ataque": 45.10000000000002
+        },
+        {
+          "caracteristica": "syn_sin_synack_max_destino",
+          "auc": 0.4610227433966443,
+          "separacion": 0.07795451320671143,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_60s",
+          "auc": 0.4671150487075736,
+          "separacion": 0.06576990258485282,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "dns_respuestas",
+          "auc": 0.4688871116749169,
+          "separacion": 0.062225776650166154,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_requests",
+          "auc": 0.4689318138450405,
+          "separacion": 0.062136372309918975,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas",
+          "auc": 0.4726803465685858,
+          "separacion": 0.05463930686282836,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "entropia_ethertype",
+          "auc": 0.4737297355722079,
+          "separacion": 0.052540528855584245,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.4394969869215134,
+          "p10_ataque": -0.0,
+          "p90_ataque": 0.4689955935892812
+        },
+        {
+          "caracteristica": "tasa_llc",
+          "auc": 0.4751802876328889,
+          "separacion": 0.049639424734222226,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_rst",
+          "auc": 0.481906852242203,
+          "separacion": 0.03618629551559405,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ratio_macs_una_trama",
+          "auc": 0.484035554015567,
+          "separacion": 0.03192889196886595,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.2142857142857142,
+          "mediana_benigno": 0.2272727272727272,
+          "p90_benigno": 0.4285714285714285,
+          "p10_ataque": 0.0952380952380952,
+          "p90_ataque": 0.528061224489796
+        },
+        {
+          "caracteristica": "arp_gateway_reclamado",
+          "auc": 0.5131156611940239,
+          "separacion": 0.026231322388047706,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_vlan",
+          "auc": 0.489211298039821,
+          "separacion": 0.021577403920358007,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo",
+          "auc": 0.5103088875475766,
+          "separacion": 0.02061777509515328,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "macs_nuevas_por_s",
+          "auc": 0.5097748300539139,
+          "separacion": 0.01954966010782777,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 4.6
+        },
+        {
+          "caracteristica": "dns_resolver_no_autorizado",
+          "auc": 0.4911540187695738,
+          "separacion": 0.017691962460852362,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos",
+          "auc": 0.5061905388857728,
+          "separacion": 0.012381077771545623,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_multiples_respuestas_txid",
+          "auc": 0.5029683352956325,
+          "separacion": 0.005936670591264903,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_gratuitos",
+          "auc": 0.4974813218320505,
+          "separacion": 0.005037356335898968,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "longitud_trama_media",
+          "auc": 0.4988022709592018,
+          "separacion": 0.0023954580815963578,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 83.6,
+          "mediana_benigno": 79.90697674418605,
+          "p90_benigno": 853.3257575757577,
+          "p10_ataque": 68.875,
+          "p90_ataque": 96.75000000000004
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas",
+          "auc": 0.5008064516129033,
+          "separacion": 0.001612903225806539,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas_60s",
+          "auc": 0.5003853171385452,
+          "separacion": 0.0007706342770903429,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta_60s",
+          "auc": 0.49988969016725726,
+          "separacion": 0.0002206196654854775,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "pct_menor_64",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_ether_distinto_hwsrc",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        }
+      ]
+    },
+    "mac_flooding": {
+      "ventanas": 2943,
+      "caracteristicas": [
+        {
+          "caracteristica": "n_tramas_60s",
+          "auc": 0.08059574937289277,
+          "separacion": 0.8388085012542145,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 3.0,
+          "mediana_benigno": 131.0,
+          "p90_benigno": 581.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "macs_nuevas_por_s",
+          "auc": 0.8771746888466456,
+          "separacion": 0.7543493776932912,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.8,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.6,
+          "p90_ataque": 12.760000000000037
+        },
+        {
+          "caracteristica": "longitud_trama_media",
+          "auc": 0.13121085904911395,
+          "separacion": 0.7375782819017721,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 60.0,
+          "mediana_benigno": 79.90697674418605,
+          "p90_benigno": 853.3257575757577,
+          "p10_ataque": 60.0,
+          "p90_ataque": 60.0
+        },
+        {
+          "caracteristica": "macs_activas",
+          "auc": 0.8059662176886867,
+          "separacion": 0.6119324353773734,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 31.0,
+          "mediana_benigno": 23.0,
+          "p90_benigno": 34.0,
+          "p10_ataque": 24.0,
+          "p90_ataque": 84.80000000000018
+        },
+        {
+          "caracteristica": "ips_origen_distintas",
+          "auc": 0.7996280266605896,
+          "separacion": 0.5992560533211793,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas_60s",
+          "auc": 0.20340428728460516,
+          "separacion": 0.5931914254307897,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 7.0,
+          "p90_benigno": 16.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.800000000000182
+        },
+        {
+          "caracteristica": "syn_medio_abiertos",
+          "auc": 0.7532046672022765,
+          "separacion": 0.506409334404553,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "iat_media_ms",
+          "auc": 0.25807612492614795,
+          "separacion": 0.4838477501477041,
+          "fraccion_nan_ataque": 0.08664627930682976,
+          "fraccion_nan_benigno": 0.002964576754960495,
+          "mediana_ataque": 197.72899999999998,
+          "mediana_benigno": 593.8418888888889,
+          "p90_benigno": 9194.627200000004,
+          "p10_ataque": 49.3871,
+          "p90_ataque": 590.7868000000004
+        },
+        {
+          "caracteristica": "tasa_syn",
+          "auc": 0.7401774854473504,
+          "separacion": 0.4803549708947008,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.3333333333333333,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.125,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.6666666666666666
+        },
+        {
+          "caracteristica": "puertos_destino_distintos_60s",
+          "auc": 0.2651096933224071,
+          "separacion": 0.46978061335518584,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 8.0,
+          "p90_benigno": 82.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "iat_std_ms",
+          "auc": 0.2691261303683152,
+          "separacion": 0.46174773926336965,
+          "fraccion_nan_ataque": 0.3944954128440367,
+          "fraccion_nan_benigno": 0.22132289066916702,
+          "mediana_ataque": 139.36038397089519,
+          "mediana_benigno": 593.872177600403,
+          "p90_benigno": 2927.4765410072323,
+          "p10_ataque": 27.70217423121794,
+          "p90_ataque": 459.2972499217474
+        },
+        {
+          "caracteristica": "longitud_trama_std",
+          "auc": 0.293344990548864,
+          "separacion": 0.41331001890227204,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.21823421535237097,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 79.70437834903151,
+          "p90_benigno": 644.3888605540676,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_broadcast",
+          "auc": 0.6871448596979011,
+          "separacion": 0.37428971939580213,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.1304347826086956,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0588235294117647,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.5
+        },
+        {
+          "caracteristica": "ratio_syn_medio_abiertos",
+          "auc": 0.6855589567285458,
+          "separacion": 0.37111791345709166,
+          "fraccion_nan_ataque": 0.43900781515460413,
+          "fraccion_nan_benigno": 0.6202997669704783,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "entropia_puertos_destino",
+          "auc": 0.681120878806915,
+          "separacion": 0.36224175761382993,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.3712323266408756,
+          "p90_benigno": 2.3901758950815526,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "macs_destino_distintas",
+          "auc": 0.6766758221860032,
+          "separacion": 0.3533516443720064,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 3.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "entropia_ethertype",
+          "auc": 0.6638475954403188,
+          "separacion": 0.3276951908806376,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.4394969869215134,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "bytes_totales",
+          "auc": 0.3416045701817239,
+          "separacion": 0.3167908596365522,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 180.0,
+          "mediana_benigno": 936.0,
+          "p90_benigno": 29889.60000000002,
+          "p10_ataque": 120.0,
+          "p90_ataque": 240.0
+        },
+        {
+          "caracteristica": "arp_requests",
+          "auc": 0.6541692640007922,
+          "separacion": 0.30833852800158446,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "dns_consultas",
+          "auc": 0.3465728113839748,
+          "separacion": 0.30685437723205045,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo",
+          "auc": 0.635845279945848,
+          "separacion": 0.2716905598916961,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_60s",
+          "auc": 0.6356322996017306,
+          "separacion": 0.27126459920346124,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "n_tramas",
+          "auc": 0.36821478626938137,
+          "separacion": 0.26357042746123727,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 3.0,
+          "mediana_benigno": 9.0,
+          "p90_benigno": 57.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo_60s",
+          "auc": 0.6147074557607274,
+          "separacion": 0.22941491152145477,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos",
+          "auc": 0.6111006489187686,
+          "separacion": 0.22220129783753717,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "tasa_unicast",
+          "auc": 0.3898685352207784,
+          "separacion": 0.22026292955844318,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.8695652173913043,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.5,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "conexiones_distintas",
+          "auc": 0.5989087535139297,
+          "separacion": 0.19781750702785939,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "n_syn",
+          "auc": 0.596850180126577,
+          "separacion": 0.19370036025315396,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 3.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "arp_replies",
+          "auc": 0.41326889400603944,
+          "separacion": 0.1734622119879211,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_sin_synack_max_destino",
+          "auc": 0.5827954194563484,
+          "separacion": 0.16559083891269677,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_max_destino",
+          "auc": 0.5770778243132157,
+          "separacion": 0.1541556486264315,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 10.0
+        },
+        {
+          "caracteristica": "tasa_multicast",
+          "auc": 0.4267335879651972,
+          "separacion": 0.14653282406960555,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.1666666666666666,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_icmp_echo",
+          "auc": 0.45757897494587924,
+          "separacion": 0.08484205010824153,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas",
+          "auc": 0.45970933359072297,
+          "separacion": 0.08058133281855406,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_vlan",
+          "auc": 0.4609434248445321,
+          "separacion": 0.0781131503109358,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_llc",
+          "auc": 0.4751802876328889,
+          "separacion": 0.049639424734222226,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_rst",
+          "auc": 0.48028211739723947,
+          "separacion": 0.039435765205521056,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_resolver_no_autorizado",
+          "auc": 0.48158515229651283,
+          "separacion": 0.03682969540697434,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas",
+          "auc": 0.5104217913195186,
+          "separacion": 0.020843582639037184,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "dns_multiples_respuestas_txid",
+          "auc": 0.4932642058381479,
+          "separacion": 0.013471588323704209,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ratio_macs_una_trama",
+          "auc": 0.5055205657769958,
+          "separacion": 0.011041131553991557,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.217391304347826,
+          "mediana_benigno": 0.2272727272727272,
+          "p90_benigno": 0.4285714285714285,
+          "p10_ataque": 0.1071428571428571,
+          "p90_ataque": 0.7708465608465614
+        },
+        {
+          "caracteristica": "arp_gratuitos",
+          "auc": 0.5007120522192805,
+          "separacion": 0.0014241044385610024,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_gateway_reclamado",
+          "auc": 0.4994001902844615,
+          "separacion": 0.001199619431077048,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas_60s",
+          "auc": 0.4995794437626684,
+          "separacion": 0.0008411124746632304,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta_60s",
+          "auc": 0.49988969016725726,
+          "separacion": 0.0002206196654854775,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "pct_menor_64",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_ether_distinto_hwsrc",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        }
+      ]
+    },
+    "port_scan": {
+      "ventanas": 422,
+      "caracteristicas": [
+        {
+          "caracteristica": "puertos_destino_distintos_60s",
+          "auc": 0.7991335874946813,
+          "separacion": 0.5982671749893627,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 28.0,
+          "mediana_benigno": 8.0,
+          "p90_benigno": 82.0,
+          "p10_ataque": 13.0,
+          "p90_ataque": 42.0
+        },
+        {
+          "caracteristica": "entropia_puertos_destino",
+          "auc": 0.7852768786604255,
+          "separacion": 0.570553757320851,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.584962500721156,
+          "mediana_benigno": 0.3712323266408756,
+          "p90_benigno": 2.3901758950815526,
+          "p10_ataque": 1.0,
+          "p90_ataque": 2.321928094887362
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_60s",
+          "auc": 0.7641185149760956,
+          "separacion": 0.5282370299521912,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 5.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 25.900000000000034
+        },
+        {
+          "caracteristica": "longitud_trama_media",
+          "auc": 0.2361549560384602,
+          "separacion": 0.5276900879230796,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 60.0,
+          "mediana_benigno": 79.90697674418605,
+          "p90_benigno": 853.3257575757577,
+          "p10_ataque": 60.0,
+          "p90_ataque": 83.95
+        },
+        {
+          "caracteristica": "puertos_destino_distintos",
+          "auc": 0.7311028735253984,
+          "separacion": 0.46220574705079676,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 7.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos",
+          "auc": 0.7300408146381148,
+          "separacion": 0.46008162927622953,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "conexiones_distintas",
+          "auc": 0.7184765473649706,
+          "separacion": 0.43695309472994115,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 7.0
+        },
+        {
+          "caracteristica": "iat_std_ms",
+          "auc": 0.7183624962775332,
+          "separacion": 0.43672499255506647,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.22132289066916702,
+          "mediana_ataque": 964.9719884351722,
+          "mediana_benigno": 593.872177600403,
+          "p90_benigno": 2927.4765410072323,
+          "p10_ataque": 354.2435374129727,
+          "p90_ataque": 2815.7754460222627
+        },
+        {
+          "caracteristica": "tasa_syn",
+          "auc": 0.6981705689314577,
+          "separacion": 0.39634113786291536,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.17914438502673796,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.125,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "ratio_syn_medio_abiertos",
+          "auc": 0.6945276487870853,
+          "separacion": 0.38905529757417057,
+          "fraccion_nan_ataque": 0.3909952606635071,
+          "fraccion_nan_benigno": 0.6202997669704783,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "n_syn",
+          "auc": 0.6578830392946757,
+          "separacion": 0.31576607858935146,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 3.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 5.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas_60s",
+          "auc": 0.3463126389778095,
+          "separacion": 0.307374722044381,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 5.0,
+          "mediana_benigno": 7.0,
+          "p90_benigno": 16.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 8.0
+        },
+        {
+          "caracteristica": "ips_origen_distintas",
+          "auc": 0.6457054676493217,
+          "separacion": 0.29141093529864337,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "syn_sin_synack_max_destino",
+          "auc": 0.6214846337684146,
+          "separacion": 0.24296926753682913,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 4.0
+        },
+        {
+          "caracteristica": "longitud_trama_std",
+          "auc": 0.382812025706112,
+          "separacion": 0.234375948587776,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.21823421535237097,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 79.70437834903151,
+          "p90_benigno": 644.3888605540676,
+          "p10_ataque": 0.0,
+          "p90_ataque": 90.3285540116223
+        },
+        {
+          "caracteristica": "n_tramas_60s",
+          "auc": 0.3976852938891164,
+          "separacion": 0.20462941222176723,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 56.5,
+          "mediana_benigno": 131.0,
+          "p90_benigno": 581.0,
+          "p10_ataque": 29.0,
+          "p90_ataque": 227.0
+        },
+        {
+          "caracteristica": "tasa_unicast",
+          "auc": 0.5951033805062528,
+          "separacion": 0.19020676101250555,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.9829147012578615,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "ratio_macs_una_trama",
+          "auc": 0.41017222972179507,
+          "separacion": 0.17965554055640987,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.1904761904761904,
+          "mediana_benigno": 0.2272727272727272,
+          "p90_benigno": 0.4285714285714285,
+          "p10_ataque": 0.0952380952380952,
+          "p90_ataque": 0.3333333333333333
+        },
+        {
+          "caracteristica": "bytes_totales",
+          "auc": 0.4139742593835079,
+          "separacion": 0.1720514812329842,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 240.0,
+          "mediana_benigno": 936.0,
+          "p90_benigno": 29889.60000000002,
+          "p10_ataque": 120.0,
+          "p90_ataque": 2125.100000000001
+        },
+        {
+          "caracteristica": "macs_destino_distintas",
+          "auc": 0.41559577471516956,
+          "separacion": 0.16880845056966087,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.5,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "dns_consultas",
+          "auc": 0.4290129106288425,
+          "separacion": 0.141974178742315,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "iat_media_ms",
+          "auc": 0.5706109544068156,
+          "separacion": 0.14122190881363128,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.002964576754960495,
+          "mediana_ataque": 1240.524,
+          "mediana_benigno": 593.8418888888889,
+          "p90_benigno": 9194.627200000004,
+          "p10_ataque": 241.3162054945055,
+          "p90_ataque": 3023.038983333337
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_max_destino",
+          "auc": 0.5619197093414325,
+          "separacion": 0.12383941868286508,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 2.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 5.0
+        },
+        {
+          "caracteristica": "n_tramas",
+          "auc": 0.44081800687776584,
+          "separacion": 0.11836398624446831,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 9.0,
+          "p90_benigno": 57.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 24.0
+        },
+        {
+          "caracteristica": "tasa_multicast",
+          "auc": 0.44551073289186305,
+          "separacion": 0.1089785342162739,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.1666666666666666,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies",
+          "auc": 0.44582989949323476,
+          "separacion": 0.10834020101353048,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "macs_activas",
+          "auc": 0.4465791470109205,
+          "separacion": 0.10684170597815901,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 22.0,
+          "mediana_benigno": 23.0,
+          "p90_benigno": 34.0,
+          "p10_ataque": 17.0,
+          "p90_ataque": 30.0
+        },
+        {
+          "caracteristica": "macs_nuevas_por_s",
+          "auc": 0.4530570233218381,
+          "separacion": 0.09388595335632377,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.9800000000000069
+        },
+        {
+          "caracteristica": "ips_destino_distintas",
+          "auc": 0.45433970187460715,
+          "separacion": 0.0913205962507857,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "tasa_broadcast",
+          "auc": 0.4578640291463672,
+          "separacion": 0.0842719417072656,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0588235294117647,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_requests",
+          "auc": 0.4604696088242115,
+          "separacion": 0.07906078235157699,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo_60s",
+          "auc": 0.5383685273761493,
+          "separacion": 0.07673705475229853,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "n_icmp_echo",
+          "auc": 0.4725197164122406,
+          "separacion": 0.05496056717551878,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_llc",
+          "auc": 0.4751802876328889,
+          "separacion": 0.049639424734222226,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas",
+          "auc": 0.4755118052759599,
+          "separacion": 0.04897638944808025,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas_60s",
+          "auc": 0.5173429537274432,
+          "separacion": 0.03468590745488642,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_vlan",
+          "auc": 0.4828032492780686,
+          "separacion": 0.03439350144386277,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "entropia_ethertype",
+          "auc": 0.48670478977971565,
+          "separacion": 0.026590420440568696,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.4394969869215134,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.7219280948873623
+        },
+        {
+          "caracteristica": "dns_multiples_respuestas_txid",
+          "auc": 0.5099160893752746,
+          "separacion": 0.0198321787505491,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas",
+          "auc": 0.509478672985782,
+          "separacion": 0.018957345971563955,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_rst",
+          "auc": 0.49194012842338686,
+          "separacion": 0.016119743153226285,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_gratuitos",
+          "auc": 0.4954552414259428,
+          "separacion": 0.009089517148114346,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta_60s",
+          "auc": 0.5022591296907083,
+          "separacion": 0.0045182593814165894,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_resolver_no_autorizado",
+          "auc": 0.49804445107232853,
+          "separacion": 0.003911097855342938,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_gateway_reclamado",
+          "auc": 0.4994001902844615,
+          "separacion": 0.001199619431077048,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo",
+          "auc": 0.5000066819789086,
+          "separacion": 1.336395781725841e-05,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "pct_menor_64",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_ether_distinto_hwsrc",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        }
+      ]
+    },
+    "syn_flood": {
+      "ventanas": 653,
+      "caracteristicas": [
+        {
+          "caracteristica": "syn_medio_abiertos",
+          "auc": 0.9922017874289402,
+          "separacion": 0.9844035748578803,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 6.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 99.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_60s",
+          "auc": 0.9907425154598999,
+          "separacion": 0.9814850309197998,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 66.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 19.0,
+          "p90_ataque": 680.000000000001
+        },
+        {
+          "caracteristica": "tasa_syn",
+          "auc": 0.9796221166062352,
+          "separacion": 0.9592442332124704,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.125,
+          "p10_ataque": 0.2835579514824798,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "n_syn",
+          "auc": 0.9734183076609229,
+          "separacion": 0.9468366153218457,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 8.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 3.0,
+          "p10_ataque": 3.0,
+          "p90_ataque": 123.0
+        },
+        {
+          "caracteristica": "ratio_syn_medio_abiertos",
+          "auc": 0.9694819211285118,
+          "separacion": 0.9389638422570237,
+          "fraccion_nan_ataque": 0.009188361408882083,
+          "fraccion_nan_benigno": 0.6202997669704783,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.8,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "syn_medio_abiertos_max_destino",
+          "auc": 0.8748217363329359,
+          "separacion": 0.7496434726658718,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 7.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 2.0,
+          "p90_ataque": 99.0
+        },
+        {
+          "caracteristica": "ips_origen_distintas",
+          "auc": 0.8625647281057945,
+          "separacion": 0.7251294562115891,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 33.80000000000007
+        },
+        {
+          "caracteristica": "longitud_trama_media",
+          "auc": 0.21500615351070232,
+          "separacion": 0.5699876929785954,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 60.0,
+          "mediana_benigno": 79.90697674418605,
+          "p90_benigno": 853.3257575757577,
+          "p10_ataque": 60.0,
+          "p90_ataque": 77.89807692307693
+        },
+        {
+          "caracteristica": "iat_media_ms",
+          "auc": 0.24842869196758385,
+          "separacion": 0.5031426160648322,
+          "fraccion_nan_ataque": 0.30474732006125577,
+          "fraccion_nan_benigno": 0.002964576754960495,
+          "mediana_ataque": 331.46387142857145,
+          "mediana_benigno": 593.8418888888889,
+          "p90_benigno": 9194.627200000004,
+          "p10_ataque": 37.96463049417437,
+          "p90_ataque": 1690.0774199999996
+        },
+        {
+          "caracteristica": "entropia_puertos_destino",
+          "auc": 0.3392692404346604,
+          "separacion": 0.3214615191306792,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.3712323266408756,
+          "p90_benigno": 2.3901758950815526,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.9641208513674792
+        },
+        {
+          "caracteristica": "puertos_destino_distintos_60s",
+          "auc": 0.346881410742822,
+          "separacion": 0.30623717851435595,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 4.0,
+          "mediana_benigno": 8.0,
+          "p90_benigno": 82.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 13.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas_60s",
+          "auc": 0.34799358893779886,
+          "separacion": 0.3040128221244023,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 5.0,
+          "mediana_benigno": 7.0,
+          "p90_benigno": 16.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 9.0
+        },
+        {
+          "caracteristica": "longitud_trama_std",
+          "auc": 0.36966943939778607,
+          "separacion": 0.26066112120442786,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.21823421535237097,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 79.70437834903151,
+          "p90_benigno": 644.3888605540676,
+          "p10_ataque": 0.0,
+          "p90_ataque": 76.8392648453122
+        },
+        {
+          "caracteristica": "n_tramas",
+          "auc": 0.6157625571559185,
+          "separacion": 0.2315251143118371,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 11.0,
+          "mediana_benigno": 9.0,
+          "p90_benigno": 57.0,
+          "p10_ataque": 3.0,
+          "p90_ataque": 129.0
+        },
+        {
+          "caracteristica": "macs_destino_distintas",
+          "auc": 0.3880403869974692,
+          "separacion": 0.22391922600506164,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "iat_std_ms",
+          "auc": 0.39465561952263595,
+          "separacion": 0.2106887609547281,
+          "fraccion_nan_ataque": 0.30474732006125577,
+          "fraccion_nan_benigno": 0.22132289066916702,
+          "mediana_ataque": 406.11324494466083,
+          "mediana_benigno": 593.872177600403,
+          "p90_benigno": 2927.4765410072323,
+          "p10_ataque": 9.511673905778405,
+          "p90_ataque": 1322.4797588333302
+        },
+        {
+          "caracteristica": "tasa_unicast",
+          "auc": 0.5942426692580748,
+          "separacion": 0.18848533851614957,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.9935737704918032,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "n_tramas_60s",
+          "auc": 0.5929626296512703,
+          "separacion": 0.18592525930254067,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 142.0,
+          "mediana_benigno": 131.0,
+          "p90_benigno": 581.0,
+          "p10_ataque": 45.2,
+          "p90_ataque": 1028.6000000000015
+        },
+        {
+          "caracteristica": "arp_replies",
+          "auc": 0.42748699525412215,
+          "separacion": 0.1450260094917557,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "ratio_macs_una_trama",
+          "auc": 0.5721107560554429,
+          "separacion": 0.14422151211088585,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.2631578947368421,
+          "mediana_benigno": 0.2272727272727272,
+          "p90_benigno": 0.4285714285714285,
+          "p10_ataque": 0.1176470588235294,
+          "p90_ataque": 0.4825031928480205
+        },
+        {
+          "caracteristica": "dns_consultas",
+          "auc": 0.4351659025887738,
+          "separacion": 0.1296681948224524,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "macs_nuevas_por_s",
+          "auc": 0.5593295438470921,
+          "separacion": 0.1186590876941842,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "ips_destino_distintas",
+          "auc": 0.4422363743337146,
+          "separacion": 0.1155272513325708,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 5.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "tasa_multicast",
+          "auc": 0.4426285507059608,
+          "separacion": 0.1147428985880784,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.1666666666666666,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "puertos_destino_distintos",
+          "auc": 0.44708252136265836,
+          "separacion": 0.10583495727468328,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "arp_requests",
+          "auc": 0.4480405846429582,
+          "separacion": 0.10391883071408359,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 1.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "bytes_totales",
+          "auc": 0.551025804371213,
+          "separacion": 0.10205160874242591,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 660.0,
+          "mediana_benigno": 936.0,
+          "p90_benigno": 29889.60000000002,
+          "p10_ataque": 180.0,
+          "p90_ataque": 7925.6
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo_60s",
+          "auc": 0.5495994944329748,
+          "separacion": 0.09919898886594969,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 1.0
+        },
+        {
+          "caracteristica": "entropia_ethertype",
+          "auc": 0.45128880167899,
+          "separacion": 0.09742239664202001,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.4394969869215134,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.13351266460017436
+        },
+        {
+          "caracteristica": "conexiones_distintas",
+          "auc": 0.45298926026931435,
+          "separacion": 0.0940214794613713,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 2.0,
+          "p90_benigno": 7.0,
+          "p10_ataque": 1.0,
+          "p90_ataque": 3.0
+        },
+        {
+          "caracteristica": "dns_respuestas",
+          "auc": 0.4605367312421919,
+          "separacion": 0.07892653751561618,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_vlan",
+          "auc": 0.4609434248445321,
+          "separacion": 0.0781131503109358,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "tasa_broadcast",
+          "auc": 0.46340513530702493,
+          "separacion": 0.07318972938595014,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0588235294117647,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "macs_activas",
+          "auc": 0.5294655216207589,
+          "separacion": 0.058931043241517767,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 23.0,
+          "mediana_benigno": 23.0,
+          "p90_benigno": 34.0,
+          "p10_ataque": 18.0,
+          "p90_ataque": 36.0
+        },
+        {
+          "caracteristica": "tasa_llc",
+          "auc": 0.4751802876328889,
+          "separacion": 0.049639424734222226,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_icmp_echo",
+          "auc": 0.4794839336917122,
+          "separacion": 0.04103213261657557,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_resolver_no_autorizado",
+          "auc": 0.4823790494599178,
+          "separacion": 0.03524190108016445,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "n_rst",
+          "auc": 0.4833942842318239,
+          "separacion": 0.0332114315363522,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_multiples_respuestas_txid",
+          "auc": 0.4932642058381479,
+          "separacion": 0.013471588323704209,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas_60s",
+          "auc": 0.5049390361855738,
+          "separacion": 0.009878072371147573,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "syn_sin_synack_max_destino",
+          "auc": 0.4973522683905801,
+          "separacion": 0.00529546321883978,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 1.0,
+          "mediana_benigno": 1.0,
+          "p90_benigno": 2.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 2.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta_60s",
+          "auc": 0.5021871606069566,
+          "separacion": 0.004374321213913124,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_gratuitos",
+          "auc": 0.4980803681882068,
+          "separacion": 0.003839263623586442,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_cambios_vinculo",
+          "auc": 0.500924626140149,
+          "separacion": 0.001849252280297975,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "dns_respuestas_sin_consulta",
+          "auc": 0.5007656967840735,
+          "separacion": 0.0015313935681469104,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_gateway_reclamado",
+          "auc": 0.4994001902844615,
+          "separacion": 0.001199619431077048,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "pct_menor_64",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_replies_no_solicitadas",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        },
+        {
+          "caracteristica": "arp_ether_distinto_hwsrc",
+          "auc": 0.5,
+          "separacion": 0.0,
+          "fraccion_nan_ataque": 0.0,
+          "fraccion_nan_benigno": 0.0,
+          "mediana_ataque": 0.0,
+          "mediana_benigno": 0.0,
+          "p90_benigno": 0.0,
+          "p10_ataque": 0.0,
+          "p90_ataque": 0.0
+        }
+      ]
+    }
+  },
+  "pcap": {
+    "sesiones": [
+      "sesion_000",
+      "sesion_001",
+      "sesion_002",
+      "sesion_003",
+      "sesion_004",
+      "sesion_005",
+      "sesion_006",
+      "sesion_007",
+      "sesion_008",
+      "sesion_009",
+      "sesion_010",
+      "sesion_011",
+      "sesion_012",
+      "sesion_013",
+      "sesion_014",
+      "sesion_015",
+      "sesion_016",
+      "sesion_017",
+      "sesion_018",
+      "sesion_019"
+    ],
+    "por_grupo": {
+      "arp_spoofing": {
+        "arp/op1": {
+          "tramas": 5059,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "arp/op2": {
+          "tramas": 8997,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        }
+      },
+      "benigno": {
+        "arp/op1": {
+          "tramas": 20172,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "arp/op2": {
+          "tramas": 19477,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "eth/0x88cc": {
+          "tramas": 600,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "icmp/0": {
+          "tramas": 31701,
+          "longitudes_distintas": 967,
+          "longitud_min_mediana_max": [
+            60,
+            98.0,
+            1041
+          ],
+          "longitudes_frecuentes": [
+            [
+              98,
+              0.3859
+            ],
+            [
+              60,
+              0.2537
+            ],
+            [
+              74,
+              0.1713
+            ],
+            [
+              78,
+              0.0159
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "icmp/3": {
+          "tramas": 1499,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            70,
+            70.0,
+            70
+          ],
+          "longitudes_frecuentes": [
+            [
+              70,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "icmp/8": {
+          "tramas": 23539,
+          "longitudes_distintas": 5,
+          "longitud_min_mediana_max": [
+            60,
+            74.0,
+            102
+          ],
+          "longitudes_frecuentes": [
+            [
+              98,
+              0.3781
+            ],
+            [
+              60,
+              0.3417
+            ],
+            [
+              74,
+              0.1799
+            ],
+            [
+              102,
+              0.067
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.5535
+            ],
+            [
+              128,
+              0.4465
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "llc": {
+          "tramas": 9000,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "tcp/A": {
+          "tramas": 1172716,
+          "longitudes_distintas": 1362,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            1514
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              0.5478
+            ],
+            [
+              1514,
+              0.3391
+            ],
+            [
+              698,
+              0.0001
+            ],
+            [
+              1392,
+              0.0001
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.7283
+            ],
+            [
+              128,
+              0.2617
+            ],
+            [
+              48,
+              0.0035
+            ],
+            [
+              52,
+              0.0033
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              29200,
+              0.7283
+            ],
+            [
+              64240,
+              0.2717
+            ],
+            [
+              8192,
+              0.0
+            ]
+          ]
+        },
+        "tcp/FA": {
+          "tramas": 112126,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.7521
+            ],
+            [
+              128,
+              0.2345
+            ],
+            [
+              48,
+              0.0045
+            ],
+            [
+              52,
+              0.0045
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              29200,
+              0.7521
+            ],
+            [
+              64240,
+              0.2479
+            ]
+          ]
+        },
+        "tcp/PA": {
+          "tramas": 56063,
+          "longitudes_distintas": 524,
+          "longitud_min_mediana_max": [
+            134,
+            394.0,
+            657
+          ],
+          "longitudes_frecuentes": [
+            [
+              430,
+              0.0025
+            ],
+            [
+              479,
+              0.0024
+            ],
+            [
+              212,
+              0.0024
+            ],
+            [
+              465,
+              0.0024
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.5042
+            ],
+            [
+              128,
+              0.469
+            ],
+            [
+              48,
+              0.009
+            ],
+            [
+              52,
+              0.0089
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              29200,
+              0.5042
+            ],
+            [
+              64240,
+              0.4958
+            ]
+          ]
+        },
+        "tcp/RA": {
+          "tramas": 13231,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.9994
+            ],
+            [
+              128,
+              0.0006
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/S": {
+          "tramas": 69325,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.4993
+            ],
+            [
+              128,
+              0.4699
+            ],
+            [
+              50,
+              0.0091
+            ],
+            [
+              48,
+              0.0073
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              29200,
+              0.4078
+            ],
+            [
+              64240,
+              0.4009
+            ],
+            [
+              8192,
+              0.1913
+            ]
+          ]
+        },
+        "tcp/SA": {
+          "tramas": 77312,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              29200,
+              0.7252
+            ],
+            [
+              8192,
+              0.2748
+            ]
+          ]
+        },
+        "udp/dns-consulta": {
+          "tramas": 33987,
+          "longitudes_distintas": 6,
+          "longitud_min_mediana_max": [
+            76,
+            77.0,
+            82
+          ],
+          "longitudes_frecuentes": [
+            [
+              77,
+              0.6427
+            ],
+            [
+              76,
+              0.188
+            ],
+            [
+              78,
+              0.0725
+            ],
+            [
+              81,
+              0.0718
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.5055
+            ],
+            [
+              128,
+              0.4945
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "udp/dns-respuesta": {
+          "tramas": 32392,
+          "longitudes_distintas": 3,
+          "longitud_min_mediana_max": [
+            108,
+            110.0,
+            112
+          ],
+          "longitudes_frecuentes": [
+            [
+              110,
+              0.7497
+            ],
+            [
+              108,
+              0.2209
+            ],
+            [
+              112,
+              0.0294
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "udp/otro": {
+          "tramas": 23204,
+          "longitudes_distintas": 7,
+          "longitud_min_mediana_max": [
+            75,
+            90.0,
+            1246
+          ],
+          "longitudes_frecuentes": [
+            [
+              90,
+              0.5079
+            ],
+            [
+              75,
+              0.2985
+            ],
+            [
+              286,
+              0.0935
+            ],
+            [
+              1242,
+              0.041
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.5142
+            ],
+            [
+              255,
+              0.3293
+            ],
+            [
+              128,
+              0.1565
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        }
+      },
+      "dns_spoofing": {
+        "udp/dns-respuesta": {
+          "tramas": 9883,
+          "longitudes_distintas": 7,
+          "longitud_min_mediana_max": [
+            112,
+            128.0,
+            128
+          ],
+          "longitudes_frecuentes": [
+            [
+              128,
+              0.6699
+            ],
+            [
+              112,
+              0.2576
+            ],
+            [
+              126,
+              0.0644
+            ],
+            [
+              124,
+              0.0072
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        }
+      },
+      "icmp_flood": {
+        "icmp/0": {
+          "tramas": 29204,
+          "longitudes_distintas": 968,
+          "longitud_min_mediana_max": [
+            74,
+            466.0,
+            1041
+          ],
+          "longitudes_frecuentes": [
+            [
+              98,
+              0.1064
+            ],
+            [
+              74,
+              0.0531
+            ],
+            [
+              383,
+              0.0014
+            ],
+            [
+              177,
+              0.0013
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "icmp/3": {
+          "tramas": 10250,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            70,
+            70.0,
+            70
+          ],
+          "longitudes_frecuentes": [
+            [
+              70,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "icmp/8": {
+          "tramas": 16212,
+          "longitudes_distintas": 968,
+          "longitud_min_mediana_max": [
+            74,
+            334.0,
+            1041
+          ],
+          "longitudes_frecuentes": [
+            [
+              98,
+              0.2104
+            ],
+            [
+              74,
+              0.106
+            ],
+            [
+              655,
+              0.0014
+            ],
+            [
+              664,
+              0.0014
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              0.824
+            ],
+            [
+              128,
+              0.176
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        }
+      },
+      "mac_flooding": {
+        "arp/op1": {
+          "tramas": 12988,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "tcp/S": {
+          "tramas": 19567,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "udp/dns-consulta": {
+          "tramas": 1,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "udp/otro": {
+          "tramas": 33015,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        }
+      },
+      "port_scan": {
+        "tcp/A": {
+          "tramas": 6,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/F": {
+          "tramas": 453,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/FPU": {
+          "tramas": 466,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/R": {
+          "tramas": 5,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/RA": {
+          "tramas": 6,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/S": {
+          "tramas": 6172,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "tcp/nulo": {
+          "tramas": 503,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        },
+        "udp/dns-consulta": {
+          "tramas": 6,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        },
+        "udp/otro": {
+          "tramas": 883,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [],
+          "tcp_ventana_frecuentes": []
+        }
+      },
+      "syn_flood": {
+        "tcp/S": {
+          "tramas": 63208,
+          "longitudes_distintas": 1,
+          "longitud_min_mediana_max": [
+            60,
+            60.0,
+            60
+          ],
+          "longitudes_frecuentes": [
+            [
+              60,
+              1.0
+            ]
+          ],
+          "ttl_frecuentes": [
+            [
+              64,
+              1.0
+            ]
+          ],
+          "tcp_cabecera_frecuentes": [
+            [
+              20,
+              1.0
+            ]
+          ],
+          "tcp_ventana_frecuentes": [
+            [
+              8192,
+              1.0
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

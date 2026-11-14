@@ -1,0 +1,1484 @@
+{
+  "etapa": "E2",
+  "fecha": "2026-11-13T19:12:24",
+  "commit": "7fb1019b495aca498b41d5bc9e197608e08eccdb",
+  "arbol_con_cambios": true,
+  "config_archivo": "configs/e2.json",
+  "config": {
+    "descripcion": "Configuración congelada de la evaluación E2 (OE2, OE3). La usan scripts/evaluar.py, scripts/ablaciones.py y scripts/evaluar_holdout.py.",
+    "dataset": "data/dataset_lab.csv",
+    "modelos": [
+      "random_forest",
+      "xgboost"
+    ],
+    "n_folds": 5,
+    "semillas": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "n_folds_internos": 3,
+    "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+    "objetivos_sensibilidad": [
+      0.25,
+      1.0,
+      4.0,
+      16.0
+    ],
+    "n_bootstrap": 1000,
+    "semilla_bootstrap": 42,
+    "salida": "reports/evaluacion_e2.json",
+    "ablaciones": {
+      "modelos": [
+        "random_forest",
+        "xgboost"
+      ],
+      "semillas": [
+        42
+      ],
+      "repeticiones_permutacion": 5,
+      "salida": "reports/ablaciones_e2.json"
+    },
+    "holdout": {
+      "dataset": "data/holdout_e2.csv",
+      "salida": "reports/holdout_e2.json",
+      "sello": "reports/.holdout_abierto"
+    }
+  },
+  "dataset": {
+    "ruta": "data/dataset_lab.csv",
+    "sha256": "3f4d28bcd1d2fee5cd5aeab0ae31d5213262a097f7a051fe87b6e63f9e04eced",
+    "filas": 78988
+  },
+  "conjuntos": {
+    "capa2": [
+      "n_tramas",
+      "bytes_totales",
+      "longitud_trama_media",
+      "longitud_trama_std",
+      "iat_media_ms",
+      "iat_std_ms",
+      "tasa_unicast",
+      "tasa_multicast",
+      "tasa_broadcast",
+      "macs_destino_distintas",
+      "pct_menor_64",
+      "tasa_vlan",
+      "tasa_llc",
+      "entropia_ethertype"
+    ],
+    "capas3_4": [
+      "n_syn",
+      "tasa_syn",
+      "syn_medio_abiertos",
+      "ratio_syn_medio_abiertos",
+      "n_rst",
+      "ips_origen_distintas",
+      "ips_destino_distintas",
+      "puertos_destino_distintos",
+      "entropia_puertos_destino",
+      "conexiones_distintas",
+      "n_icmp_echo",
+      "n_tramas_60s",
+      "arp_replies_no_solicitadas_60s",
+      "arp_cambios_vinculo_60s",
+      "syn_medio_abiertos_60s",
+      "dns_respuestas_sin_consulta_60s",
+      "puertos_destino_distintos_60s",
+      "ips_destino_distintas_60s"
+    ],
+    "completo": [
+      "n_tramas",
+      "bytes_totales",
+      "longitud_trama_media",
+      "longitud_trama_std",
+      "iat_media_ms",
+      "iat_std_ms",
+      "tasa_unicast",
+      "tasa_multicast",
+      "tasa_broadcast",
+      "macs_destino_distintas",
+      "pct_menor_64",
+      "tasa_vlan",
+      "tasa_llc",
+      "entropia_ethertype",
+      "arp_requests",
+      "arp_replies",
+      "arp_replies_no_solicitadas",
+      "arp_gratuitos",
+      "arp_cambios_vinculo",
+      "arp_ether_distinto_hwsrc",
+      "arp_gateway_reclamado",
+      "n_syn",
+      "tasa_syn",
+      "syn_medio_abiertos",
+      "ratio_syn_medio_abiertos",
+      "n_rst",
+      "ips_origen_distintas",
+      "ips_destino_distintas",
+      "puertos_destino_distintos",
+      "entropia_puertos_destino",
+      "conexiones_distintas",
+      "n_icmp_echo",
+      "dns_consultas",
+      "dns_respuestas",
+      "dns_respuestas_sin_consulta",
+      "dns_multiples_respuestas_txid",
+      "dns_resolver_no_autorizado",
+      "n_tramas_60s",
+      "arp_replies_no_solicitadas_60s",
+      "arp_cambios_vinculo_60s",
+      "syn_medio_abiertos_60s",
+      "dns_respuestas_sin_consulta_60s",
+      "puertos_destino_distintos_60s",
+      "ips_destino_distintas_60s",
+      "macs_nuevas_por_s",
+      "macs_activas",
+      "ratio_macs_una_trama",
+      "syn_sin_synack_max_destino",
+      "syn_medio_abiertos_max_destino"
+    ]
+  },
+  "loao": {
+    "conjunto": "completo",
+    "columnas": [
+      "n_tramas",
+      "bytes_totales",
+      "longitud_trama_media",
+      "longitud_trama_std",
+      "iat_media_ms",
+      "iat_std_ms",
+      "tasa_unicast",
+      "tasa_multicast",
+      "tasa_broadcast",
+      "macs_destino_distintas",
+      "pct_menor_64",
+      "tasa_vlan",
+      "tasa_llc",
+      "entropia_ethertype",
+      "arp_requests",
+      "arp_replies",
+      "arp_replies_no_solicitadas",
+      "arp_gratuitos",
+      "arp_cambios_vinculo",
+      "arp_ether_distinto_hwsrc",
+      "arp_gateway_reclamado",
+      "n_syn",
+      "tasa_syn",
+      "syn_medio_abiertos",
+      "ratio_syn_medio_abiertos",
+      "n_rst",
+      "ips_origen_distintas",
+      "ips_destino_distintas",
+      "puertos_destino_distintos",
+      "entropia_puertos_destino",
+      "conexiones_distintas",
+      "n_icmp_echo",
+      "dns_consultas",
+      "dns_respuestas",
+      "dns_respuestas_sin_consulta",
+      "dns_multiples_respuestas_txid",
+      "dns_resolver_no_autorizado",
+      "n_tramas_60s",
+      "arp_replies_no_solicitadas_60s",
+      "arp_cambios_vinculo_60s",
+      "syn_medio_abiertos_60s",
+      "dns_respuestas_sin_consulta_60s",
+      "puertos_destino_distintos_60s",
+      "ips_destino_distintas_60s",
+      "macs_nuevas_por_s",
+      "macs_activas",
+      "ratio_macs_una_trama",
+      "syn_sin_synack_max_destino",
+      "syn_medio_abiertos_max_destino"
+    ],
+    "media_seis": {
+      "random_forest": {
+        "recall_episodios_excluido": {
+          "valor": 0.02763696876600102,
+          "ic95": [
+            0.005555555555555556,
+            0.0546979006656426
+          ],
+          "tipos": 6
+        },
+        "recall_episodios_con_entrenamiento": {
+          "valor": 0.7978795819403031,
+          "ic95": [
+            0.7451046655221227,
+            0.8500673548989488
+          ],
+          "tipos": 6
+        },
+        "minimo_por_tipo_excluido": [
+          0.0,
+          "arp_spoofing"
+        ]
+      },
+      "xgboost": {
+        "recall_episodios_excluido": {
+          "valor": 0.11082874009818981,
+          "ic95": [
+            0.06713193879702418,
+            0.15640488991295443
+          ],
+          "tipos": 6
+        },
+        "recall_episodios_con_entrenamiento": {
+          "valor": 0.7817505496822384,
+          "ic95": [
+            0.7285073868256982,
+            0.8372351736393481
+          ],
+          "tipos": 6
+        },
+        "minimo_por_tipo_excluido": [
+          0.0,
+          "arp_spoofing"
+        ]
+      }
+    },
+    "random_forest": {
+      "arp_spoofing": {
+        "filas_excluidas_de_entrenamiento": 564,
+        "recall_episodios_excluido": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ],
+          "n": 34
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.8235294117647058,
+          "ic95": [
+            0.6764705882352942,
+            0.9411764705882353
+          ],
+          "n": 34
+        },
+        "caida": 0.8235294117647058,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 15
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 8
+          },
+          "suave": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 11
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": null,
+          "ic95": [
+            null,
+            null
+          ],
+          "n": 0
+        },
+        "recall_episodios_otros_tipos": {
+          "dns_spoofing": {
+            "valor": 0.6666666666666666,
+            "ic95": [
+              0.5,
+              0.8333333333333334
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.3225806451612903,
+            "ic95": [
+              0.16129032258064516,
+              0.4838709677419355
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.6785714285714286,
+            "ic95": [
+              0.5,
+              0.8571428571428571
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 1.0428934776048626,
+          "ic95": [
+            0.30200273347878925,
+            1.9176459793548999
+          ]
+        }
+      },
+      "dns_spoofing": {
+        "filas_excluidas_de_entrenamiento": 783,
+        "recall_episodios_excluido": {
+          "valor": 0.03333333333333333,
+          "ic95": [
+            0.0,
+            0.1
+          ],
+          "n": 30
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.7333333333333333,
+          "ic95": [
+            0.5666666666666667,
+            0.8666666666666667
+          ],
+          "n": 30
+        },
+        "caida": 0.7,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 7
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 5
+          },
+          "suave": {
+            "valor": 0.05555555555555555,
+            "ic95": [
+              0.0,
+              0.16666666666666666
+            ],
+            "n": 18
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 95.0,
+          "ic95": [
+            95.0,
+            95.0
+          ],
+          "n": 1
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.7647058823529411,
+            "ic95": [
+              0.6176470588235294,
+              0.9117647058823529
+            ],
+            "n": 34
+          },
+          "icmp_flood": {
+            "valor": 0.41935483870967744,
+            "ic95": [
+              0.25806451612903225,
+              0.6129032258064516
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.6785714285714286,
+            "ic95": [
+              0.5,
+              0.8571428571428571
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 1.3408630426348234,
+          "ic95": [
+            0.296423204566521,
+            2.6662301832821718
+          ]
+        }
+      },
+      "icmp_flood": {
+        "filas_excluidas_de_entrenamiento": 626,
+        "recall_episodios_excluido": {
+          "valor": 0.06451612903225806,
+          "ic95": [
+            0.0,
+            0.16129032258064516
+          ],
+          "n": 31
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.5161290322580645,
+          "ic95": [
+            0.3225806451612903,
+            0.6774193548387096
+          ],
+          "n": 31
+        },
+        "caida": 0.45161290322580644,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.15384615384615385,
+            "ic95": [
+              0.0,
+              0.38461538461538464
+            ],
+            "n": 13
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 4
+          },
+          "suave": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 14
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 2
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.8823529411764706,
+            "ic95": [
+              0.7647058823529411,
+              0.9705882352941176
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.7666666666666667,
+            "ic95": [
+              0.6,
+              0.9
+            ],
+            "n": 30
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.8214285714285714,
+            "ic95": [
+              0.6785714285714286,
+              0.9285714285714286
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 1.7878173901797647,
+          "ic95": [
+            0.5994039894973422,
+            3.2576081946975655
+          ]
+        }
+      },
+      "mac_flooding": {
+        "filas_excluidas_de_entrenamiento": 3247,
+        "recall_episodios_excluido": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ],
+          "n": 34
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 34
+        },
+        "caida": 1.0,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 10
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 5
+          },
+          "suave": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 19
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": null,
+          "ic95": [
+            null,
+            null
+          ],
+          "n": 0
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.7058823529411765,
+            "ic95": [
+              0.5588235294117647,
+              0.8529411764705882
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.5333333333333333,
+            "ic95": [
+              0.36666666666666664,
+              0.7
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.3225806451612903,
+            "ic95": [
+              0.16129032258064516,
+              0.5161290322580645
+            ],
+            "n": 31
+          },
+          "port_scan": {
+            "valor": 0.5714285714285714,
+            "ic95": [
+              0.39285714285714285,
+              0.75
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 1.191878260119843,
+          "ic95": [
+            0.0,
+            2.9490032706919873
+          ]
+        }
+      },
+      "port_scan": {
+        "filas_excluidas_de_entrenamiento": 552,
+        "recall_episodios_excluido": {
+          "valor": 0.03571428571428571,
+          "ic95": [
+            0.0,
+            0.10714285714285714
+          ],
+          "n": 28
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.7142857142857143,
+          "ic95": [
+            0.5357142857142857,
+            0.8571428571428571
+          ],
+          "n": 28
+        },
+        "caida": 0.6785714285714286,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 4
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 7
+          },
+          "suave": {
+            "valor": 0.058823529411764705,
+            "ic95": [
+              0.0,
+              0.17647058823529413
+            ],
+            "n": 17
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 15.0,
+          "ic95": [
+            15.0,
+            15.0
+          ],
+          "n": 1
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.8235294117647058,
+            "ic95": [
+              0.7058823529411765,
+              0.9411764705882353
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.7666666666666667,
+            "ic95": [
+              0.6,
+              0.9
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.5483870967741935,
+            "ic95": [
+              0.3548387096774194,
+              0.7096774193548387
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "syn_flood": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 1.191878260119843,
+          "ic95": [
+            0.15277857665022054,
+            2.465855687089228
+          ]
+        }
+      },
+      "syn_flood": {
+        "filas_excluidas_de_entrenamiento": 693,
+        "recall_episodios_excluido": {
+          "valor": 0.03225806451612903,
+          "ic95": [
+            0.0,
+            0.0967741935483871
+          ],
+          "n": 31
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 31
+        },
+        "caida": 0.967741935483871,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 13
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 5
+          },
+          "suave": {
+            "valor": 0.07692307692307693,
+            "ic95": [
+              0.0,
+              0.23076923076923078
+            ],
+            "n": 13
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 105.0,
+          "ic95": [
+            105.0,
+            105.0
+          ],
+          "n": 1
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.7941176470588235,
+            "ic95": [
+              0.6470588235294118,
+              0.9117647058823529
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.7666666666666667,
+            "ic95": [
+              0.6,
+              0.9
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.3870967741935484,
+            "ic95": [
+              0.22580645161290322,
+              0.5483870967741935
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.6071428571428571,
+            "ic95": [
+              0.42857142857142855,
+              0.7857142857142857
+            ],
+            "n": 28
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.8939086950898824,
+          "ic95": [
+            0.0,
+            2.0269468717221844
+          ]
+        }
+      }
+    },
+    "xgboost": {
+      "arp_spoofing": {
+        "filas_excluidas_de_entrenamiento": 564,
+        "recall_episodios_excluido": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ],
+          "n": 34
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.8235294117647058,
+          "ic95": [
+            0.7058823529411765,
+            0.9411764705882353
+          ],
+          "n": 34
+        },
+        "caida": 0.8235294117647058,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 15
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 8
+          },
+          "suave": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 11
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": null,
+          "ic95": [
+            null,
+            null
+          ],
+          "n": 0
+        },
+        "recall_episodios_otros_tipos": {
+          "dns_spoofing": {
+            "valor": 0.7666666666666667,
+            "ic95": [
+              0.6,
+              0.9
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.45161290322580644,
+            "ic95": [
+              0.2903225806451613,
+              0.6129032258064516
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.6785714285714286,
+            "ic95": [
+              0.5,
+              0.8571428571428571
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.9354838709677419,
+            "ic95": [
+              0.8387096774193549,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.5959391300599215,
+          "ic95": [
+            0.0,
+            1.809634526283087
+          ]
+        }
+      },
+      "dns_spoofing": {
+        "filas_excluidas_de_entrenamiento": 783,
+        "recall_episodios_excluido": {
+          "valor": 0.16666666666666666,
+          "ic95": [
+            0.03333333333333333,
+            0.30083333333333256
+          ],
+          "n": 30
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.7333333333333333,
+          "ic95": [
+            0.6,
+            0.8666666666666667
+          ],
+          "n": 30
+        },
+        "caida": 0.5666666666666667,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 7
+          },
+          "rafaga": {
+            "valor": 0.4,
+            "ic95": [
+              0.0,
+              0.8
+            ],
+            "n": 5
+          },
+          "suave": {
+            "valor": 0.16666666666666666,
+            "ic95": [
+              0.0,
+              0.3888888888888889
+            ],
+            "n": 18
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 30.0,
+          "ic95": [
+            5.0,
+            240.0
+          ],
+          "n": 5
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.8235294117647058,
+            "ic95": [
+              0.7058823529411765,
+              0.9411764705882353
+            ],
+            "n": 34
+          },
+          "icmp_flood": {
+            "valor": 0.4838709677419355,
+            "ic95": [
+              0.2903225806451613,
+              0.6451612903225806
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.7142857142857143,
+            "ic95": [
+              0.5357142857142857,
+              0.8928571428571429
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.7449239125749019,
+          "ic95": [
+            0.0,
+            1.823376972794982
+          ]
+        }
+      },
+      "icmp_flood": {
+        "filas_excluidas_de_entrenamiento": 626,
+        "recall_episodios_excluido": {
+          "valor": 0.12903225806451613,
+          "ic95": [
+            0.03225806451612903,
+            0.25806451612903225
+          ],
+          "n": 31
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.4838709677419355,
+          "ic95": [
+            0.2903225806451613,
+            0.6774193548387096
+          ],
+          "n": 31
+        },
+        "caida": 0.3548387096774194,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.15384615384615385,
+            "ic95": [
+              0.0,
+              0.38461538461538464
+            ],
+            "n": 13
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 4
+          },
+          "suave": {
+            "valor": 0.14285714285714285,
+            "ic95": [
+              0.0,
+              0.35714285714285715
+            ],
+            "n": 14
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            80.0
+          ],
+          "n": 4
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.8823529411764706,
+            "ic95": [
+              0.7647058823529411,
+              0.9705882352941176
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.8333333333333334,
+            "ic95": [
+              0.7,
+              0.9666666666666667
+            ],
+            "n": 30
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.8214285714285714,
+            "ic95": [
+              0.6785714285714286,
+              0.9642857142857143
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.4469543475449412,
+          "ic95": [
+            0.0,
+            1.3314336185130138
+          ]
+        }
+      },
+      "mac_flooding": {
+        "filas_excluidas_de_entrenamiento": 3247,
+        "recall_episodios_excluido": {
+          "valor": 0.029411764705882353,
+          "ic95": [
+            0.0,
+            0.08823529411764706
+          ],
+          "n": 34
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 1.0,
+          "ic95": [
+            1.0,
+            1.0
+          ],
+          "n": 34
+        },
+        "caida": 0.9705882352941176,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.1,
+            "ic95": [
+              0.0,
+              0.3
+            ],
+            "n": 10
+          },
+          "rafaga": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 5
+          },
+          "suave": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 19
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 10.0,
+          "ic95": [
+            10.0,
+            10.0
+          ],
+          "n": 1
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.7941176470588235,
+            "ic95": [
+              0.6470588235294118,
+              0.9117647058823529
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.7,
+            "ic95": [
+              0.5333333333333333,
+              0.8666666666666667
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.3870967741935484,
+            "ic95": [
+              0.22580645161290322,
+              0.5806451612903226
+            ],
+            "n": 31
+          },
+          "port_scan": {
+            "valor": 0.5357142857142857,
+            "ic95": [
+              0.35714285714285715,
+              0.75
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.9354838709677419,
+            "ic95": [
+              0.8387096774193549,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.7449239125749019,
+          "ic95": [
+            0.0,
+            2.041300507656607
+          ]
+        }
+      },
+      "port_scan": {
+        "filas_excluidas_de_entrenamiento": 552,
+        "recall_episodios_excluido": {
+          "valor": 0.17857142857142858,
+          "ic95": [
+            0.03571428571428571,
+            0.32142857142857145
+          ],
+          "n": 28
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.7142857142857143,
+          "ic95": [
+            0.5357142857142857,
+            0.8928571428571429
+          ],
+          "n": 28
+        },
+        "caida": 0.5357142857142857,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 4
+          },
+          "rafaga": {
+            "valor": 0.14285714285714285,
+            "ic95": [
+              0.0,
+              0.42857142857142855
+            ],
+            "n": 7
+          },
+          "suave": {
+            "valor": 0.23529411764705882,
+            "ic95": [
+              0.058823529411764705,
+              0.47058823529411764
+            ],
+            "n": 17
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 15.0,
+          "ic95": [
+            10.0,
+            65.0
+          ],
+          "n": 5
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.8235294117647058,
+            "ic95": [
+              0.7058823529411765,
+              0.9411764705882353
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.8666666666666667,
+            "ic95": [
+              0.7333333333333333,
+              0.9666666666666667
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.5161290322580645,
+            "ic95": [
+              0.3548387096774194,
+              0.6774193548387096
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.7449239125749019,
+          "ic95": [
+            0.0,
+            2.058014998372768
+          ]
+        }
+      },
+      "syn_flood": {
+        "filas_excluidas_de_entrenamiento": 693,
+        "recall_episodios_excluido": {
+          "valor": 0.16129032258064516,
+          "ic95": [
+            0.06370967741935557,
+            0.2903225806451613
+          ],
+          "n": 31
+        },
+        "recall_episodios_excluido_con_entrenamiento": {
+          "valor": 0.9354838709677419,
+          "ic95": [
+            0.8387096774193549,
+            1.0
+          ],
+          "n": 31
+        },
+        "caida": 0.7741935483870968,
+        "recall_episodios_por_intensidad_excluido": {
+          "media": {
+            "valor": 0.23076923076923078,
+            "ic95": [
+              0.0,
+              0.46153846153846156
+            ],
+            "n": 13
+          },
+          "rafaga": {
+            "valor": 0.4,
+            "ic95": [
+              0.0,
+              0.8
+            ],
+            "n": 5
+          },
+          "suave": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ],
+            "n": 13
+          }
+        },
+        "tiempo_deteccion_s_mediana_excluido": {
+          "valor": 25.0,
+          "ic95": [
+            5.0,
+            50.0
+          ],
+          "n": 5
+        },
+        "recall_episodios_otros_tipos": {
+          "arp_spoofing": {
+            "valor": 0.9117647058823529,
+            "ic95": [
+              0.8235294117647058,
+              1.0
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.8666666666666667,
+            "ic95": [
+              0.7333333333333333,
+              0.9666666666666667
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.5483870967741935,
+            "ic95": [
+              0.3870967741935484,
+              0.7096774193548387
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.75,
+            "ic95": [
+              0.5714285714285714,
+              0.8928571428571429
+            ],
+            "n": 28
+          }
+        },
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 1.4898478251498037,
+          "ic95": [
+            0.3023663764940026,
+            2.948877175845903
+          ]
+        }
+      }
+    }
+  }
+}

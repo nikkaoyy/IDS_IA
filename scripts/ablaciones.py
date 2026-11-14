@@ -75,6 +75,11 @@ CONJUNTOS: dict[str, list[str]] = {
     "capas3_4": list(FEATURES_TCP) + list(FEATURES_LARGAS),
     "completo": list(COLUMNAS_MODELO),
 }
+# Conjuntos que solo usa el LOAO (`--conjunto`): no forman parte de la ablación de E2.
+CONJUNTOS_LOAO: dict[str, list[str]] = {
+    **CONJUNTOS,
+    "sin_capa2": [c for c in COLUMNAS_MODELO if c not in set(FEATURES_CAPA2)],
+}
 FAMILIAS: dict[str, list[str]] = {
     "capa2": list(FEATURES_CAPA2), "arp": list(FEATURES_ARP), "tcp": list(FEATURES_TCP),
     "dns": list(FEATURES_DNS), "largas_60s": list(FEATURES_LARGAS), "globales": list(FEATURES_GLOBALES),
@@ -132,29 +137,54 @@ def ablacion(df: pd.DataFrame, cfg: dict, cache: dict) -> dict:
         for nombre, columnas in CONJUNTOS.items():
             t0 = time.time()
             preds = _predecir(df, modelo, cfg, columnas)
-            if nombre == "completo":
-                cache[modelo] = preds
+            cache[(modelo, nombre)] = preds
             salida[modelo][nombre] = {"n_columnas": len(columnas), "columnas": columnas,
                                       **_resumen_corto(ev.resumir(df, preds, n_rep, sem_b))}
             logger.info("ablación %s/%s: %.0f s", modelo, nombre, time.time() - t0)
     return salida
 
 
-def loao(df: pd.DataFrame, cfg: dict, cache: dict) -> dict:
-    """Seis entrenamientos sin un tipo de ataque; recall por episodio del tipo excluido."""
+def media_de_tipos(detecciones: dict[str, np.ndarray], n_replicas: int, semilla: int) -> dict:
+    """Media de los recalls por tipo, con IC bootstrap estratificado (episodios dentro de cada tipo)."""
+    rng = np.random.default_rng(semilla)
+    valores = [d for d in detecciones.values() if len(d)]
+    replicas = [np.mean([d[rng.integers(0, len(d), len(d))].mean() for d in valores]) for _ in range(n_replicas)]
+    return {"valor": float(np.mean([d.mean() for d in valores])),
+            "ic95": [float(np.percentile(replicas, 2.5)), float(np.percentile(replicas, 97.5))],
+            "tipos": len(valores)}
+
+
+def _deteccion_por_episodio(df: pd.DataFrame, preds: list[ev.PrediccionesFueraDeFold], tipo: str) -> np.ndarray:
+    """Detección de cada episodio del tipo, promediada entre semillas."""
+    tablas = [ev.tabla_episodios(df, p.alarma) for p in preds]
+    return np.mean([t.loc[t["tipo"] == tipo, "detectado"].to_numpy(dtype=float) for t in tablas], axis=0)
+
+
+def loao(df: pd.DataFrame, cfg: dict, cache: dict, conjunto: str = "completo") -> dict:
+    """Seis entrenamientos sin un tipo de ataque; recall por episodio del tipo excluido.
+
+    `conjunto` (de `CONJUNTOS_LOAO`) fija las características de los seis entrenamientos y de
+    la referencia «con el tipo en train». Devuelve, además, la media de los seis con IC.
+    """
     n_rep, sem_b = int(cfg["n_bootstrap"]), int(cfg["semilla_bootstrap"])
+    columnas = CONJUNTOS_LOAO[conjunto]
     tipo_ep = tipo_de_episodio(df)
     tipos = sorted(df.loc[df[ETIQUETA] == 1, "tipo_ataque"].unique())
     salida: dict = {}
+    medias: dict = {}
     for modelo in cfg["ablaciones"]["modelos"]:
-        if modelo not in cache:
-            cache[modelo] = _predecir(df, modelo, cfg)
-        base = ev.resumir(df, cache[modelo], n_rep, sem_b)["episodios"]["por_tipo"]
+        if (modelo, conjunto) not in cache:
+            cache[(modelo, conjunto)] = _predecir(df, modelo, cfg, columnas)
+        base = ev.resumir(df, cache[(modelo, conjunto)], n_rep, sem_b)["episodios"]["por_tipo"]
         salida[modelo] = {}
+        det_excluido, det_base = {}, {}
         for tipo in tipos:
             t0 = time.time()
             excluir = (tipo_ep == tipo) | (df["tipo_ataque"] == tipo)
-            r = ev.resumir(df, _predecir(df, modelo, cfg, excluir=excluir), n_rep, sem_b)
+            preds = _predecir(df, modelo, cfg, columnas, excluir=excluir)
+            det_excluido[tipo] = _deteccion_por_episodio(df, preds, tipo)
+            det_base[tipo] = _deteccion_por_episodio(df, cache[(modelo, conjunto)], tipo)
+            r = ev.resumir(df, preds, n_rep, sem_b)
             otros = {t: v for t, v in r["episodios"]["por_tipo"].items() if t != tipo}
             salida[modelo][tipo] = {
                 "filas_excluidas_de_entrenamiento": int(excluir.sum()),
@@ -171,7 +201,12 @@ def loao(df: pd.DataFrame, cfg: dict, cache: dict) -> dict:
             }
             logger.info("LOAO %s/%s: recall %.3f (con entrenamiento %.3f), %.0f s", modelo, tipo,
                         r["episodios"]["por_tipo"][tipo]["valor"], base[tipo]["valor"], time.time() - t0)
-    return salida
+        medias[modelo] = {
+            "recall_episodios_excluido": media_de_tipos(det_excluido, n_rep, sem_b),
+            "recall_episodios_con_entrenamiento": media_de_tipos(det_base, n_rep, sem_b),
+            "minimo_por_tipo_excluido": min((float(d.mean()), t) for t, d in det_excluido.items()),
+        }
+    return {"conjunto": conjunto, "columnas": columnas, "media_seis": medias, **salida}
 
 
 # --------------------------------------------------------------------------------------------
@@ -266,9 +301,9 @@ def permutacion(df: pd.DataFrame, cfg: dict, cache: dict, n_repeticiones: int = 
     unidades = {**{f"familia:{k}": v for k, v in FAMILIAS.items()}, **{c: [c] for c in columnas}}
     salida: dict = {}
     for modelo in cfg["ablaciones"]["modelos"]:
-        if modelo not in cache:
-            cache[modelo] = _predecir(df, modelo, cfg)
-        folds = cache[modelo][0].folds
+        if (modelo, "completo") not in cache:
+            cache[(modelo, "completo")] = _predecir(df, modelo, cfg)
+        folds = cache[(modelo, "completo")][0].folds
         caidas: dict[str, list[tuple[float, float, float]]] = {u: [] for u in unidades}
         base_folds = []
         t0 = time.time()
@@ -319,10 +354,17 @@ def markdown(inf: dict) -> str:
          f"Dataset sha256 `{inf['dataset']['sha256']}`. Semillas {inf['config']['ablaciones']['semillas']}, "
          f"umbral anidado para ≤ {inf['config']['objetivo_falsas_alarmas_dispositivo_dia']:g} FA/dispositivo-día.", ""]
     if "loao" in inf:
-        lineas += ["## Leave-one-attack-out (recall por episodio del tipo excluido)", "",
-              "| Tipo excluido | Modelo | Sin el tipo en train | Con el tipo en train | Caída | FA/disp-día |",
-              "|---|---|---|---|---|---|"]
-        for m, d in inf["loao"].items():
+        lo = inf["loao"]
+        lineas += [f"## Leave-one-attack-out (recall por episodio del tipo excluido; conjunto `{lo.get('conjunto', 'completo')}`)", ""]
+        for m, med in lo.get("media_seis", {}).items():
+            lineas.append(f"- **{m}**: media de los seis {fmt_ic(med['recall_episodios_excluido'])} "
+                          f"(con el tipo en train {fmt_ic(med['recall_episodios_con_entrenamiento'])}); "
+                          f"mínimo {med['minimo_por_tipo_excluido'][0]:.3f} ({med['minimo_por_tipo_excluido'][1]})")
+        lineas += ["", "| Tipo excluido | Modelo | Sin el tipo en train | Con el tipo en train | Caída | FA/disp-día |",
+                   "|---|---|---|---|---|---|"]
+        for m, d in lo.items():
+            if m in ("conjunto", "columnas", "media_seis"):
+                continue
             for t, v in d.items():
                 lineas.append(f"| {t} | {m} | {fmt_ic(v['recall_episodios_excluido'])} "
                          f"(n={v['recall_episodios_excluido']['n']}) | "
@@ -379,6 +421,9 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Ablaciones, LOAO, multiclase e importancia por permutación (E2).")
     p.add_argument("--config", required=True, type=Path)
     p.add_argument("--partes", default=",".join(PARTES), help=f"Subconjunto de {PARTES}, separado por comas.")
+    p.add_argument("--conjunto", default="completo", choices=sorted(CONJUNTOS_LOAO),
+                   help="Características del LOAO (solo afecta a la parte loao).")
+    p.add_argument("--salida", type=Path, help="JSON de salida (por defecto, ablaciones.salida de la config).")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
     cfg = leer_config(args.config)
@@ -395,12 +440,13 @@ def main(argv: list[str] | None = None) -> int:
     }
     cache: dict = {}
     n_perm = int(cfg["ablaciones"].get("repeticiones_permutacion", N_REPETICIONES_PERMUTACION))
-    funciones = {"ablacion": ablacion, "loao": loao, "multiclase": lambda d, c, _: multiclase(d, c),
+    funciones = {"ablacion": ablacion, "loao": lambda d, c, k: loao(d, c, k, args.conjunto),
+                 "multiclase": lambda d, c, _: multiclase(d, c),
                  "permutacion": lambda d, c, k: permutacion(d, c, k, n_perm)}
     for parte in PARTES:
         if parte in partes:
             informe[parte] = funciones[parte](df, cfg, cache)
-    destino = ruta_proyecto(cfg["ablaciones"]["salida"])
+    destino = args.salida.resolve() if args.salida else ruta_proyecto(cfg["ablaciones"]["salida"])
     escribir_json(informe, destino)
     destino.with_suffix(".md").write_text(markdown(json.loads(destino.read_text())))
     print(f"Escrito {destino} y {destino.with_suffix('.md')}")
