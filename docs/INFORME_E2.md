@@ -497,3 +497,21 @@ Para Nico:
    de falsas alarmas precisa, hacen falta sesiones benignas más largas o más numerosas.
    El generador está congelado, así que eso sería otra etapa.
 7. **E3–E6** siguen fuera del alcance. No se adelantó nada.
+
+## Addendum (2026-11-13) — esquema 3.0 tras PEDIDO-EXTRACTOR-1
+
+Este addendum no reescribe nada de lo anterior; las cifras de arriba son las del esquema 2.0
+y quedan como históricas (`reports/historico/evaluacion_e2_esquema2.0.*`).
+
+- El esquema pasa a **3.0**: se añade el contador compartido `respuestas_no_solicitadas`
+  (y su tasa y su suma en 60 s). Dataset de desarrollo regenerado con el generador
+  congelado (sha256 `7f06d099…a945`).
+- **Validación de E2 en 3.0** (`reports/evaluacion_e2.json`): recall por episodio RF
+  **0,878** [0,834, 0,922] y XGB **0,894** [0,856, 0,936]; FA/dispositivo-día 1,19 y 0,89.
+- **LOAO sin capa 2**: RF 0,068 [0,032, 0,105], XGB 0,228 [0,168, 0,286], frente a 0,044 y
+  0,116. La única transferencia atribuible es arp_spoofing (0 → 0,294 en XGB).
+- **El holdout no se recalculó** (está gastado): no hay cifra limpia de holdout para 3.0.
+- La conclusión del §6 sigue en pie con un matiz: el sistema detecta el catálogo, y los
+  contadores de violación de protocolo compartidos dan una transferencia limitada a tipos no
+  vistos. Detalle en `docs/INFORME_EXTRACTOR.md`.
+

@@ -37,3 +37,11 @@ def test_criterio_parada_por_media_o_por_tres_tipos():
     assert not ef.criterio_parada(base, dos)["transferencia_lograda"]
     media = _resumen({"random_forest": 0.20, "xgboost": 0.12}, {"random_forest": {}, "xgboost": {}})
     assert ef.criterio_parada(base, media)["por_modelo"]["random_forest"]["media_cumple"]
+
+
+def test_registro_de_features_cubre_el_contrato_3_0():
+    from src.feature_schema import COLUMNAS_MODELO, VERSION_ESQUEMA
+
+    assert VERSION_ESQUEMA == "3.0"
+    assert list(ef.FEATURES_3_0) == COLUMNAS_MODELO
+    assert all(a == "contexto" or a == "compartido" or a.startswith("propio:") for a, _, _ in ef.FEATURES_3_0.values())

@@ -1,4 +1,4 @@
-SEGUIR — siguiente vuelta: CIERRE (criterio de parada v2 cumplido en XGB, 3 de 6 tipos ≥ 0,25, con matices; presupuesto de 4 h casi agotado). No abrir otra familia.
+PARAR — pedido cerrado el 2026-11-13: criterio de parada v2 cumplido al pie de la letra en XGB (3 de 6 tipos ≥ 0,25; solo arp_spoofing atribuible a la familia) y presupuesto de 4 h agotado. Informe: docs/INFORME_EXTRACTOR.md.
 
 # Progreso — PEDIDO-EXTRACTOR-1
 
@@ -240,3 +240,9 @@ llevan los dos al cierre.
 - Iteración 1: familia «respuestas sin petición previa» (esquema 3.0, dataset `7f06d099…a945`) — se queda.
 - LOAO medio: RF 0,068 [0,032, 0,105], XGB 0,228 [0,168, 0,286] (línea base 0,044 / 0,116); tipos declarados, RF/XGB: arp_spoofing 0,147/0,294, icmp_flood 0,097/0,161 (predicción fallida), dns_spoofing 0,100/0,100.
 - Sigue el cierre: criterio de parada cumplido por la letra (XGB: arp 0,294, mac 0,265, port_scan 0,321 ≥ 0,25), pero solo arp_spoofing es atribuible a la familia; informe `docs/INFORME_EXTRACTOR.md` y `PARAR`.
+
+### Cierre del pedido
+
+- Cierre: `docs/INFORME_EXTRACTOR.md` y `reports/extractor_final.json` (características vivas en 3.0 con su alcance y fuente, transferencia y respuesta explícita); addendum en `docs/INFORME_E2.md`.
+- LOAO final sin capa 2: RF 0,068 [0,032, 0,105], XGB 0,228 [0,168, 0,286] (línea base 0,044 / 0,116); arp_spoofing 0,147/0,294, icmp_flood 0,097/0,161, dns_spoofing 0,100/0,100.
+- Se transfiere poco y de forma atribuible solo hacia arp_spoofing. Las familias 2–5 quedan sin medir, sin que eso sea una negativa. `PARAR`.

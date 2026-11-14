@@ -1,6 +1,6 @@
 {
   "pedido": "PEDIDO-EXTRACTOR-1 (v2)",
-  "fecha": "2026-11-13T22:10:11",
+  "fecha": "2026-11-13T23:14:57",
   "marcador": "Recall por episodio del tipo excluido (LOAO), conjunto sin_capa2, IC 95 % bootstrap",
   "linea_base_semantica": {
     "informe": "reports/extractor/loao_it0_sin_capa2.json",
@@ -496,5 +496,333 @@
       }
     },
     "transferencia_lograda": true
-  }
+  },
+  "features_3_0": {
+    "n_tramas": {
+      "alcance": "contexto",
+      "justificacion": "volumen emitido por la MAC en 5 s",
+      "fuente_pcap": "tramas con esa MAC origen",
+      "en_marcador": false
+    },
+    "bytes_totales": {
+      "alcance": "contexto",
+      "justificacion": "volumen en octetos",
+      "fuente_pcap": "longitud de trama en el medio",
+      "en_marcador": false
+    },
+    "longitud_trama_media": {
+      "alcance": "contexto",
+      "justificacion": "composición de la ventana, no construcción de la trama",
+      "fuente_pcap": "longitud de trama",
+      "en_marcador": false
+    },
+    "longitud_trama_std": {
+      "alcance": "contexto",
+      "justificacion": "ídem; NaN con una sola trama (22 % del benigno)",
+      "fuente_pcap": "longitud de trama",
+      "en_marcador": false
+    },
+    "iat_media_ms": {
+      "alcance": "contexto",
+      "justificacion": "ritmo de emisión",
+      "fuente_pcap": "marcas de tiempo",
+      "en_marcador": false
+    },
+    "iat_std_ms": {
+      "alcance": "contexto",
+      "justificacion": "regularidad del ritmo",
+      "fuente_pcap": "marcas de tiempo",
+      "en_marcador": false
+    },
+    "tasa_unicast": {
+      "alcance": "contexto",
+      "justificacion": "reparto del destino de enlace",
+      "fuente_pcap": "MAC destino",
+      "en_marcador": false
+    },
+    "tasa_multicast": {
+      "alcance": "contexto",
+      "justificacion": "ídem",
+      "fuente_pcap": "MAC destino, bit I/G",
+      "en_marcador": false
+    },
+    "tasa_broadcast": {
+      "alcance": "contexto",
+      "justificacion": "ídem",
+      "fuente_pcap": "MAC destino ff:ff:ff:ff:ff:ff",
+      "en_marcador": false
+    },
+    "macs_destino_distintas": {
+      "alcance": "contexto",
+      "justificacion": "pares de enlace",
+      "fuente_pcap": "MAC destino",
+      "en_marcador": false
+    },
+    "pct_menor_64": {
+      "alcance": "contexto",
+      "justificacion": "tramas runt (< 64 B con FCS)",
+      "fuente_pcap": "longitud de trama",
+      "en_marcador": false
+    },
+    "tasa_vlan": {
+      "alcance": "contexto",
+      "justificacion": "tramas 802.1Q",
+      "fuente_pcap": "EtherType 0x8100",
+      "en_marcador": false
+    },
+    "tasa_llc": {
+      "alcance": "contexto",
+      "justificacion": "tramas 802.3/LLC",
+      "fuente_pcap": "campo longitud < 0x0600",
+      "en_marcador": false
+    },
+    "entropia_ethertype": {
+      "alcance": "contexto",
+      "justificacion": "mezcla de protocolos",
+      "fuente_pcap": "EtherType",
+      "en_marcador": false
+    },
+    "arp_requests": {
+      "alcance": "contexto",
+      "justificacion": "peticiones ARP emitidas",
+      "fuente_pcap": "ARP op 1",
+      "en_marcador": true
+    },
+    "arp_replies": {
+      "alcance": "contexto",
+      "justificacion": "respuestas ARP emitidas",
+      "fuente_pcap": "ARP op 2",
+      "en_marcador": true
+    },
+    "arp_replies_no_solicitadas": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "respuesta ARP sin petición (psrc, pdst)",
+      "fuente_pcap": "ARP op 2 sin op 1 previo en 5 s",
+      "en_marcador": true
+    },
+    "arp_gratuitos": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "anuncio de vínculo sin petición",
+      "fuente_pcap": "ARP con psrc == pdst",
+      "en_marcador": true
+    },
+    "arp_cambios_vinculo": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "una IP conocida aparece con otra MAC",
+      "fuente_pcap": "tabla IP->MAC de ARP",
+      "en_marcador": true
+    },
+    "arp_ether_distinto_hwsrc": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "la MAC de enlace no coincide con la que declara ARP",
+      "fuente_pcap": "Ether.src frente a ARP.hwsrc",
+      "en_marcador": true
+    },
+    "arp_gateway_reclamado": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "alguien que no es el gateway dice serlo (NaN sin gateway declarado)",
+      "fuente_pcap": "ARP psrc == IP del gateway",
+      "en_marcador": true
+    },
+    "n_syn": {
+      "alcance": "contexto",
+      "justificacion": "aperturas TCP",
+      "fuente_pcap": "flags SYN sin ACK",
+      "en_marcador": true
+    },
+    "tasa_syn": {
+      "alcance": "contexto",
+      "justificacion": "proporción de aperturas",
+      "fuente_pcap": "flags SYN / tramas",
+      "en_marcador": true
+    },
+    "syn_medio_abiertos": {
+      "alcance": "propio:syn_flood",
+      "justificacion": "SYN sin SYN-ACK ni RST tras 1 s",
+      "fuente_pcap": "seguimiento de flujos TCP",
+      "en_marcador": true
+    },
+    "ratio_syn_medio_abiertos": {
+      "alcance": "propio:syn_flood",
+      "justificacion": "ídem, normalizado por SYN evaluables",
+      "fuente_pcap": "seguimiento de flujos TCP",
+      "en_marcador": true
+    },
+    "n_rst": {
+      "alcance": "contexto",
+      "justificacion": "reinicios TCP",
+      "fuente_pcap": "flag RST",
+      "en_marcador": true
+    },
+    "ips_origen_distintas": {
+      "alcance": "contexto",
+      "justificacion": "IP de origen que usa la MAC",
+      "fuente_pcap": "IP.src",
+      "en_marcador": true
+    },
+    "ips_destino_distintas": {
+      "alcance": "contexto",
+      "justificacion": "abanico de destinos",
+      "fuente_pcap": "IP.dst",
+      "en_marcador": true
+    },
+    "puertos_destino_distintos": {
+      "alcance": "contexto",
+      "justificacion": "abanico de puertos",
+      "fuente_pcap": "TCP/UDP dport",
+      "en_marcador": true
+    },
+    "entropia_puertos_destino": {
+      "alcance": "contexto",
+      "justificacion": "reparto de puertos",
+      "fuente_pcap": "TCP/UDP dport",
+      "en_marcador": true
+    },
+    "conexiones_distintas": {
+      "alcance": "contexto",
+      "justificacion": "pares (ip, puerto) de destino",
+      "fuente_pcap": "IP.dst + dport",
+      "en_marcador": true
+    },
+    "n_icmp_echo": {
+      "alcance": "contexto",
+      "justificacion": "echo request emitidos",
+      "fuente_pcap": "ICMP tipo 8",
+      "en_marcador": true
+    },
+    "dns_consultas": {
+      "alcance": "contexto",
+      "justificacion": "consultas DNS",
+      "fuente_pcap": "DNS qr=0",
+      "en_marcador": true
+    },
+    "dns_respuestas": {
+      "alcance": "contexto",
+      "justificacion": "respuestas DNS emitidas",
+      "fuente_pcap": "DNS qr=1",
+      "en_marcador": true
+    },
+    "dns_respuestas_sin_consulta": {
+      "alcance": "propio:dns_spoofing",
+      "justificacion": "respuesta DNS sin consulta (ip, puerto, txid)",
+      "fuente_pcap": "DNS qr=1 sin qr=0 previo en 5 s",
+      "en_marcador": true
+    },
+    "dns_multiples_respuestas_txid": {
+      "alcance": "propio:dns_spoofing",
+      "justificacion": "dos respondedores para el mismo txid",
+      "fuente_pcap": "DNS qr=1 repetido",
+      "en_marcador": true
+    },
+    "dns_resolver_no_autorizado": {
+      "alcance": "propio:dns_spoofing",
+      "justificacion": "responde quien no es resolver (NaN sin resolvers declarados)",
+      "fuente_pcap": "IP.src de DNS qr=1",
+      "en_marcador": true
+    },
+    "n_tramas_60s": {
+      "alcance": "contexto",
+      "justificacion": "volumen en 60 s",
+      "fuente_pcap": "tramas",
+      "en_marcador": true
+    },
+    "arp_replies_no_solicitadas_60s": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "ver arp_replies_no_solicitadas",
+      "fuente_pcap": "ídem, 60 s",
+      "en_marcador": true
+    },
+    "arp_cambios_vinculo_60s": {
+      "alcance": "propio:arp_spoofing",
+      "justificacion": "ver arp_cambios_vinculo",
+      "fuente_pcap": "ídem, 60 s",
+      "en_marcador": true
+    },
+    "syn_medio_abiertos_60s": {
+      "alcance": "propio:syn_flood",
+      "justificacion": "ver syn_medio_abiertos (también port_scan)",
+      "fuente_pcap": "ídem, 60 s",
+      "en_marcador": true
+    },
+    "dns_respuestas_sin_consulta_60s": {
+      "alcance": "propio:dns_spoofing",
+      "justificacion": "ver dns_respuestas_sin_consulta",
+      "fuente_pcap": "ídem, 60 s",
+      "en_marcador": true
+    },
+    "puertos_destino_distintos_60s": {
+      "alcance": "propio:port_scan",
+      "justificacion": "abanico de puertos sostenido",
+      "fuente_pcap": "dport, 60 s",
+      "en_marcador": true
+    },
+    "ips_destino_distintas_60s": {
+      "alcance": "contexto",
+      "justificacion": "abanico de destinos sostenido",
+      "fuente_pcap": "IP.dst, 60 s",
+      "en_marcador": true
+    },
+    "macs_nuevas_por_s": {
+      "alcance": "propio:mac_flooding",
+      "justificacion": "aparición de MAC nunca vistas",
+      "fuente_pcap": "MAC origen del segmento",
+      "en_marcador": true
+    },
+    "macs_activas": {
+      "alcance": "propio:mac_flooding",
+      "justificacion": "MAC que emiten en la ventana",
+      "fuente_pcap": "MAC origen del segmento",
+      "en_marcador": true
+    },
+    "ratio_macs_una_trama": {
+      "alcance": "propio:mac_flooding",
+      "justificacion": "MAC que emiten una sola trama",
+      "fuente_pcap": "MAC origen del segmento",
+      "en_marcador": true
+    },
+    "syn_sin_synack_max_destino": {
+      "alcance": "propio:syn_flood",
+      "justificacion": "presión de SYN sobre un destino",
+      "fuente_pcap": "flujos TCP por destino",
+      "en_marcador": true
+    },
+    "syn_medio_abiertos_max_destino": {
+      "alcance": "propio:syn_flood",
+      "justificacion": "conexiones medio abiertas sobre un destino",
+      "fuente_pcap": "flujos TCP por destino",
+      "en_marcador": true
+    },
+    "respuestas_no_solicitadas": {
+      "alcance": "compartido",
+      "justificacion": "respuesta de protocolo que nadie pidió (ARP, DNS, ICMP echo, error ICMP)",
+      "fuente_pcap": "ARP reply sin request (psrc, pdst) previo; respuesta DNS sin consulta (ip, puerto, txid); ICMP echo reply sin echo request (ips, id, seq); error ICMP 3/11 que cita un datagrama que su destinatario no envió; ventana de 5 s",
+      "en_marcador": true
+    },
+    "tasa_respuestas_no_solicitadas": {
+      "alcance": "compartido",
+      "justificacion": "ídem, por trama",
+      "fuente_pcap": "ídem",
+      "en_marcador": true
+    },
+    "respuestas_no_solicitadas_60s": {
+      "alcance": "compartido",
+      "justificacion": "ídem, en 60 s",
+      "fuente_pcap": "ídem",
+      "en_marcador": true
+    }
+  },
+  "capa2_fuera_del_marcador": "FEATURES_CAPA2 sigue en el contrato 3.0 (E2 la usa) pero no en el marcador LOAO: según el diagnóstico de la iteración 0, mide la composición de la ventana (ARP 60 B y SYN 60 B iguales en ataque y benigno), longitud_trama_std es NaN en el 22 % del benigno, y quitarla no cambia el LOAO (RF 0,028 -> 0,044; XGB 0,111 -> 0,116).",
+  "retiradas_del_contrato": {},
+  "nunca_entran": {
+    "ventana_tcp": "8192 en el 100 % del TCP de ataque (benigno 29200/64240): huella de la herramienta",
+    "ttl_ip": "64 en el 100 % del IP de ataque (benigno 64/128/48-50): huella de la herramienta"
+  },
+  "familias_no_medidas": {
+    "2": "flujos iniciados que nunca se completan (syn_flood, port_scan)",
+    "3": "reclamación de rol (arp_spoofing, dns_spoofing)",
+    "4": "abanico de identidad (mac_flooding, port_scan, syn_flood)",
+    "5": "tasa de eventos de control por encima de lo humano (los seis)"
+  },
+  "iteraciones_sin_mejora": [],
+  "respuesta_transferencia": "Sí, poco y casi todo en un tipo. Con el contador compartido, el LOAO medio de XGB pasa de 0,116 [0,074, 0,156] a 0,228 [0,168, 0,286] (los IC no se solapan); el de RF, de 0,044 a 0,068 (se solapan). La única transferencia atribuible es arp_spoofing (0 -> 0,294 en XGB, 0 -> 0,147 en RF). icmp_flood, el tipo que más usa el contador, no se beneficia al quedar excluido. Lo que transfiere es la semántica del protocolo (respuestas sin petición), no la huella de capa 2: quitarla no movió el LOAO en la iteración 0. Con 20 de 38 características propias de un solo ataque y 3 compartidas, el clasificador supervisado sigue siendo un detector del catálogo conocido; a <= 1 FA/dispositivo-día no detecta un ataque nuevo en más de 1 de cada 4 episodios de media."
 }
