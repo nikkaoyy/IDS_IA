@@ -243,3 +243,112 @@ def test_sin_no_confiable_acusa_desde_la_segunda_ventana():
     seg.observar(_ventana(0))
     assert seg.estado == idn.CONFIABLE and seg.observar(_ventana(1, ttl=128))["alarma"]
 
+
+
+# --- PEDIDO-E3B-1, bloque 3: contadores de IP-ID y vigilante IP → MAC ---------------------
+
+def _ventana_global(k: int, contador: int, n_flujos: int = 2, mac: str = VICTIMA, ip: str = "10.20.0.5",
+                    t0: float = 0.5) -> tuple[list[Trama], int]:
+    """Tramas de k con un contador de IP-ID global compartido por `n_flujos` flujos intercalados."""
+    tramas = []
+    for i in range(3 * n_flujos):
+        f = i % n_flujos
+        contador = (contador + 1) % 65536
+        tramas.append(Trama(
+            ts_us=int((5 * k + t0 + 0.1 * i) * 1_000_000), longitud=60, mac_src=mac, mac_dst="bb:bb:bb:00:00:01",
+            ethertype=0x0800, ip_src=ip, ip_dst="93.184.216.34", proto="tcp", sport=50000 + 10 * k + f, dport=443,
+            tcp_flags=0x02 if i < n_flujos else 0x10, ip_ttl=128, ip_id=contador, ip_df=True,
+            tcp_window=64240 if i < n_flujos else 502, tcp_options=OPC_WIN if i < n_flujos else None,
+            tcp_seq=1000 * i, tcp_ack=0))
+    return tramas, contador
+
+
+def _historia_global(n: int = 15) -> tuple[list[list[Trama]], int]:
+    ventanas, c = [], 7000
+    for k in range(n):
+        v, c = _ventana_global(k, c)
+        ventanas.append(v)
+    return ventanas, c
+
+
+def test_contador_global_abre_la_puerta_y_un_segundo_contador_dispara():
+    ventanas, c = _historia_global()
+    perfil = idn.perfil_dispositivo([t for v in ventanas for t in v])
+    assert perfil["ipid_global"]
+    limpia, c = _ventana_global(20, c)
+    assert idn.desviacion(perfil, limpia)["por_senal"]["ipid_contadores"] == 0.0
+    clon, _ = _ventana_global(20, 41000, t0=0.55)  # misma pila, su propio contador
+    d = idn.desviacion(perfil, limpia + clon)
+    assert d["por_senal"]["ipid_contadores"] == idn.Z_FIRMA_NUEVA and d["puntaje"] > idn.UMBRAL_DESVIACION
+
+
+def test_contador_por_flujo_deja_la_puerta_cerrada():
+    """Linux: cada flujo lleva su contador; dos flujos simultáneos no son dos emisores."""
+    tramas = [t for k in range(15)
+              for t in _flujo_linux(k, 51000 + k, 3000 + 97 * k, 0.5) + _flujo_linux(k, 52000 + k, 40000 + 13 * k, 0.6)]
+    perfil = idn.perfil_dispositivo(tramas)
+    assert not perfil["ipid_global"]
+    d = idn.desviacion(perfil, _flujo_linux(30, 51000, 100, 0.5) + _flujo_linux(30, 52000, 30000, 0.6))
+    assert "ipid_contadores" not in d["por_senal"]
+
+
+def test_ipid_cero_no_cuenta_como_contador():
+    ventanas, c = _historia_global()
+    perfil = idn.perfil_dispositivo([t for v in ventanas for t in v])
+    limpia, _ = _ventana_global(20, c)
+    mdns = [Trama(ts_us=int((100 + 0.3 * i) * 1_000_000), longitud=80, mac_src=VICTIMA, mac_dst="01:00:5e:00:00:fb",
+                  ethertype=0x0800, ip_src="10.20.0.5", ip_dst="224.0.0.251", proto="udp", sport=5353, dport=5353,
+                  ip_ttl=255, ip_id=0) for i in range(3)]
+    assert idn.desviacion(perfil, limpia + mdns)["por_senal"]["ipid_contadores"] == 0.0
+
+
+def _tramas_ip(k: int, mac: str, ip: str) -> list[Trama]:
+    return [Trama(ts_us=int((5 * k + 1) * 1_000_000), longitud=60, mac_src=mac, mac_dst="bb:bb:bb:00:00:01",
+                  ethertype=0x0800, ip_src=ip, ip_dst="93.184.216.34", proto="tcp", sport=40000, dport=443)]
+
+
+def _vigilante_con_vinculo() -> idn.VigilanteIP:
+    vig = idn.VigilanteIP()
+    for k in range(idn.MIN_VENTANAS_PERFIL):
+        assert vig.observar(_tramas_ip(k, VICTIMA, "10.20.0.5"), int(5 * k * 1e6)) == []
+    assert vig.vinculo["10.20.0.5"] == VICTIMA
+    return vig
+
+
+def test_misma_ip_con_dos_mac_a_la_vez_es_conflicto():
+    vig = _vigilante_con_vinculo()
+    a = vig.observar(_tramas_ip(20, VICTIMA, "10.20.0.5") + _tramas_ip(20, CLON, "10.20.0.5"), int(100e6))
+    assert [x["tipo"] for x in a] == ["conflicto"]
+
+
+def test_ip_de_la_victima_callada_con_otra_mac_es_reasignacion():
+    vig = _vigilante_con_vinculo()
+    a = vig.observar(_tramas_ip(30, CLON, "10.20.0.5"), int(150e6))
+    assert [x["tipo"] for x in a] == ["reasignacion"] and a[0]["mac_anterior"] == VICTIMA
+
+
+def test_pasada_la_gracia_el_vinculo_se_traspasa_sin_alerta():
+    vig = _vigilante_con_vinculo()
+    k0 = int(idn.GRACIA_REASIGNACION_S / 5) + 20
+    alertas = [vig.observar(_tramas_ip(k0 + j, CLON, "10.20.0.5"), int(5 * (k0 + j) * 1e6))
+               for j in range(idn.MIN_VENTANAS_PERFIL + 1)]
+    assert not any(alertas) and vig.vinculo["10.20.0.5"] == CLON
+
+
+def test_ip_externa_no_se_vigila():
+    vig = idn.VigilanteIP()
+    assert vig.observar(_tramas_ip(0, VICTIMA, "93.184.216.34") + _tramas_ip(0, CLON, "93.184.216.34"), 0) == []
+
+
+def test_dos_conexiones_solapadas_de_un_contador_global_no_son_dos_contadores(monkeypatch):
+    """IDs intercalados de un mismo bloque contiguo: un contador (grupos); las cadenas registradas fallaban."""
+    ventanas, c = _historia_global()
+    perfil = idn.perfil_dispositivo([t for v in ventanas for t in v])
+    base = ventanas[0][0]
+    ids = [c + 1, c + 6, c + 2, c + 7, c + 3, c + 8, c + 4, c + 5]
+    solapadas = [Trama(ts_us=int((200 + 0.01 * i) * 1e6), longitud=60, mac_src=VICTIMA, mac_dst=base.mac_dst,
+                       ip_src=base.ip_src, ip_dst=base.ip_dst, proto="tcp", sport=60000 + (i % 2), dport=443,
+                       ip_ttl=128, ip_id=x % 65536) for i, x in enumerate(ids)]
+    assert idn.desviacion(perfil, solapadas)["por_senal"]["ipid_contadores"] == 0.0
+    monkeypatch.setattr(idn, "IPID_CONTADORES_MODO", "cadenas")
+    assert idn.desviacion(perfil, solapadas)["por_senal"]["ipid_contadores"] == idn.Z_FIRMA_NUEVA

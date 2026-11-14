@@ -27,6 +27,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import logging
 import math
@@ -43,6 +44,7 @@ import numpy as np  # noqa: E402
 
 from scripts.evaluar import commit_actual, escribir_json, fmt_ic, leer_config, ruta_proyecto  # noqa: E402
 from scripts.lab import generar_clones as gc  # noqa: E402
+from scripts.lab import generar_suplantacion as gs  # noqa: E402
 from scripts.lab import generar_variacion as gv  # noqa: E402
 from src import evaluacion as ev  # noqa: E402
 from src import identidad as idn  # noqa: E402
@@ -232,7 +234,37 @@ def markdown_b(informe: dict) -> str:
                               f"{fmt_ic(v['fraccion_dispositivos_nunca_confiables'], 2)} | {v['reperfilados']} | "
                               f"{', '.join(f'{s} {c}' for s, c in list(v['fa_por_senal'].items())[:3]) or '—'} |")
             lineas.append("")
+    if "niveles" in informe:
+        lineas += _md_niveles(informe["niveles"])
     return "\n".join(lineas) + "\n"
+
+
+def _md_niveles(nv: dict) -> list[str]:
+    lineas = ["## Bloque 3 — tabla por nivel de clon", "",
+              "Ingenuo y ritmo sobre las sesiones de E3A; los otros tres sobre las sesiones de "
+              "`generar_suplantacion.py`. Detección = alarma de identidad sobre la MAC víctima o del "
+              "vigilante sobre la IP víctima dentro del episodio.", ""]
+    variantes = [("señal de contadores por grupos (corrección post hoc)", "e3a", "e3b"),
+                 ("señal de contadores por cadenas (registrada)", "e3a_cadenas_registradas", "e3b_cadenas_registradas"),
+                 ("sin señal de contadores", "e3a_sin_contadores_ipid", "e3b_sin_contadores_ipid")]
+    if "confirmacion" in nv:
+        variantes.append(("confirmación en sesiones nuevas (grupos)", None, None))
+    for titulo, ka, kb in variantes:
+        a, b = (nv[ka], nv[kb]) if ka else (nv["confirmacion"]["e3a"], nv["confirmacion"]["e3b"])
+        lineas += [f"### {titulo}", "",
+                   "| Nivel | Episodios | Detección | Por identidad | Por vigilante | Latencia mediana (s) | FA/disp-día de sus sesiones |",
+                   "|---|---|---|---|---|---|---|"]
+        for bloque in (a, b):
+            fa = fmt_ic(bloque["legitimos"]["falsas_alarmas_por_dispositivo_dia"], 2)
+            for n, v in bloque["por_nivel"].items():
+                lineas.append(f"| {n} | {v['episodios']} | {fmt_ic(v['deteccion'])} | {fmt_ic(v['deteccion_identidad'])} | "
+                              f"{fmt_ic(v['deteccion_vigilante'])} | {fmt_ic(v['latencia_s_mediana'], 1)} | {fa} |")
+        pc = b["por_nivel"].get("pila_completa")
+        if pc:
+            lineas += ["", "Pila completa por familia de la víctima: " + ", ".join(
+                f"{p} {x['detectados']}/{x['episodios']}" for p, x in pc["por_pila_victima"].items()) + "."]
+        lineas.append("")
+    return lineas
 
 
 def markdown(informe: dict) -> str:
@@ -272,14 +304,7 @@ def markdown(informe: dict) -> str:
 
 def _sesiones_clones(cfg_sec: dict) -> list[tuple[str, list, dict]]:
     """(nombre, tramas, manifiesto) de las sesiones de clones de la parte A (mismas semillas)."""
-    dir_pcap = ruta_proyecto(cfg_sec["dir_pcap"])
-    salida = []
-    for i in range(int(cfg_sec["inicio"]), int(cfg_sec["inicio"]) + int(cfg_sec["sesiones"])):
-        ruta = dir_pcap / f"clones_{i:03d}.pcap"
-        if cfg_sec.get("regenerar", False) or not ruta.exists():
-            gc.escribir_sesion(*gc.generar_sesion(gc.SEMILLA_BASE_CLONES + i), ruta)
-        salida.append((ruta.stem, list(leer_pcap(ruta)), json.loads(ruta.with_suffix(".clones.json").read_text())))
-    return salida
+    return _sesiones_generadas(cfg_sec, "clones", gc.generar_sesion, gc.SEMILLA_BASE_CLONES)
 
 
 def _medir(sesiones: list[tuple[str, list, dict]], n_rep: int, semilla: int, **seguidor) -> dict:
@@ -302,6 +327,9 @@ def seccion_ipid(cfg: dict, cfg_sec: dict) -> dict:
             idn.IPID_MODO = modo
             salida[f"ipid_por_{modo}"] = _medir(sesiones, n_rep, sem)
             logger.info("ipid %s hecho", modo)
+        # Bloque 3: la cifra del bloque 1 sin la señal de contadores de IP-ID.
+        with _modulo(JUZGAR_CONTADORES_IPID=False):
+            salida["ipid_por_flujo_sin_contadores"] = _medir(sesiones, n_rep, sem)
         # Bloque 2: el reperfilado registrado (24) sobre las mismas sesiones con clon.
         salida["ipid_por_flujo_reperfilado_24"] = _medir(sesiones, n_rep, sem, reperfilar_tras=idn.REPERFILAR_REGISTRADO)
         logger.info("ipid flujo + reperfilado hecho")
@@ -320,14 +348,23 @@ def seccion_ipid(cfg: dict, cfg_sec: dict) -> dict:
     return salida
 
 
+_LEIDAS: dict[Path, tuple[str, list, dict]] = {}
+
+
 def _sesiones_generadas(cfg_sec: dict, prefijo: str, generar, semilla_base: int) -> list[tuple[str, list, dict]]:
+    """(nombre, tramas, manifiesto) de las sesiones `prefijo_XXX`; genera las que falten.
+
+    Cada pcap se lee una sola vez por corrida (varias secciones usan las mismas sesiones).
+    """
     dir_pcap = ruta_proyecto(cfg_sec["dir_pcap"])
     salida = []
     for i in range(int(cfg_sec["inicio"]), int(cfg_sec["inicio"]) + int(cfg_sec["sesiones"])):
         ruta = dir_pcap / f"{prefijo}_{i:03d}.pcap"
-        if cfg_sec.get("regenerar", False) or not ruta.exists():
-            gc.escribir_sesion(*generar(semilla_base + i), ruta)
-        salida.append((ruta.stem, list(leer_pcap(ruta)), json.loads(ruta.with_suffix(".clones.json").read_text())))
+        if ruta not in _LEIDAS:
+            if cfg_sec.get("regenerar", False) or not ruta.exists():
+                gc.escribir_sesion(*generar(semilla_base + i), ruta)
+            _LEIDAS[ruta] = (ruta.stem, list(leer_pcap(ruta)), json.loads(ruta.with_suffix(".clones.json").read_text()))
+        salida.append(_LEIDAS[ruta])
     return salida
 
 
@@ -382,11 +419,130 @@ def seccion_con_variacion(cfg: dict, cfg_sec: dict, **seguidor) -> dict:
     salida = {"sesiones": [s[0] for s in sesiones], **tablas(_dispositivos_por_variacion(sesiones, **seguidor))}
     salida["reperfilado_24"] = tablas(_dispositivos_por_variacion(
         sesiones, **{**seguidor, "reperfilar_tras": idn.REPERFILAR_REGISTRADO}))
+    with _modulo(JUZGAR_CONTADORES_IPID=False):  # la configuración medida en el bloque 2
+        salida["sin_contadores_ipid"] = tablas(_dispositivos_por_variacion(sesiones, **seguidor))
     logger.info("con_variacion hecho")
     return salida
 
 
-SECCIONES_B = {"ipid": seccion_ipid, "con_variacion": seccion_con_variacion}
+@contextlib.contextmanager
+def _modulo(**valores):
+    """Cambia constantes de `src/identidad.py` mientras dura el bloque (variantes y ablación)."""
+    originales = {k: getattr(idn, k) for k in valores}
+    try:
+        for k, v in valores.items():
+            setattr(idn, k, v)
+        yield
+    finally:
+        for k, v in originales.items():
+            setattr(idn, k, v)
+
+
+def vigilar_sesion(tramas, ventana_s: float = idn.VENTANA_S, **vigilante) -> list[dict]:
+    """Alertas de `VigilanteIP` por ventana sobre todas las tramas de la sesión."""
+    por_ventana: dict[int, list] = {}
+    for t in tramas:
+        por_ventana.setdefault(int(t.ts_us // (ventana_s * US)), []).append(t)
+    vig = idn.VigilanteIP(**vigilante)
+    return [{"idx": k, **a} for k in sorted(por_ventana)
+            for a in vig.observar(por_ventana[k], int(k * ventana_s * US))]
+
+
+def evaluar_sesion_niveles(nombre: str, tramas, manifiesto: dict, ventana_s: float = idn.VENTANA_S,
+                           **seguidor) -> dict:
+    """Detección por canal (identidad de la MAC víctima, vigilante de la IP víctima) y FA de ambos.
+
+    Los equipos del atacante con MAC propia no son legítimos: no cuentan para las FA.
+    """
+    seguimiento = seguir_sesion(tramas, ventana_s, **seguidor)
+    r = evaluar_sesion(nombre, seguimiento, manifiesto, ventana_s)
+    alertas = vigilar_sesion(tramas, ventana_s)
+    ip_de = {e["mac"]: e["ip"] for e in manifiesto["equipos"]}
+    for e in r["episodios"]:
+        a, b = int(e["inicio_s"] // ventana_s), int(e["fin_s"] // ventana_s)
+        ip_v = e.get("ip_victima", ip_de.get(e["mac_victima"]))
+        propias = sorted(x["idx"] for x in alertas if x["ip"] == ip_v and a <= x["idx"] <= b)
+        lat_v = (propias[0] + 1) * ventana_s - e["inicio_s"] if propias else math.nan
+        e["detectado_identidad"], e["latencia_identidad_s"] = e["detectado"], e["latencia_s"]
+        e["detectado_vigilante"], e["latencia_vigilante_s"] = bool(propias), lat_v
+        e["tipos_vigilante"] = sorted({x["tipo"] for x in alertas if x["ip"] == ip_v and a <= x["idx"] <= b})
+        e["detectado"] = e["detectado_identidad"] or e["detectado_vigilante"]
+        e["latencia_s"] = float(np.nanmin([e["latencia_identidad_s"], lat_v])) if e["detectado"] else math.nan
+    clones = {e["mac_clon"] for e in manifiesto["episodios"] if e.get("mac_clon") not in (None, e["mac_victima"])}
+    episodios_ip: dict[str, list[tuple[int, int]]] = {}
+    for e in manifiesto["episodios"]:
+        episodios_ip.setdefault(e.get("ip_victima", ip_de.get(e["mac_victima"])), []).append(
+            (int(e["inicio_s"] // ventana_s), int(e["fin_s"] // ventana_s)))
+    dispositivos = []
+    for d in r["dispositivos"]:
+        if d["mac"] in clones:
+            continue
+        ip = ip_de.get(d["mac"])
+        fa_v = len({x["idx"] for x in alertas if ip is not None and x["ip"] == ip
+                    and not any(a <= x["idx"] <= b for a, b in episodios_ip.get(ip, []))})
+        dispositivos.append({**d, "fa_identidad": d["falsas_alarmas"], "fa_vigilante": fa_v,
+                             "falsas_alarmas": d["falsas_alarmas"] + fa_v})
+    return {"episodios": r["episodios"], "dispositivos": dispositivos,
+            "alertas_vigilante_fuera": [x for x in alertas
+                                        if not any(a <= x["idx"] <= b for a, b in episodios_ip.get(x["ip"], []))]}
+
+
+def _medir_niveles(sesiones, n_rep: int, semilla: int, **seguidor) -> dict:
+    episodios, dispositivos, fuera = [], [], []
+    for nombre, tramas, man in sesiones:
+        r = evaluar_sesion_niveles(nombre, tramas, man, **seguidor)
+        episodios += r["episodios"]
+        dispositivos += r["dispositivos"]
+        fuera += [{"sesion": nombre, **x} for x in r["alertas_vigilante_fuera"]]
+    res = resumir(episodios, dispositivos, n_rep, semilla)
+    for nivel, fila in res["por_nivel"].items():
+        ep = [e for e in episodios if e["nivel"] == nivel]
+        for canal in ("identidad", "vigilante"):
+            fila[f"deteccion_{canal}"] = ev.ic_media_por_unidad(
+                np.array([e[f"detectado_{canal}"] for e in ep], float), n_rep, semilla)
+        fila["por_pila_victima"] = {
+            p: {"episodios": sum(e["pila_victima"] == p for e in ep),
+                "detectados": int(sum(e["detectado"] for e in ep if e["pila_victima"] == p))}
+            for p in sorted({e["pila_victima"] for e in ep})}
+        fila["tipos_vigilante"] = dict(Counter(tp for e in ep for tp in e["tipos_vigilante"]))
+    sesiones_n = sorted({d["sesion"] for d in dispositivos})
+    dias = np.array([[sum(d["segundos"] for d in dispositivos if d["sesion"] == s) / ev.SEGUNDOS_POR_DIA
+                      for s in sesiones_n]])
+    for canal in ("identidad", "vigilante"):
+        num = np.array([[sum(d[f"fa_{canal}"] for d in dispositivos if d["sesion"] == s) for s in sesiones_n]])
+        res["legitimos"][f"fa_{canal}_por_dispositivo_dia"] = ev.ic_razon_por_sesion(num, dias, n_rep, semilla)
+    res["legitimos"]["alertas_vigilante_fuera_de_episodio"] = fuera[:20]
+    return res
+
+
+def seccion_niveles(cfg: dict, cfg_sec: dict, **seguidor) -> dict:
+    """Bloque 3: tabla por nivel (ingenuo y ritmo sobre E3A; pila completa, víctima apagada y
+    suplantación de IP sobre las sesiones nuevas) con detección por canal, latencia y FA."""
+    n_rep, sem = int(cfg["n_bootstrap"]), int(cfg["semilla_bootstrap"])
+    e3a = _sesiones_clones(cfg_sec["e3a"])
+    nuevas = _sesiones_generadas(cfg_sec["e3b"], "suplantacion", gs.generar_sesion, gs.SEMILLA_BASE_SUPLANTACION)
+    salida = {"sesiones_e3a": [s[0] for s in e3a], "sesiones_e3b": [s[0] for s in nuevas],
+              "e3a": _medir_niveles(e3a, n_rep, sem, **seguidor),
+              "e3b": _medir_niveles(nuevas, n_rep, sem, **seguidor)}
+    with _modulo(JUZGAR_CONTADORES_IPID=False):
+        salida["e3a_sin_contadores_ipid"] = _medir_niveles(e3a, n_rep, sem, **seguidor)
+        salida["e3b_sin_contadores_ipid"] = _medir_niveles(nuevas, n_rep, sem, **seguidor)
+    with _modulo(IPID_CONTADORES_MODO="cadenas"):  # la señal tal como se registró
+        salida["e3a_cadenas_registradas"] = _medir_niveles(e3a, n_rep, sem, **seguidor)
+        salida["e3b_cadenas_registradas"] = _medir_niveles(nuevas, n_rep, sem, **seguidor)
+    salida["tabla"] = {**salida["e3a"]["por_nivel"], **salida["e3b"]["por_nivel"]}
+    if "confirmacion" in cfg_sec:  # sesiones nuevas para la corrección post hoc (grupos)
+        conf = cfg_sec["confirmacion"]
+        e3a_c = _sesiones_clones(conf["e3a"])
+        nuevas_c = _sesiones_generadas(conf["e3b"], "suplantacion", gs.generar_sesion, gs.SEMILLA_BASE_SUPLANTACION)
+        salida["confirmacion"] = {"sesiones_e3a": [s[0] for s in e3a_c], "sesiones_e3b": [s[0] for s in nuevas_c],
+                                  "e3a": _medir_niveles(e3a_c, n_rep, sem, **seguidor),
+                                  "e3b": _medir_niveles(nuevas_c, n_rep, sem, **seguidor)}
+    logger.info("niveles hecho")
+    return salida
+
+
+SECCIONES_B = {"ipid": seccion_ipid, "con_variacion": seccion_con_variacion, "niveles": seccion_niveles}
 
 
 def resumen_b(informe: dict) -> dict:
@@ -405,6 +561,17 @@ def resumen_b(informe: dict) -> dict:
                                   "fa_eventos_dia": round(cv[k]["fa_eventos_por_dispositivo_dia"]["valor"], 2),
                                   "no_confiable_ventanas": round(cv[k]["fraccion_ventanas_no_confiable"]["valor"], 3)}
                               for k in ("con_variacion", "sin_variacion")}
+    if "niveles" in informe:
+        nv = informe["niveles"]
+        r["niveles"] = {n: {"deteccion": round(v["deteccion"]["valor"], 3),
+                            "latencia_s": None if v["latencia_s_mediana"]["valor"] is None
+                            else round(v["latencia_s_mediana"]["valor"], 1)}
+                        for n, v in nv["tabla"].items()}
+        r["niveles"]["fa_dia"] = {k: round(nv[k]["legitimos"]["falsas_alarmas_por_dispositivo_dia"]["valor"], 2)
+                                  for k in ("e3a", "e3b")}
+        if "confirmacion" in nv:
+            r["niveles"]["confirmacion_pila_completa"] = round(
+                nv["confirmacion"]["e3b"]["por_nivel"]["pila_completa"]["deteccion"]["valor"], 3)
     return r
 
 

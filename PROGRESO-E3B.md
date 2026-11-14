@@ -1,4 +1,4 @@
-SEGUIR — bloque 2 hecho; sigue el bloque 3 (pila completa, víctima apagada, conflicto de sesión).
+SEGUIR — bloque 3 hecho; sigue el bloque 4 (contaminación y ablación de defensas).
 
 # Progreso — PEDIDO-E3B-1
 
@@ -86,3 +86,122 @@ dentro y la víctima acumula alarmas cuando se va (FA 0,38 → 12,05/disp-día; 
 declarada así: queda apagado por defecto (`REPERFILAR_TRAS_ALARMAS = inf`) y entra en la
 ablación del bloque 4. No se ajusta ningún otro parámetro a la vista de esta tabla; el
 arreglo de fondo (cómo aprender un cambio legítimo sin aprender un clon) queda abierto.
+
+## Bloque 3 — pila completa, víctima apagada, conflicto de sesión (registrado antes de medir)
+
+Generador nuevo `scripts/lab/generar_suplantacion.py` (semillas 79000–79019; usa las
+primitivas de `generar_clones.py`, que no cambia). Doce equipos y seis episodios por sesión,
+dos de cada nivel, víctimas distintas:
+
+- `pila_completa`: misma MAC, misma IP, misma familia de pila (TTL, ventana, opciones, política
+  de IP-ID) y mismo ritmo y tamaños que la víctima, que sigue emitiendo. El clon lleva **su
+  propio** contador de IP-ID (no puede compartir el de la víctima sin producir IDs
+  duplicados). No se modelan los RST que la víctima enviaría a los SYN-ACK del clon si el
+  switch se los entregara: dependen de la topología y se dejan para el laboratorio de E4.
+  Sin ellos, la cifra es una cota inferior de lo que vería una red real.
+- `victima_apagada`: la víctima calla desde 5–60 s antes del episodio hasta 10–60 s después;
+  el atacante usa la IP de la víctima con **su** MAC y su propia pila.
+- `suplantacion_ip`: el atacante usa la IP de la víctima con su MAC **mientras ella emite**.
+
+Señales nuevas, fijadas antes de medir:
+
+1. `ipid_contadores` (en `src/identidad.py`). En cada ventana se encadenan los IP-ID del equipo
+   (sin los 0) en orden temporal: un ID se une a la cadena cuyo último ID queda entre 1 y 2048
+   por detrás. El perfil marca el equipo como de **contador global** si, en al menos 3 ventanas
+   con IP-ID de dos o más flujos y en el 80 % de ellas, una sola cadena cruza flujos y no hay
+   cadenas extra. Solo en esos equipos, una ventana con una segunda cadena de ≥ 2 tramas puntúa
+   `Z_FIRMA_NUEVA` (10). En Linux (contador por flujo), macOS (aleatorio) y Android (cero)
+   la puerta queda cerrada: ahí la señal no existe.
+2. `VigilanteIP` (en `src/identidad.py`), sobre las IP de la red local (10.20.0.0/16):
+   - **conflicto**: la misma IP con dos MAC en la misma ventana de 5 s. En una red sana es
+     imposible (salvo failover de gateway, que aquí no hay).
+   - **reasignación**: una IP vinculada a una MAC (vínculo tras 12 ventanas, como el perfil)
+     aparece con otra MAC mientras la anterior lleva **menos de 600 s** callada. Pasados los
+     600 s el vínculo se traspasa en silencio (como un DHCP); no se acusa. Esto es un límite
+     declarado: un atacante que espere más de diez minutos después de que la víctima calle
+     pasa.
+
+Medida por nivel: detección (cualquier alarma de identidad sobre la MAC víctima o del
+vigilante sobre la IP víctima dentro del episodio), por canal (identidad / vigilante),
+latencia y FA (identidad + vigilante, fuera de episodios). Los niveles ingenuo y ritmo se
+remiden con la señal nueva sobre las sesiones de E3A, y las FA con variación (bloque 2) se
+remiden con ella, con la cifra de antes al lado.
+
+Lo que espero: pila completa detectada solo en víctimas de contador global (Windows e IoT,
+≈ 2 de cada 5), y nada en el resto; víctima apagada ≈ 1,0 por reasignación; suplantación de IP
+≈ 1,0 por conflicto. Las FA del vigilante serán 0 en estos datos porque el generador no tiene
+DHCP ni failover: es una cifra optimista y se dirá así.
+
+Corrección de diseño antes de medir (la detectó la prueba del generador, no una cifra): con el
+ritmo propio del atacante, un episodio corto podía quedar sin ninguna trama suya (0 tramas en un
+episodio de 148 s de la sesión 79000). En los tres niveles el atacante abre ahora una conexión
+en los 2 s siguientes al inicio y después sigue su ritmo.
+
+### Bloque 3 — primera medida (señal registrada) y corrección post hoc declarada
+
+Con la señal **tal como se registró** (cadenas en orden temporal):
+
+| Nivel | Detección | Identidad / vigilante | FA/disp-día (sesiones del nivel) |
+|---|---|---|---|
+| ingenuo / ritmo (E3A) | 0,975 / 1,000 | igual / 0 | **21,08** (era 0,38) |
+| pila completa | **0,25** (10/40: IoT 6/7, Windows 4/6; Linux, macOS, Android 0/27) | 0,25 / 0 | 20,30 |
+| víctima apagada | 1,00 | 0 / 1,00 (reasignación) | |
+| suplantación de IP | 0,95 | 0,05 / 0,95 (conflicto 37, reasignación 36) | |
+
+Sin la señal, la pila completa es **0/40** y las FA vuelven a 0,38. La señal registrada rompe el
+presupuesto: 55 de 56 FA en E3A son `ipid_contadores` en equipos Windows e IoT **solos**. Causa
+vista en las tramas: dos conexiones del mismo equipo que se solapan en el tiempo llevan IDs
+intercalados (34195, 34200, 34196, 34201…). El encadenado en orden temporal ve un retroceso y abre
+una segunda cadena, aunque los IDs formen un único bloque contiguo. En el generador pasa porque
+cada conexión toma sus IDs al crearse; en una red real, el reordenamiento en la captura produce lo
+mismo. El defecto está en la señal, no en un umbral.
+
+**Corrección post hoc (decidida después de ver la cifra, declarada así, sin parámetros nuevos):**
+los contadores se cuentan como **grupos de IDs separados por más de 2048** (el mismo
+`SALTO_IPID_CONTINUO`), sin importar el orden: los IDs de la ventana se ordenan por valor
+(circular, módulo 65536) y cada hueco mayor que 2048 separa dos grupos. Un contador global da un
+grupo; dos contadores independientes dan dos, salvo que caigan a menos de 2048 el uno del otro
+(≈ 6 % de las veces con inicio aleatorio). La puerta (`ipid_global`) y la puntuación no cambian.
+La señal registrada queda accesible (`IPID_CONTADORES_MODO = "cadenas"`) y su cifra se publica
+junto a la corregida. Como la corrección se diseñó mirando estas sesiones, se **confirma en
+sesiones nuevas**: 20 de clones de E3A (semillas 77020–77039; no tienen nada que ver con el holdout
+20–29 del dataset de E2) y 20 de suplantación (79020–79039).
+
+### Bloque 3 — resultado (señal por grupos; `reports/identidad_e3b.json`, sección `niveles`)
+
+| Nivel | Detección | Canal | Latencia mediana (s) | Confirmación (sesiones nuevas) |
+|---|---|---|---|---|
+| ingenuo | 0,975 [0,925, 1,000] | identidad | 3,7 | 1,000 |
+| ritmo y tamaños | 1,000 [1,000, 1,000] | identidad | 10,0 | 0,975 |
+| **pila completa** | **0,200 [0,075, 0,325]** | identidad (contadores de IP-ID) | 8,6 | **0,325 [0,175, 0,475]** |
+| víctima apagada | 1,000 [1,000, 1,000] | vigilante (reasignación) | 4,6 | 1,000 |
+| suplantación de IP | 0,950 [0,875, 1,000] | vigilante (conflicto) | 3,9 | 0,975 |
+
+FA/disp-día: 0,38 [0,00, 1,13] en las sesiones de E3A y 0,38 en las de suplantación (0,75 y 0,75
+en las de confirmación). Dentro del presupuesto. La única alerta del vigilante fuera de episodio
+es la cola de uno: las tramas del atacante 0,03 s después de `fin_s` caen en la ventana siguiente.
+Se cuenta como FA igual, sin corregir la ventana del episodio.
+
+**Pila completa, por familia de la víctima (las 80 sesiones):** IoT 15/20 y Windows 6/13 (las dos
+con contador global); Linux 0/15, macOS 0/17 y Android 0/15. Sin la señal de contadores, 0/40.
+Por qué se escapan los globales: en 31 de 33 episodios con víctima global la puerta estaba
+abierta. De los 12 no detectados, en 10 los dos contadores existen a lo largo del episodio pero
+**nunca coinciden en la misma ventana de 5 s** (ritmos de ~4 conexiones/min), y en 2 caen a menos
+de 2048 uno del otro. El conflicto de sesión (misma IP, dos MAC) no lo ve: la MAC también es la
+misma. El SEQ tampoco: el ISN es aleatorio por conexión en todas las familias.
+
+**Frase para el artículo:** el sistema se rompe en el tercer nivel. El clon de pila completa se
+detecta en el **20 % de los episodios (32,5 % en sesiones nuevas)**, y solo cuando la víctima
+usa un contador de IP-ID global (IoT, Windows). Con víctima Linux, macOS o Android, la
+detección es **0 de 47**. Se declara **límite no resuelto**. La víctima apagada (1,00) y la
+suplantación de IP con la víctima activa (0,95) se detectan por el vínculo IP→MAC, no por la pila.
+
+**Contadores en los benignos con variación:** la señal añade 4 FA en dos pilas y 5 en un control
+macOS cuya puerta se abrió por azar. Con IP-ID aleatorio y pocas ventanas multiflujo en el
+aprendizaje, tres ventanas cumplen el criterio por casualidad. Las FA sin variación (control y
+gateway) suben de 1,6 a 9,7/disp-día, con IC que se solapan. Queda registrado como debilidad de la
+puerta (`MIN_VENTANAS_CRUCE = 3`), sin reajustar.
+
+Pendiente para E4: juzgar los contadores **entre ventanas** (un contador global que retrocede de
+una ventana a otra delata a un segundo emisor aunque no coincidan en la misma ventana), los RST de
+la víctima en un switch real, y FA del vigilante con DHCP real.

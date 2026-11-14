@@ -61,6 +61,7 @@ Decisiones fijadas antes de medir:
 
 from __future__ import annotations
 
+import ipaddress
 import math
 from collections import deque
 from collections.abc import Iterable, Sequence
@@ -85,6 +86,12 @@ REPERFILAR_REGISTRADO: int = 24  # valor registrado en E3B (2 min de alarma cont
 REPERFILAR_TRAS_ALARMAS: float = math.inf  # apagado por defecto tras medirlo (ver docstring)
 HISTORIA_MAX: int = 120
 SALTO_IPID_CONTINUO: int = 2048
+JUZGAR_CONTADORES_IPID: bool = True  # E3B bloque 3; False reproduce las cifras del bloque 2
+IPID_CONTADORES_MODO: str = "grupos"  # "cadenas": versión registrada, rota por el orden (ver _cadenas_ipid)
+MIN_VENTANAS_CRUCE: int = 3
+FRACCION_CRUCE: float = 0.8
+RED_LOCAL: str = "10.20.0.0/16"
+GRACIA_REASIGNACION_S: float = 600.0
 SALTO_SEQ_CONTINUO: int = 1 << 20
 ESCALA_MAD: float = 1.4826
 PISO_RELATIVO: float = 0.01
@@ -121,6 +128,7 @@ def senales_ventana(tramas: Sequence[Trama]) -> dict:
     if ventanas_tcp:
         s["tcp_window"] = float(np.median(ventanas_tcp))
     _senales_ipid(ip, s)
+    _cadenas_ipid(ip, s)
     flujos: dict[tuple, list[int]] = {}
     for t in sorted((t for t in ip if t.tcp_seq is not None), key=lambda t: t.ts_us):
         flujos.setdefault((t.ip_dst, t.sport, t.dport), []).append(t.tcp_seq)
@@ -156,6 +164,61 @@ def _senales_ipid(ip: Sequence[Trama], s: dict) -> None:
         s["ipid_salto_log2"] = float(np.median(s["ipid_salto_log2_valores"]))
 
 
+def _cadenas_ipid(ip: Sequence[Trama], s: dict) -> None:
+    """Contadores de IP-ID simultáneos en la ventana (PEDIDO-E3B-1, bloque 3).
+
+    Encadena los IP-ID distintos de 0 en orden temporal: cada uno se une a la cadena cuyo
+    último ID queda entre 1 y `SALTO_IPID_CONTINUO` por detrás (la más cercana). Un equipo con
+    contador global produce una sola cadena que cruza flujos; dos emisores con contador global
+    producen dos.
+    """
+    ordenadas = [t for t in sorted(ip, key=lambda t: t.ts_us) if t.ip_id]
+    if not ordenadas:
+        return
+    s["ipid_multiflujo"] = len({(t.ip_dst, t.proto, t.sport, t.dport) for t in ordenadas}) >= 2
+    if IPID_CONTADORES_MODO == "grupos":
+        _grupos_ipid(ordenadas, s)
+        return
+    cadenas: list[list] = []  # [último ID, tramas, flujos]
+    for t in ordenadas:
+        flujo = (t.ip_dst, t.proto, t.sport, t.dport)
+        candidatas = [(g, c) for c in cadenas if 1 <= (g := (t.ip_id - c[0]) % 65536) <= SALTO_IPID_CONTINUO]
+        if candidatas:
+            c = min(candidatas, key=lambda gc: gc[0])[1]
+            c[0], c[1] = t.ip_id, c[1] + 1
+            c[2].add(flujo)
+        else:
+            cadenas.append([t.ip_id, 1, {flujo}])
+    largas = [c for c in cadenas if c[1] >= 2]
+    s["ipid_cruce"] = any(len(c[2]) >= 2 for c in largas)
+    s["ipid_contadores_extra"] = max(0, len(largas) - 1)
+
+
+def _grupos_ipid(ordenadas: Sequence[Trama], s: dict) -> None:
+    """Contadores como grupos de IDs separados por más de `SALTO_IPID_CONTINUO` (corrección post hoc).
+
+    Los IDs se ordenan por valor en el círculo módulo 65536 y cada hueco mayor que el salto separa
+    dos grupos. No depende del orden de llegada: dos conexiones solapadas de un mismo contador
+    global forman un único bloque contiguo aunque sus IDs lleguen intercalados.
+    """
+    por_valor = sorted(ordenadas, key=lambda t: t.ip_id)
+    ids = [t.ip_id for t in por_valor]
+    huecos = [(b - a) for a, b in zip(ids, ids[1:])] + [ids[0] + 65536 - ids[-1]]
+    cortes = [i for i, h in enumerate(huecos) if h > SALTO_IPID_CONTINUO]
+    if not cortes:
+        grupos = [por_valor]
+    else:  # el grupo k empieza justo después del corte k (circular)
+        n = len(por_valor)
+        grupos = []
+        for j, c in enumerate(cortes):
+            fin = cortes[(j + 1) % len(cortes)]
+            idx = [(c + 1 + m) % n for m in range((fin - c) % n or n)]
+            grupos.append([por_valor[i] for i in idx])
+    largos = [g for g in grupos if len(g) >= 2]
+    s["ipid_cruce"] = any(len({(t.ip_dst, t.proto, t.sport, t.dport) for t in g}) >= 2 for g in largos)
+    s["ipid_contadores_extra"] = max(0, len(largos) - 1)
+
+
 def tiene_senal(s: dict) -> bool:
     """¿La ventana aporta alguna señal de pila? Solo esas cuentan para el perfil."""
     return bool(s["tcp_opciones"]) or any(not math.isnan(s[k]) for k in SENALES_NUMERICAS)
@@ -185,6 +248,9 @@ def perfil_desde_senales(ventanas: Sequence[dict]) -> dict:
             for x in v.get(f"{k}_valores", ()):
                 apariciones[x] = apariciones.get(x, 0) + 1
         perfil[f"{k}_valores"] = apariciones
+    multi = [v for v in ventanas if v.get("ipid_multiflujo")]
+    cruzan = [v for v in multi if v.get("ipid_cruce") and v.get("ipid_contadores_extra", 0) == 0]
+    perfil["ipid_global"] = len(multi) >= MIN_VENTANAS_CRUCE and len(cruzan) >= FRACCION_CRUCE * len(multi)
     return perfil
 
 
@@ -219,6 +285,8 @@ def desviacion_senales(perfil: dict, s: dict) -> dict:
                 por_senal[k] = max(abs(x - p["mediana"]) / escala for x in s[f"{k}_valores"])
             else:
                 por_senal[k] = abs(s[k] - p["mediana"]) / escala
+    if JUZGAR_CONTADORES_IPID and perfil.get("ipid_global") and "ipid_contadores_extra" in s:
+        por_senal["ipid_contadores"] = Z_FIRMA_NUEVA if s["ipid_contadores_extra"] >= 1 else 0.0
     if s["tcp_opciones"] and perfil.get("tcp_opciones"):
         por_senal["tcp_opciones"] = 0.0 if s["tcp_opciones"] <= perfil["tcp_opciones"] else Z_FIRMA_NUEVA
     puntaje = max(por_senal.values()) if por_senal else math.nan
@@ -322,3 +390,72 @@ class SeguidorIdentidad:
                 salida["aprendio"] = self._aprender(s, dia)
         salida["estado"] = self.estado
         return salida
+
+
+@dataclass
+class VigilanteIP:
+    """Vínculo IP → MAC de la red local (PEDIDO-E3B-1, bloque 3).
+
+    Dos alertas, fijadas antes de medir:
+
+    - `conflicto`: la misma IP con dos o más MAC en la misma ventana. Dos emisores con la misma
+      IP no existen en una red sana (salvo failover de gateway).
+    - `reasignacion`: una IP vinculada a una MAC (tras `MIN_VENTANAS_PERFIL` ventanas) aparece
+      con otra mientras la anterior lleva menos de `gracia_s` callada. Pasada la gracia, el
+      vínculo se traspasa sin alerta tras otras `MIN_VENTANAS_PERFIL` ventanas (como un DHCP).
+      Límite declarado: un atacante que espere más que la gracia después de que la víctima
+      calle no se acusa.
+
+    Las alertas no aprenden: una IP en conflicto o en reasignación no cuenta para el vínculo.
+    """
+
+    red: str = RED_LOCAL
+    gracia_s: float = GRACIA_REASIGNACION_S
+    min_ventanas: int = MIN_VENTANAS_PERFIL
+    vinculo: dict[str, str] = field(default_factory=dict)
+    ultima_us: dict[str, int] = field(default_factory=dict)
+    cuentas: dict[tuple[str, str], int] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self._red = ipaddress.ip_network(self.red)
+
+    def _local(self, ip: str | None) -> bool:
+        if not ip or ip == "0.0.0.0":
+            return False
+        try:
+            return ipaddress.ip_address(ip) in self._red
+        except ValueError:
+            return False
+
+    def observar(self, tramas: Sequence[Trama], ts_us: int) -> list[dict]:
+        """Procesa las tramas de una ventana (de todos los equipos); devuelve sus alertas."""
+        por_ip: dict[str, set[str]] = {}
+        for t in tramas:
+            if self._local(t.ip_src):
+                por_ip.setdefault(t.ip_src, set()).add(t.mac_src)
+        alertas = []
+        for ip, macs in sorted(por_ip.items()):
+            if len(macs) >= 2:
+                alertas.append({"tipo": "conflicto", "ip": ip, "macs": sorted(macs)})
+                continue
+            mac, previa = next(iter(macs)), self.vinculo.get(ip)
+            if previa is None or previa == mac:
+                if previa is None:
+                    self._contar(ip, mac)
+                continue
+            silencio_s = (ts_us - self.ultima_us.get(previa, -(1 << 62))) / 1_000_000
+            if silencio_s <= self.gracia_s:
+                alertas.append({"tipo": "reasignacion", "ip": ip, "mac": mac, "mac_anterior": previa,
+                                "silencio_s": silencio_s})
+            else:
+                self._contar(ip, mac)
+        for t in tramas:
+            self.ultima_us[t.mac_src] = max(self.ultima_us.get(t.mac_src, 0), t.ts_us)
+        return alertas
+
+    def _contar(self, ip: str, mac: str) -> None:
+        n = self.cuentas.get((ip, mac), 0) + 1
+        self.cuentas[(ip, mac)] = n
+        if n >= self.min_ventanas:
+            self.vinculo[ip] = mac
+            self.cuentas = {k: v for k, v in self.cuentas.items() if k[0] != ip}

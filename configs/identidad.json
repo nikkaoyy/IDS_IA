@@ -21,6 +21,34 @@
         "inicio": 0,
         "sesiones": 20,
         "regenerar": false
+      },
+      "niveles": {
+        "e3a": {
+          "dir_pcap": "data/pcap_clones",
+          "inicio": 0,
+          "sesiones": 20,
+          "regenerar": false
+        },
+        "e3b": {
+          "dir_pcap": "data/pcap_e3b",
+          "inicio": 0,
+          "sesiones": 20,
+          "regenerar": false
+        },
+        "confirmacion": {
+          "e3a": {
+            "dir_pcap": "data/pcap_clones",
+            "inicio": 20,
+            "sesiones": 20,
+            "regenerar": false
+          },
+          "e3b": {
+            "dir_pcap": "data/pcap_e3b",
+            "inicio": 20,
+            "sesiones": 20,
+            "regenerar": false
+          }
+        }
       }
     }
   }
