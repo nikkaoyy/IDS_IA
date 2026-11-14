@@ -1,0 +1,18 @@
+{
+  "descripcion": "PEDIDO-E4R-1: robustez del detector supervisado frente a la intensidad del ataque, sobre el corpus congelado de E1/E2. No genera ataques nuevos; reutiliza data/pcap/sesion_000..019 y data/dataset_lab.csv.",
+  "dataset": "data/dataset_lab.csv",
+  "sha256_esperado": "7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945",
+  "modelo": "xgboost",
+  "n_folds": 5,
+  "n_folds_internos": 3,
+  "semillas": [42, 43, 44, 45, 46],
+  "semilla_or": 42,
+  "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+  "n_bootstrap": 1000,
+  "semilla_bootstrap": 42,
+  "dir_pcap": "data/pcap",
+  "sesiones": 20,
+  "k_tramas_ataque": 2,
+  "fa_identidad_e3b_variacion": 826.24,
+  "salida": "reports/robustez_e4.json"
+}
