@@ -1,0 +1,500 @@
+{
+  "pedido": "PEDIDO-EXTRACTOR-1 (v2)",
+  "fecha": "2026-11-13T22:10:11",
+  "marcador": "Recall por episodio del tipo excluido (LOAO), conjunto sin_capa2, IC 95 % bootstrap",
+  "linea_base_semantica": {
+    "informe": "reports/extractor/loao_it0_sin_capa2.json",
+    "loao": {
+      "random_forest": {
+        "media": {
+          "valor": 0.044,
+          "ic95": [
+            0.016,
+            0.076
+          ]
+        },
+        "por_tipo": {
+          "arp_spoofing": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "dns_spoofing": {
+            "valor": 0.1,
+            "ic95": [
+              0.0,
+              0.233
+            ]
+          },
+          "icmp_flood": {
+            "valor": 0.129,
+            "ic95": [
+              0.032,
+              0.258
+            ]
+          },
+          "mac_flooding": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "port_scan": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "syn_flood": {
+            "valor": 0.032,
+            "ic95": [
+              0.0,
+              0.097
+            ]
+          }
+        }
+      },
+      "xgboost": {
+        "media": {
+          "valor": 0.116,
+          "ic95": [
+            0.074,
+            0.156
+          ]
+        },
+        "por_tipo": {
+          "arp_spoofing": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "dns_spoofing": {
+            "valor": 0.033,
+            "ic95": [
+              0.0,
+              0.1
+            ]
+          },
+          "icmp_flood": {
+            "valor": 0.097,
+            "ic95": [
+              0.0,
+              0.226
+            ]
+          },
+          "mac_flooding": {
+            "valor": 0.294,
+            "ic95": [
+              0.147,
+              0.441
+            ]
+          },
+          "port_scan": {
+            "valor": 0.143,
+            "ic95": [
+              0.036,
+              0.286
+            ]
+          },
+          "syn_flood": {
+            "valor": 0.129,
+            "ic95": [
+              0.032,
+              0.258
+            ]
+          }
+        }
+      }
+    }
+  },
+  "iteraciones": [
+    {
+      "iteracion": 1,
+      "familia": "respuestas sin petición previa",
+      "features": [
+        "respuestas_no_solicitadas",
+        "tasa_respuestas_no_solicitadas",
+        "respuestas_no_solicitadas_60s"
+      ],
+      "viola": "Un equipo legítimo no contesta lo que nadie preguntó.",
+      "fuente_pcap": "ARP reply sin request (psrc, pdst) previo; respuesta DNS sin consulta (ip, puerto, txid); ICMP echo reply sin echo request (ips, id, seq); error ICMP 3/11 que cita un datagrama que su destinatario no envió; ventana de 5 s",
+      "cubre": [
+        "icmp_flood",
+        "arp_spoofing",
+        "dns_spoofing"
+      ],
+      "prediccion": {
+        "icmp_flood": {
+          "minimo_declarado": 0.15,
+          "cumplida": false
+        },
+        "arp_spoofing": {
+          "minimo_declarado": 0.1,
+          "cumplida": true
+        },
+        "dns_spoofing": {
+          "minimo_declarado": null,
+          "cumplida": true
+        }
+      },
+      "regla_decision": "Se queda si el LOAO medio sube en al menos un modelo y icmp_flood o arp_spoofing sube >= 0,10 al quedar excluido.",
+      "informe": "reports/extractor/loao_it1_respuestas.json",
+      "loao": {
+        "random_forest": {
+          "media": {
+            "valor": 0.068,
+            "ic95": [
+              0.032,
+              0.105
+            ]
+          },
+          "por_tipo": {
+            "arp_spoofing": {
+              "valor": 0.147,
+              "ic95": [
+                0.029,
+                0.265
+              ]
+            },
+            "dns_spoofing": {
+              "valor": 0.1,
+              "ic95": [
+                0.0,
+                0.233
+              ]
+            },
+            "icmp_flood": {
+              "valor": 0.097,
+              "ic95": [
+                0.0,
+                0.194
+              ]
+            },
+            "mac_flooding": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "port_scan": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "syn_flood": {
+              "valor": 0.065,
+              "ic95": [
+                0.0,
+                0.161
+              ]
+            }
+          }
+        },
+        "xgboost": {
+          "media": {
+            "valor": 0.228,
+            "ic95": [
+              0.168,
+              0.286
+            ]
+          },
+          "por_tipo": {
+            "arp_spoofing": {
+              "valor": 0.294,
+              "ic95": [
+                0.147,
+                0.441
+              ]
+            },
+            "dns_spoofing": {
+              "valor": 0.1,
+              "ic95": [
+                0.0,
+                0.233
+              ]
+            },
+            "icmp_flood": {
+              "valor": 0.161,
+              "ic95": [
+                0.064,
+                0.29
+              ]
+            },
+            "mac_flooding": {
+              "valor": 0.265,
+              "ic95": [
+                0.146,
+                0.412
+              ]
+            },
+            "port_scan": {
+              "valor": 0.321,
+              "ic95": [
+                0.143,
+                0.5
+              ]
+            },
+            "syn_flood": {
+              "valor": 0.226,
+              "ic95": [
+                0.097,
+                0.387
+              ]
+            }
+          }
+        }
+      },
+      "transferencia": {
+        "icmp_flood": {
+          "random_forest": {
+            "antes": {
+              "valor": 0.129,
+              "ic95": [
+                0.032,
+                0.258
+              ]
+            },
+            "despues": {
+              "valor": 0.097,
+              "ic95": [
+                0.0,
+                0.194
+              ]
+            },
+            "delta": -0.032
+          },
+          "xgboost": {
+            "antes": {
+              "valor": 0.097,
+              "ic95": [
+                0.0,
+                0.226
+              ]
+            },
+            "despues": {
+              "valor": 0.161,
+              "ic95": [
+                0.064,
+                0.29
+              ]
+            },
+            "delta": 0.064
+          }
+        },
+        "arp_spoofing": {
+          "random_forest": {
+            "antes": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "despues": {
+              "valor": 0.147,
+              "ic95": [
+                0.029,
+                0.265
+              ]
+            },
+            "delta": 0.147
+          },
+          "xgboost": {
+            "antes": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ]
+            },
+            "despues": {
+              "valor": 0.294,
+              "ic95": [
+                0.147,
+                0.441
+              ]
+            },
+            "delta": 0.294
+          }
+        },
+        "dns_spoofing": {
+          "random_forest": {
+            "antes": {
+              "valor": 0.1,
+              "ic95": [
+                0.0,
+                0.233
+              ]
+            },
+            "despues": {
+              "valor": 0.1,
+              "ic95": [
+                0.0,
+                0.233
+              ]
+            },
+            "delta": 0.0
+          },
+          "xgboost": {
+            "antes": {
+              "valor": 0.033,
+              "ic95": [
+                0.0,
+                0.1
+              ]
+            },
+            "despues": {
+              "valor": 0.1,
+              "ic95": [
+                0.0,
+                0.233
+              ]
+            },
+            "delta": 0.067
+          }
+        }
+      },
+      "se_queda": true
+    }
+  ],
+  "vigente": {
+    "random_forest": {
+      "media": {
+        "valor": 0.068,
+        "ic95": [
+          0.032,
+          0.105
+        ]
+      },
+      "por_tipo": {
+        "arp_spoofing": {
+          "valor": 0.147,
+          "ic95": [
+            0.029,
+            0.265
+          ]
+        },
+        "dns_spoofing": {
+          "valor": 0.1,
+          "ic95": [
+            0.0,
+            0.233
+          ]
+        },
+        "icmp_flood": {
+          "valor": 0.097,
+          "ic95": [
+            0.0,
+            0.194
+          ]
+        },
+        "mac_flooding": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "port_scan": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "syn_flood": {
+          "valor": 0.065,
+          "ic95": [
+            0.0,
+            0.161
+          ]
+        }
+      }
+    },
+    "xgboost": {
+      "media": {
+        "valor": 0.228,
+        "ic95": [
+          0.168,
+          0.286
+        ]
+      },
+      "por_tipo": {
+        "arp_spoofing": {
+          "valor": 0.294,
+          "ic95": [
+            0.147,
+            0.441
+          ]
+        },
+        "dns_spoofing": {
+          "valor": 0.1,
+          "ic95": [
+            0.0,
+            0.233
+          ]
+        },
+        "icmp_flood": {
+          "valor": 0.161,
+          "ic95": [
+            0.064,
+            0.29
+          ]
+        },
+        "mac_flooding": {
+          "valor": 0.265,
+          "ic95": [
+            0.146,
+            0.412
+          ]
+        },
+        "port_scan": {
+          "valor": 0.321,
+          "ic95": [
+            0.143,
+            0.5
+          ]
+        },
+        "syn_flood": {
+          "valor": 0.226,
+          "ic95": [
+            0.097,
+            0.387
+          ]
+        }
+      }
+    }
+  },
+  "criterio_parada": {
+    "por_modelo": {
+      "random_forest": {
+        "media": 0.068,
+        "objetivo_media": 0.194,
+        "media_cumple": false,
+        "tipos_sobre_umbral": [],
+        "tipos_cumple": false
+      },
+      "xgboost": {
+        "media": 0.228,
+        "objetivo_media": 0.266,
+        "media_cumple": false,
+        "tipos_sobre_umbral": [
+          "arp_spoofing",
+          "mac_flooding",
+          "port_scan"
+        ],
+        "tipos_cumple": true
+      }
+    },
+    "transferencia_lograda": true
+  }
+}

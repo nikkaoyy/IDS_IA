@@ -1,0 +1,3056 @@
+{
+  "etapa": "E2",
+  "fecha": "2026-11-13T00:51:52",
+  "commit": "cd01e1a37ef6da68be95a6c1ef12e85ecf96a4f8",
+  "arbol_con_cambios": true,
+  "config_archivo": "configs/e2.json",
+  "config": {
+    "descripcion": "Configuración congelada de la evaluación E2 (OE2, OE3). La usan scripts/evaluar.py, scripts/ablaciones.py y scripts/evaluar_holdout.py.",
+    "dataset": "data/dataset_lab.csv",
+    "modelos": [
+      "random_forest",
+      "xgboost"
+    ],
+    "n_folds": 5,
+    "semillas": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "n_folds_internos": 3,
+    "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+    "objetivos_sensibilidad": [
+      0.25,
+      1.0,
+      4.0,
+      16.0
+    ],
+    "n_bootstrap": 1000,
+    "semilla_bootstrap": 42,
+    "salida": "reports/evaluacion_e2.json",
+    "ablaciones": {
+      "modelos": [
+        "random_forest",
+        "xgboost"
+      ],
+      "semillas": [
+        42
+      ],
+      "repeticiones_permutacion": 5,
+      "salida": "reports/ablaciones_e2.json"
+    },
+    "holdout": {
+      "dataset": "data/holdout_e2.csv",
+      "salida": "reports/holdout_e2.json",
+      "sello": "reports/.holdout_abierto"
+    }
+  },
+  "dataset": {
+    "ruta": "data/dataset_lab.csv",
+    "sha256": "3f4d28bcd1d2fee5cd5aeab0ae31d5213262a097f7a051fe87b6e63f9e04eced",
+    "filas": 78988
+  },
+  "version_esquema": "2.0",
+  "columnas_modelo": [
+    "n_tramas",
+    "bytes_totales",
+    "longitud_trama_media",
+    "longitud_trama_std",
+    "iat_media_ms",
+    "iat_std_ms",
+    "tasa_unicast",
+    "tasa_multicast",
+    "tasa_broadcast",
+    "macs_destino_distintas",
+    "pct_menor_64",
+    "tasa_vlan",
+    "tasa_llc",
+    "entropia_ethertype",
+    "arp_requests",
+    "arp_replies",
+    "arp_replies_no_solicitadas",
+    "arp_gratuitos",
+    "arp_cambios_vinculo",
+    "arp_ether_distinto_hwsrc",
+    "arp_gateway_reclamado",
+    "n_syn",
+    "tasa_syn",
+    "syn_medio_abiertos",
+    "ratio_syn_medio_abiertos",
+    "n_rst",
+    "ips_origen_distintas",
+    "ips_destino_distintas",
+    "puertos_destino_distintos",
+    "entropia_puertos_destino",
+    "conexiones_distintas",
+    "n_icmp_echo",
+    "dns_consultas",
+    "dns_respuestas",
+    "dns_respuestas_sin_consulta",
+    "dns_multiples_respuestas_txid",
+    "dns_resolver_no_autorizado",
+    "n_tramas_60s",
+    "arp_replies_no_solicitadas_60s",
+    "arp_cambios_vinculo_60s",
+    "syn_medio_abiertos_60s",
+    "dns_respuestas_sin_consulta_60s",
+    "puertos_destino_distintos_60s",
+    "ips_destino_distintas_60s",
+    "macs_nuevas_por_s",
+    "macs_activas",
+    "ratio_macs_una_trama",
+    "syn_sin_synack_max_destino",
+    "syn_medio_abiertos_max_destino"
+  ],
+  "definiciones": {
+    "falsa_alarma": "ventana benigna limpia (n_tramas_ataque == 0) con prob > umbral",
+    "ventana_ambigua": "0 < n_tramas_ataque < K, etiquetada benigna; no cuenta como FP ni como TP",
+    "dispositivo_dia": "lapso observado de cada (sesión, MAC), de la primera a la última ventana, × 5 s, sumado y dividido por 86 400",
+    "episodio_detectado": "al menos una ventana etiquetada del episodio con alarma",
+    "tiempo_deteccion_s": "desde el inicio de la primera ventana con alguna trama del episodio hasta el cierre de la primera ventana etiquetada con alarma",
+    "umbral": "k-ésima mayor probabilidad benigna limpia en las predicciones internas (OOF) del fold externo, con k = floor(objetivo × dispositivo-días internos); alarma si prob > umbral",
+    "ic95": "percentiles 2,5/97,5 del bootstrap: sesiones para razones y PR-AUC; episodios o atacantes para recall y tiempos; promedio entre semillas dentro de cada réplica"
+  },
+  "modelos": {
+    "random_forest": {
+      "resumen": {
+        "episodios": {
+          "recall": {
+            "valor": 0.7872340425531915,
+            "ic95": [
+              0.7319148936170214,
+              0.8425531914893616
+            ],
+            "n": 188
+          },
+          "por_tipo": {
+            "arp_spoofing": {
+              "valor": 0.8,
+              "ic95": [
+                0.6764705882352942,
+                0.9
+              ],
+              "n": 34
+            },
+            "dns_spoofing": {
+              "valor": 0.7266666666666667,
+              "ic95": [
+                0.5733333333333334,
+                0.8733333333333333
+              ],
+              "n": 30
+            },
+            "icmp_flood": {
+              "valor": 0.43870967741935485,
+              "ic95": [
+                0.2645161290322581,
+                0.6000000000000001
+              ],
+              "n": 31
+            },
+            "mac_flooding": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 34
+            },
+            "port_scan": {
+              "valor": 0.7285714285714286,
+              "ic95": [
+                0.5714285714285714,
+                0.8785714285714287
+              ],
+              "n": 28
+            },
+            "syn_flood": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 31
+            }
+          },
+          "por_intensidad": {
+            "media": {
+              "valor": 0.8387096774193549,
+              "ic95": [
+                0.7451612903225807,
+                0.9193548387096774
+              ],
+              "n": 62
+            },
+            "rafaga": {
+              "valor": 0.6058823529411765,
+              "ic95": [
+                0.45294117647058824,
+                0.7470588235294118
+              ],
+              "n": 34
+            },
+            "suave": {
+              "valor": 0.8195652173913044,
+              "ic95": [
+                0.7434782608695653,
+                0.8956521739130434
+              ],
+              "n": 92
+            }
+          },
+          "por_tipo_e_intensidad": {
+            "arp_spoofing/media": {
+              "valor": 0.8666666666666668,
+              "ic95": [
+                0.7200000000000001,
+                0.9866666666666667
+              ],
+              "n": 15
+            },
+            "arp_spoofing/rafaga": {
+              "valor": 0.5,
+              "ic95": [
+                0.2,
+                0.8006249999999995
+              ],
+              "n": 8
+            },
+            "arp_spoofing/suave": {
+              "valor": 0.9272727272727272,
+              "ic95": [
+                0.8181818181818182,
+                1.0
+              ],
+              "n": 11
+            },
+            "dns_spoofing/media": {
+              "valor": 0.8571428571428571,
+              "ic95": [
+                0.5714285714285714,
+                1.0
+              ],
+              "n": 7
+            },
+            "dns_spoofing/rafaga": {
+              "valor": 0.8,
+              "ic95": [
+                0.4,
+                1.0
+              ],
+              "n": 5
+            },
+            "dns_spoofing/suave": {
+              "valor": 0.6555555555555556,
+              "ic95": [
+                0.43333333333333335,
+                0.8333333333333334
+              ],
+              "n": 18
+            },
+            "icmp_flood/media": {
+              "valor": 0.47692307692307695,
+              "ic95": [
+                0.23038461538461574,
+                0.7076923076923076
+              ],
+              "n": 13
+            },
+            "icmp_flood/rafaga": {
+              "valor": 0.0,
+              "ic95": [
+                0.0,
+                0.0
+              ],
+              "n": 4
+            },
+            "icmp_flood/suave": {
+              "valor": 0.5285714285714286,
+              "ic95": [
+                0.29999999999999993,
+                0.7714285714285715
+              ],
+              "n": 14
+            },
+            "mac_flooding/media": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 10
+            },
+            "mac_flooding/rafaga": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 5
+            },
+            "mac_flooding/suave": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 19
+            },
+            "port_scan/media": {
+              "valor": 0.95,
+              "ic95": [
+                0.8500000000000001,
+                1.0
+              ],
+              "n": 4
+            },
+            "port_scan/rafaga": {
+              "valor": 0.37142857142857144,
+              "ic95": [
+                0.08571428571428572,
+                0.7142857142857143
+              ],
+              "n": 7
+            },
+            "port_scan/suave": {
+              "valor": 0.8235294117647058,
+              "ic95": [
+                0.6470588235294118,
+                1.0
+              ],
+              "n": 17
+            },
+            "syn_flood/media": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 13
+            },
+            "syn_flood/rafaga": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 5
+            },
+            "syn_flood/suave": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 13
+            }
+          },
+          "tiempo_deteccion_s_mediana": {
+            "valor": 10.0,
+            "ic95": [
+              10.0,
+              10.0
+            ],
+            "n": 155
+          },
+          "tiempo_deteccion_s_p90": {
+            "valor": 60.0,
+            "ic95": [
+              40.0,
+              85.0
+            ],
+            "n": 155
+          },
+          "tiempo_deteccion_s_mediana_por_tipo": {
+            "arp_spoofing": {
+              "valor": 10.0,
+              "ic95": [
+                10.0,
+                15.0
+              ],
+              "n": 30
+            },
+            "dns_spoofing": {
+              "valor": 10.0,
+              "ic95": [
+                10.0,
+                25.0
+              ],
+              "n": 23
+            },
+            "icmp_flood": {
+              "valor": 22.5,
+              "ic95": [
+                15.0,
+                40.0
+              ],
+              "n": 16
+            },
+            "mac_flooding": {
+              "valor": 5.0,
+              "ic95": [
+                5.0,
+                5.0
+              ],
+              "n": 34
+            },
+            "port_scan": {
+              "valor": 25.0,
+              "ic95": [
+                17.5,
+                40.0
+              ],
+              "n": 21
+            },
+            "syn_flood": {
+              "valor": 10.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 31
+            }
+          }
+        },
+        "atacantes": {
+          "recall": {
+            "valor": 0.8268041237113403,
+            "ic95": [
+              0.7505154639175259,
+              0.8989690721649485
+            ],
+            "n": 97
+          }
+        },
+        "dispositivos": {
+          "falsas_alarmas_por_dispositivo_dia": {
+            "valor": 0.9535026080958744,
+            "ic95": [
+              0.2419409988011398,
+              1.8132021259274431
+            ]
+          },
+          "fraccion_con_alguna_alarma": {
+            "valor": 0.004810996563573883,
+            "ic95": [
+              0.0016183572627260865,
+              0.00867872116359012
+            ]
+          },
+          "dispositivos": 873,
+          "dispositivo_dias": 6.712094907407407
+        },
+        "ventanas_referencia": {
+          "pr_auc": {
+            "valor": 0.9814701494255536,
+            "ic95": [
+              0.9686600642201572,
+              0.989297622571995
+            ]
+          },
+          "recall": {
+            "valor": 0.6969378827646544,
+            "ic95": [
+              0.5986073726205007,
+              0.7662710171872817
+            ]
+          },
+          "fpr": {
+            "valor": 8.824786619417288e-05,
+            "ic95": [
+              2.223883289574649e-05,
+              0.00016852856530291544
+            ]
+          },
+          "recall_por_tipo": {
+            "arp_spoofing": 0.3710526315789474,
+            "dns_spoofing": 0.33462157809983895,
+            "icmp_flood": 0.12483870967741935,
+            "mac_flooding": 0.9810397553516819,
+            "port_scan": 0.3639810426540285,
+            "syn_flood": 0.7470137825421133
+          }
+        },
+        "conteos": {
+          "sesiones": 20,
+          "episodios": 188,
+          "atacantes": 97,
+          "ventanas": 78988,
+          "ventanas_maliciosas": 5715,
+          "ventanas_benignas_limpias": 72523,
+          "ventanas_ambiguas": 750
+        },
+        "umbral": {
+          "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+          "umbrales_por_fold": [
+            0.815,
+            0.87,
+            0.81,
+            0.8,
+            0.84,
+            0.825,
+            0.86,
+            0.845,
+            0.79,
+            0.855,
+            0.86,
+            0.855,
+            0.83,
+            0.805,
+            0.85,
+            0.85,
+            0.875,
+            0.835,
+            0.805,
+            0.835,
+            0.86,
+            0.875,
+            0.8,
+            0.81,
+            0.845
+          ]
+        },
+        "sensibilidad_al_objetivo": {
+          "0.25": {
+            "recall_episodios": {
+              "valor": 0.6946808510638297,
+              "ic95": [
+                0.6361702127659575,
+                0.7531914893617022
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.7628865979381443,
+              "ic95": [
+                0.6844845360824743,
+                0.847422680412371
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 0.29796956502996075,
+              "ic95": [
+                0.0,
+                0.6949532131618917
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 2.757745818567903e-05,
+              "ic95": [
+                0.0,
+                6.482610086824815e-05
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 10.0,
+              "ic95": [
+                10.0,
+                10.0
+              ],
+              "n": 143
+            }
+          },
+          "1.0": {
+            "recall_episodios": {
+              "valor": 0.7872340425531915,
+              "ic95": [
+                0.7319148936170214,
+                0.8425531914893616
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.8268041237113403,
+              "ic95": [
+                0.7505154639175259,
+                0.8989690721649485
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 0.9535026080958744,
+              "ic95": [
+                0.2419409988011398,
+                1.8132021259274431
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 8.824786619417288e-05,
+              "ic95": [
+                2.223883289574649e-05,
+                0.00016852856530291544
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 10.0,
+              "ic95": [
+                10.0,
+                10.0
+              ],
+              "n": 155
+            }
+          },
+          "4.0": {
+            "recall_episodios": {
+              "valor": 0.874468085106383,
+              "ic95": [
+                0.8308244680851063,
+                0.9181117021276596
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.8865979381443299,
+              "ic95": [
+                0.8226288659793815,
+                0.9443298969072165
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 5.661421735569254,
+              "ic95": [
+                2.460139501723478,
+                9.578483380775614
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 0.0005239717055279014,
+              "ic95": [
+                0.0002259864462685112,
+                0.000886257191129891
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 10.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 169
+            }
+          },
+          "16.0": {
+            "recall_episodios": {
+              "valor": 0.9542553191489362,
+              "ic95": [
+                0.925531914893617,
+                0.9808510638297873
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.9690721649484536,
+              "ic95": [
+                0.931958762886598,
+                0.9979381443298969
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 14.391929990947105,
+              "ic95": [
+                7.656057798312601,
+                22.488935693241455
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 0.001331991230368297,
+              "ic95": [
+                0.0007036493963539303,
+                0.0020879945246973595
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 5.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 182
+            }
+          }
+        }
+      },
+      "corridas": [
+        {
+          "semilla": 42,
+          "segundos": 47.6,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.815,
+              "umbrales_por_objetivo": {
+                "1.0": 0.815,
+                "0.25": 0.87,
+                "4.0": 0.695,
+                "16.0": 0.525
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.87,
+              "umbrales_por_objetivo": {
+                "1.0": 0.87,
+                "0.25": 0.92,
+                "4.0": 0.745,
+                "16.0": 0.595
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.81,
+              "umbrales_por_objetivo": {
+                "1.0": 0.81,
+                "0.25": 0.87,
+                "4.0": 0.735,
+                "16.0": 0.555
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.8,
+              "umbrales_por_objetivo": {
+                "1.0": 0.8,
+                "0.25": 0.825,
+                "4.0": 0.73,
+                "16.0": 0.55
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.7487082832353037,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.84,
+              "umbrales_por_objetivo": {
+                "1.0": 0.84,
+                "0.25": 0.895,
+                "4.0": 0.755,
+                "16.0": 0.595
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.7351705506333827,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 43,
+          "segundos": 47.1,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.825,
+              "umbrales_por_objetivo": {
+                "1.0": 0.825,
+                "0.25": 0.9,
+                "4.0": 0.69,
+                "16.0": 0.555
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.86,
+              "umbrales_por_objetivo": {
+                "1.0": 0.86,
+                "0.25": 0.88,
+                "4.0": 0.725,
+                "16.0": 0.58
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.845,
+              "umbrales_por_objetivo": {
+                "1.0": 0.845,
+                "0.25": 0.88,
+                "4.0": 0.74,
+                "16.0": 0.565
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.79,
+              "umbrales_por_objetivo": {
+                "1.0": 0.79,
+                "0.25": 0.84,
+                "4.0": 0.725,
+                "16.0": 0.555
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.855,
+              "umbrales_por_objetivo": {
+                "1.0": 0.855,
+                "0.25": 0.88,
+                "4.0": 0.765,
+                "16.0": 0.59
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 44,
+          "segundos": 45.0,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.86,
+              "umbrales_por_objetivo": {
+                "1.0": 0.86,
+                "0.25": 0.9,
+                "4.0": 0.7,
+                "16.0": 0.53
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.855,
+              "umbrales_por_objetivo": {
+                "1.0": 0.855,
+                "0.25": 0.92,
+                "4.0": 0.765,
+                "16.0": 0.59
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.83,
+              "umbrales_por_objetivo": {
+                "1.0": 0.83,
+                "0.25": 0.875,
+                "4.0": 0.74,
+                "16.0": 0.57
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.805,
+              "umbrales_por_objetivo": {
+                "1.0": 0.805,
+                "0.25": 0.825,
+                "4.0": 0.75,
+                "16.0": 0.555
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.85,
+              "umbrales_por_objetivo": {
+                "1.0": 0.85,
+                "0.25": 0.915,
+                "4.0": 0.77,
+                "16.0": 0.595
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 45,
+          "segundos": 42.8,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.85,
+              "umbrales_por_objetivo": {
+                "1.0": 0.85,
+                "0.25": 0.9,
+                "4.0": 0.705,
+                "16.0": 0.535
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.875,
+              "umbrales_por_objetivo": {
+                "1.0": 0.875,
+                "0.25": 0.92,
+                "4.0": 0.735,
+                "16.0": 0.585
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.835,
+              "umbrales_por_objetivo": {
+                "1.0": 0.835,
+                "0.25": 0.87,
+                "4.0": 0.735,
+                "16.0": 0.57
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.805,
+              "umbrales_por_objetivo": {
+                "1.0": 0.805,
+                "0.25": 0.835,
+                "4.0": 0.735,
+                "16.0": 0.56
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.835,
+              "umbrales_por_objetivo": {
+                "1.0": 0.835,
+                "0.25": 0.895,
+                "4.0": 0.755,
+                "16.0": 0.6
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.7351705506333827,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 46,
+          "segundos": 42.9,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.86,
+              "umbrales_por_objetivo": {
+                "1.0": 0.86,
+                "0.25": 0.875,
+                "4.0": 0.68,
+                "16.0": 0.54
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.875,
+              "umbrales_por_objetivo": {
+                "1.0": 0.875,
+                "0.25": 0.94,
+                "4.0": 0.755,
+                "16.0": 0.605
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.7467911318553092,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.8,
+              "umbrales_por_objetivo": {
+                "1.0": 0.8,
+                "0.25": 0.845,
+                "4.0": 0.735,
+                "16.0": 0.585
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.81,
+              "umbrales_por_objetivo": {
+                "1.0": 0.81,
+                "0.25": 0.83,
+                "4.0": 0.735,
+                "16.0": 0.575
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.7487082832353037,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.845,
+              "umbrales_por_objetivo": {
+                "1.0": 0.845,
+                "0.25": 0.89,
+                "4.0": 0.78,
+                "16.0": 0.6
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "xgboost": {
+      "resumen": {
+        "episodios": {
+          "recall": {
+            "valor": 0.7872340425531915,
+            "ic95": [
+              0.7340425531914894,
+              0.8404255319148937
+            ],
+            "n": 188
+          },
+          "por_tipo": {
+            "arp_spoofing": {
+              "valor": 0.8235294117647058,
+              "ic95": [
+                0.7058823529411765,
+                0.9411764705882353
+              ],
+              "n": 34
+            },
+            "dns_spoofing": {
+              "valor": 0.7333333333333333,
+              "ic95": [
+                0.6,
+                0.8666666666666667
+              ],
+              "n": 30
+            },
+            "icmp_flood": {
+              "valor": 0.4838709677419355,
+              "ic95": [
+                0.2903225806451613,
+                0.6774193548387096
+              ],
+              "n": 31
+            },
+            "mac_flooding": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 34
+            },
+            "port_scan": {
+              "valor": 0.7142857142857143,
+              "ic95": [
+                0.5357142857142857,
+                0.8928571428571429
+              ],
+              "n": 28
+            },
+            "syn_flood": {
+              "valor": 0.9354838709677419,
+              "ic95": [
+                0.8387096774193549,
+                1.0
+              ],
+              "n": 31
+            }
+          },
+          "por_intensidad": {
+            "media": {
+              "valor": 0.8709677419354839,
+              "ic95": [
+                0.7741935483870968,
+                0.9516129032258065
+              ],
+              "n": 62
+            },
+            "rafaga": {
+              "valor": 0.7058823529411765,
+              "ic95": [
+                0.5588235294117647,
+                0.8529411764705882
+              ],
+              "n": 34
+            },
+            "suave": {
+              "valor": 0.7608695652173914,
+              "ic95": [
+                0.6736413043478263,
+                0.8478260869565217
+              ],
+              "n": 92
+            }
+          },
+          "por_tipo_e_intensidad": {
+            "arp_spoofing/media": {
+              "valor": 0.8666666666666667,
+              "ic95": [
+                0.6666666666666666,
+                1.0
+              ],
+              "n": 15
+            },
+            "arp_spoofing/rafaga": {
+              "valor": 0.75,
+              "ic95": [
+                0.5,
+                1.0
+              ],
+              "n": 8
+            },
+            "arp_spoofing/suave": {
+              "valor": 0.8181818181818182,
+              "ic95": [
+                0.5454545454545454,
+                1.0
+              ],
+              "n": 11
+            },
+            "dns_spoofing/media": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 7
+            },
+            "dns_spoofing/rafaga": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 5
+            },
+            "dns_spoofing/suave": {
+              "valor": 0.5555555555555556,
+              "ic95": [
+                0.3333333333333333,
+                0.7777777777777778
+              ],
+              "n": 18
+            },
+            "icmp_flood/media": {
+              "valor": 0.6153846153846154,
+              "ic95": [
+                0.3076923076923077,
+                0.8461538461538461
+              ],
+              "n": 13
+            },
+            "icmp_flood/rafaga": {
+              "valor": 0.25,
+              "ic95": [
+                0.0,
+                0.75
+              ],
+              "n": 4
+            },
+            "icmp_flood/suave": {
+              "valor": 0.42857142857142855,
+              "ic95": [
+                0.14285714285714285,
+                0.7142857142857143
+              ],
+              "n": 14
+            },
+            "mac_flooding/media": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 10
+            },
+            "mac_flooding/rafaga": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 5
+            },
+            "mac_flooding/suave": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 19
+            },
+            "port_scan/media": {
+              "valor": 0.75,
+              "ic95": [
+                0.25,
+                1.0
+              ],
+              "n": 4
+            },
+            "port_scan/rafaga": {
+              "valor": 0.5714285714285714,
+              "ic95": [
+                0.2857142857142857,
+                0.8571428571428571
+              ],
+              "n": 7
+            },
+            "port_scan/suave": {
+              "valor": 0.7647058823529411,
+              "ic95": [
+                0.5294117647058824,
+                0.9411764705882353
+              ],
+              "n": 17
+            },
+            "syn_flood/media": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 13
+            },
+            "syn_flood/rafaga": {
+              "valor": 0.6,
+              "ic95": [
+                0.2,
+                1.0
+              ],
+              "n": 5
+            },
+            "syn_flood/suave": {
+              "valor": 1.0,
+              "ic95": [
+                1.0,
+                1.0
+              ],
+              "n": 13
+            }
+          },
+          "tiempo_deteccion_s_mediana": {
+            "valor": 10.0,
+            "ic95": [
+              5.0,
+              10.0
+            ],
+            "n": 148
+          },
+          "tiempo_deteccion_s_p90": {
+            "valor": 55.0,
+            "ic95": [
+              40.0,
+              80.0
+            ],
+            "n": 148
+          },
+          "tiempo_deteccion_s_mediana_por_tipo": {
+            "arp_spoofing": {
+              "valor": 10.0,
+              "ic95": [
+                5.0,
+                12.5
+              ],
+              "n": 28
+            },
+            "dns_spoofing": {
+              "valor": 10.0,
+              "ic95": [
+                5.0,
+                15.0
+              ],
+              "n": 22
+            },
+            "icmp_flood": {
+              "valor": 30.0,
+              "ic95": [
+                15.0,
+                35.0
+              ],
+              "n": 15
+            },
+            "mac_flooding": {
+              "valor": 5.0,
+              "ic95": [
+                5.0,
+                5.0
+              ],
+              "n": 34
+            },
+            "port_scan": {
+              "valor": 32.5,
+              "ic95": [
+                15.0,
+                50.0
+              ],
+              "n": 20
+            },
+            "syn_flood": {
+              "valor": 5.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 29
+            }
+          }
+        },
+        "atacantes": {
+          "recall": {
+            "valor": 0.8556701030927835,
+            "ic95": [
+              0.7835051546391752,
+              0.9175257731958762
+            ],
+            "n": 97
+          }
+        },
+        "dispositivos": {
+          "falsas_alarmas_por_dispositivo_dia": {
+            "valor": 1.0428934776048626,
+            "ic95": [
+              0.0,
+              2.5816103074529844
+            ]
+          },
+          "fraccion_con_alguna_alarma": {
+            "valor": 0.002290950744558992,
+            "ic95": [
+              0.0,
+              0.005650037430178321
+            ]
+          },
+          "dispositivos": 873,
+          "dispositivo_dias": 6.712094907407407
+        },
+        "ventanas_referencia": {
+          "pr_auc": {
+            "valor": 0.9844959488525846,
+            "ic95": [
+              0.9728849311098955,
+              0.9914585574105914
+            ]
+          },
+          "recall": {
+            "valor": 0.7139107611548556,
+            "ic95": [
+              0.6131124441616692,
+              0.7863781127560066
+            ]
+          },
+          "fpr": {
+            "valor": 9.652110364987658e-05,
+            "ic95": [
+              0.0,
+              0.00023725335128038378
+            ]
+          },
+          "recall_por_tipo": {
+            "arp_spoofing": 0.4364035087719299,
+            "dns_spoofing": 0.3961352657004831,
+            "icmp_flood": 0.14516129032258066,
+            "mac_flooding": 0.9850492694529391,
+            "port_scan": 0.3744075829383886,
+            "syn_flood": 0.7473200612557427
+          }
+        },
+        "conteos": {
+          "sesiones": 20,
+          "episodios": 188,
+          "atacantes": 97,
+          "ventanas": 78988,
+          "ventanas_maliciosas": 5715,
+          "ventanas_benignas_limpias": 72523,
+          "ventanas_ambiguas": 750
+        },
+        "umbral": {
+          "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+          "umbrales_por_fold": [
+            0.9974599480628967,
+            0.9891480803489685,
+            0.9908248782157898,
+            0.9925166964530945,
+            0.9948574304580688,
+            0.9974599480628967,
+            0.9891480803489685,
+            0.9908248782157898,
+            0.9925166964530945,
+            0.9948574304580688,
+            0.9974599480628967,
+            0.9891480803489685,
+            0.9908248782157898,
+            0.9925166964530945,
+            0.9948574304580688,
+            0.9974599480628967,
+            0.9891480803489685,
+            0.9908248782157898,
+            0.9925166964530945,
+            0.9948574304580688,
+            0.9974599480628967,
+            0.9891480803489685,
+            0.9908248782157898,
+            0.9925166964530945,
+            0.9948574304580688
+          ]
+        },
+        "sensibilidad_al_objetivo": {
+          "0.25": {
+            "recall_episodios": {
+              "valor": 0.6223404255319149,
+              "ic95": [
+                0.5585106382978723,
+                0.6914893617021277
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.7628865979381443,
+              "ic95": [
+                0.6804123711340206,
+                0.845360824742268
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 0.5959391300599215,
+              "ic95": [
+                0.0,
+                1.6038789703016199
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 5.515491637135806e-05,
+              "ic95": [
+                0.0,
+                0.000148025753904192
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 10.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 117
+            }
+          },
+          "1.0": {
+            "recall_episodios": {
+              "valor": 0.7872340425531915,
+              "ic95": [
+                0.7340425531914894,
+                0.8404255319148937
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.8556701030927835,
+              "ic95": [
+                0.7835051546391752,
+                0.9175257731958762
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 1.0428934776048626,
+              "ic95": [
+                0.0,
+                2.5816103074529844
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 9.652110364987658e-05,
+              "ic95": [
+                0.0,
+                0.00023725335128038378
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 10.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 148
+            }
+          },
+          "4.0": {
+            "recall_episodios": {
+              "valor": 0.9095744680851063,
+              "ic95": [
+                0.8722074468085108,
+                0.9468085106382979
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.9381443298969072,
+              "ic95": [
+                0.8865979381443299,
+                0.979381443298969
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 3.57563478035953,
+              "ic95": [
+                1.2338376155762651,
+                6.392416014645147
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 0.0003309294982281483,
+              "ic95": [
+                0.00011526108849752118,
+                0.0005963178213868004
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 5.0,
+              "ic95": [
+                5.0,
+                10.0
+              ],
+              "n": 171
+            }
+          },
+          "16.0": {
+            "recall_episodios": {
+              "valor": 0.9680851063829787,
+              "ic95": [
+                0.9414893617021277,
+                0.9893617021276596
+              ],
+              "n": 188
+            },
+            "recall_atacantes": {
+              "valor": 0.979381443298969,
+              "ic95": [
+                0.9484536082474226,
+                1.0
+              ],
+              "n": 97
+            },
+            "falsas_alarmas_por_dispositivo_dia": {
+              "valor": 15.941371729102901,
+              "ic95": [
+                10.250954003971263,
+                22.493915635033762
+              ]
+            },
+            "fpr_ventana": {
+              "valor": 0.001475394012933828,
+              "ic95": [
+                0.0009457397456790797,
+                0.0020974161502987773
+              ]
+            },
+            "tiempo_deteccion_s_mediana": {
+              "valor": 5.0,
+              "ic95": [
+                5.0,
+                5.0
+              ],
+              "n": 182
+            }
+          }
+        }
+      },
+      "corridas": [
+        {
+          "semilla": 42,
+          "segundos": 21.0,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.9974599480628967,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9974599480628967,
+                "0.25": 0.9995872378349304,
+                "4.0": 0.9616224765777588,
+                "16.0": 0.7195129990577698
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.9891480803489685,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9891480803489685,
+                "0.25": 0.9942575693130493,
+                "4.0": 0.9636915326118469,
+                "16.0": 0.8292880654335022
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.9908248782157898,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9908248782157898,
+                "0.25": 0.9962151646614075,
+                "4.0": 0.9641807675361633,
+                "16.0": 0.8637938499450684
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.9925166964530945,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9925166964530945,
+                "0.25": 0.9973459243774414,
+                "4.0": 0.9669911861419678,
+                "16.0": 0.8109374642372131
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.9948574304580688,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9948574304580688,
+                "0.25": 0.9989293217658997,
+                "4.0": 0.9766879677772522,
+                "16.0": 0.8536403775215149
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 43,
+          "segundos": 20.5,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.9974599480628967,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9974599480628967,
+                "0.25": 0.9995872378349304,
+                "4.0": 0.9616224765777588,
+                "16.0": 0.7195129990577698
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.9891480803489685,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9891480803489685,
+                "0.25": 0.9942575693130493,
+                "4.0": 0.9636915326118469,
+                "16.0": 0.8292880654335022
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.9908248782157898,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9908248782157898,
+                "0.25": 0.9962151646614075,
+                "4.0": 0.9641807675361633,
+                "16.0": 0.8637938499450684
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.9925166964530945,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9925166964530945,
+                "0.25": 0.9973459243774414,
+                "4.0": 0.9669911861419678,
+                "16.0": 0.8109374642372131
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.9948574304580688,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9948574304580688,
+                "0.25": 0.9989293217658997,
+                "4.0": 0.9766879677772522,
+                "16.0": 0.8536403775215149
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 44,
+          "segundos": 21.1,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.9974599480628967,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9974599480628967,
+                "0.25": 0.9995872378349304,
+                "4.0": 0.9616224765777588,
+                "16.0": 0.7195129990577698
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.9891480803489685,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9891480803489685,
+                "0.25": 0.9942575693130493,
+                "4.0": 0.9636915326118469,
+                "16.0": 0.8292880654335022
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.9908248782157898,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9908248782157898,
+                "0.25": 0.9962151646614075,
+                "4.0": 0.9641807675361633,
+                "16.0": 0.8637938499450684
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.9925166964530945,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9925166964530945,
+                "0.25": 0.9973459243774414,
+                "4.0": 0.9669911861419678,
+                "16.0": 0.8109374642372131
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.9948574304580688,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9948574304580688,
+                "0.25": 0.9989293217658997,
+                "4.0": 0.9766879677772522,
+                "16.0": 0.8536403775215149
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 45,
+          "segundos": 20.2,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.9974599480628967,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9974599480628967,
+                "0.25": 0.9995872378349304,
+                "4.0": 0.9616224765777588,
+                "16.0": 0.7195129990577698
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.9891480803489685,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9891480803489685,
+                "0.25": 0.9942575693130493,
+                "4.0": 0.9636915326118469,
+                "16.0": 0.8292880654335022
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.9908248782157898,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9908248782157898,
+                "0.25": 0.9962151646614075,
+                "4.0": 0.9641807675361633,
+                "16.0": 0.8637938499450684
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.9925166964530945,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9925166964530945,
+                "0.25": 0.9973459243774414,
+                "4.0": 0.9669911861419678,
+                "16.0": 0.8109374642372131
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.9948574304580688,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9948574304580688,
+                "0.25": 0.9989293217658997,
+                "4.0": 0.9766879677772522,
+                "16.0": 0.8536403775215149
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        },
+        {
+          "semilla": 46,
+          "segundos": 33450.0,
+          "folds": [
+            {
+              "fold": 0,
+              "umbral": 0.9974599480628967,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9974599480628967,
+                "0.25": 0.9995872378349304,
+                "4.0": 0.9616224765777588,
+                "16.0": 0.7195129990577698
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9354091332308425,
+              "sesiones_train": [
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_000",
+                "sesion_007",
+                "sesion_014",
+                "sesion_018"
+              ]
+            },
+            {
+              "fold": 1,
+              "umbral": 0.9891480803489685,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9891480803489685,
+                "0.25": 0.9942575693130493,
+                "4.0": 0.9636915326118469,
+                "16.0": 0.8292880654335022
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9334889148191365,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_003",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_009",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_002",
+                "sesion_004",
+                "sesion_008",
+                "sesion_010"
+              ]
+            },
+            {
+              "fold": 2,
+              "umbral": 0.9908248782157898,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9908248782157898,
+                "0.25": 0.9962151646614075,
+                "4.0": 0.9641807675361633,
+                "16.0": 0.8637938499450684
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9322399654725939,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_011",
+                "sesion_014",
+                "sesion_017",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_012",
+                "sesion_013",
+                "sesion_015",
+                "sesion_016"
+              ]
+            },
+            {
+              "fold": 3,
+              "umbral": 0.9925166964530945,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9925166964530945,
+                "0.25": 0.9973459243774414,
+                "4.0": 0.9669911861419678,
+                "16.0": 0.8109374642372131
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9358853540441296,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_001",
+                "sesion_002",
+                "sesion_004",
+                "sesion_006",
+                "sesion_007",
+                "sesion_008",
+                "sesion_010",
+                "sesion_011",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_018",
+                "sesion_019"
+              ],
+              "sesiones_test": [
+                "sesion_003",
+                "sesion_005",
+                "sesion_009",
+                "sesion_017"
+              ]
+            },
+            {
+              "fold": 4,
+              "umbral": 0.9948574304580688,
+              "umbrales_por_objetivo": {
+                "1.0": 0.9948574304580688,
+                "0.25": 0.9989293217658997,
+                "4.0": 0.9766879677772522,
+                "16.0": 0.8536403775215149
+              },
+              "falsas_alarmas_dispositivo_dia_interna": 0.9189631882917283,
+              "sesiones_train": [
+                "sesion_000",
+                "sesion_002",
+                "sesion_003",
+                "sesion_004",
+                "sesion_005",
+                "sesion_007",
+                "sesion_008",
+                "sesion_009",
+                "sesion_010",
+                "sesion_012",
+                "sesion_013",
+                "sesion_014",
+                "sesion_015",
+                "sesion_016",
+                "sesion_017",
+                "sesion_018"
+              ],
+              "sesiones_test": [
+                "sesion_001",
+                "sesion_006",
+                "sesion_011",
+                "sesion_019"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -37,7 +37,11 @@ FCS_OCTETOS: int = 4
 GRACIA_SYN_US: int = 1_000_000
 TTL_ARP_US: int = 5_000_000
 TTL_DNS_US: int = 5_000_000
+TTL_ICMP_US: int = 5_000_000
 PUERTO_DNS: int = 53
+ICMP_ECHO_REPLY, ICMP_ECHO_REQUEST = 0, 8
+ICMP_ERRORES = (3, 11)  # destination unreachable, time exceeded
+_PROTO_IP = {1: "icmp", 6: "tcp", 17: "udp"}
 
 
 @dataclass(frozen=True)
@@ -70,13 +74,29 @@ class Trama:
     dport: int = 0
     tcp_flags: int = 0
     icmp_tipo: int = -1
+    icmp_id_seq: tuple[int, int] | None = None  # echo request / reply
+    # Error ICMP: datagrama citado (ip_src, ip_dst, proto, sport, dport).
+    icmp_cita: tuple[str, str, str, int, int] | None = None
     dns_qr: int | None = None
     dns_id: int = 0
 
 
 def trama_desde_paquete(pkt) -> Trama | None:
     """Convierte un paquete Scapy en `Trama`; None si no tiene capa de enlace."""
-    from scapy.all import ARP, DNS, ICMP, IP, TCP, UDP, Dot1Q, Dot3, Ether
+    from scapy.all import (
+        ARP,
+        DNS,
+        ICMP,
+        IP,
+        TCP,
+        UDP,
+        Dot1Q,
+        Dot3,
+        Ether,
+        IPerror,
+        TCPerror,
+        UDPerror,
+    )
 
     capa = pkt.getlayer(Ether) or pkt.getlayer(Dot3)
     if capa is None:
@@ -116,6 +136,15 @@ def trama_desde_paquete(pkt) -> Trama | None:
     elif icmp is not None:
         trama.proto = "icmp"
         trama.icmp_tipo = int(icmp.type)
+        if trama.icmp_tipo in (ICMP_ECHO_REPLY, ICMP_ECHO_REQUEST):
+            trama.icmp_id_seq = (int(icmp.id or 0), int(icmp.seq or 0))
+        citado = pkt.getlayer(IPerror)
+        if trama.icmp_tipo in ICMP_ERRORES and citado is not None:
+            capa4 = pkt.getlayer(TCPerror) or pkt.getlayer(UDPerror)
+            trama.icmp_cita = (
+                str(citado.src), str(citado.dst), _PROTO_IP.get(int(citado.proto), str(citado.proto)),
+                int(capa4.sport) if capa4 is not None else 0, int(capa4.dport) if capa4 is not None else 0,
+            )
     return trama
 
 
@@ -200,6 +229,8 @@ class AgregadorVentanas:
         self._arp_pendientes: dict[tuple[str, str], int] = {}
         self._vinculos: dict[str, str] = {}
         self._dns: dict[tuple, _ConsultaDns] = {}
+        self._echo_pendientes: dict[tuple, int] = {}
+        self._datagramas: dict[tuple, int] = {}
         self._historial: dict[str, deque] = {}
 
     def agregar(self, trama: Trama) -> list[dict]:
@@ -249,13 +280,15 @@ class AgregadorVentanas:
         if t.ip_src is not None:
             acc.ips_origen.add(t.ip_src)
             acc.ips_destino.add(t.ip_dst)
+            self._datagramas[(t.ip_src, t.ip_dst, t.proto, t.sport, t.dport)] = t.ts_us
         if t.proto in ("tcp", "udp"):
             acc.puertos[t.dport] += 1
             acc.conexiones.add((t.ip_dst, t.dport))
         if t.proto == "tcp":
             self._acumular_tcp(t, acc)
         elif t.proto == "icmp":
-            c["n_icmp_echo"] += t.icmp_tipo == 8
+            c["n_icmp_echo"] += t.icmp_tipo == ICMP_ECHO_REQUEST
+            self._acumular_icmp(t, acc)
         elif t.dns_qr is not None and PUERTO_DNS in (t.sport, t.dport):
             self._acumular_dns(t, acc)
 
@@ -280,6 +313,21 @@ class AgregadorVentanas:
             pendiente = self._arp_pendientes.get((t.arp_pdst, t.arp_psrc))
             if pendiente is None or t.ts_us - pendiente > TTL_ARP_US:
                 c["arp_replies_no_solicitadas"] += 1
+                c["respuestas_no_solicitadas"] += 1
+
+    def _acumular_icmp(self, t: Trama, acc: _Acumulador) -> None:
+        """Echo reply sin request, o error que cita un datagrama que su destinatario no envió."""
+        if t.icmp_tipo == ICMP_ECHO_REQUEST and t.icmp_id_seq is not None:
+            self._echo_pendientes[(t.ip_src, t.ip_dst, t.icmp_id_seq)] = t.ts_us
+        elif t.icmp_tipo == ICMP_ECHO_REPLY:
+            pendiente = self._echo_pendientes.get((t.ip_dst, t.ip_src, t.icmp_id_seq))
+            if pendiente is None or t.ts_us - pendiente > TTL_ICMP_US:
+                acc.c["respuestas_no_solicitadas"] += 1
+        elif t.icmp_tipo in ICMP_ERRORES:
+            cita = t.icmp_cita
+            enviado = self._datagramas.get(cita) if cita is not None else None
+            if cita is None or cita[0] != t.ip_dst or enviado is None or t.ts_us - enviado > TTL_ICMP_US:
+                acc.c["respuestas_no_solicitadas"] += 1
 
     def _acumular_tcp(self, t: Trama, acc: _Acumulador) -> None:
         syn, ack, rst = t.tcp_flags & 0x02, t.tcp_flags & 0x10, t.tcp_flags & 0x04
@@ -309,6 +357,7 @@ class AgregadorVentanas:
         consulta = self._dns.get((t.ip_dst, t.dport, t.dns_id))
         if consulta is None or t.ts_us - consulta.ts_us > TTL_DNS_US:
             c["dns_respuestas_sin_consulta"] += 1
+            c["respuestas_no_solicitadas"] += 1
         elif consulta.primer_respondedor is None:
             consulta.primer_respondedor = t.mac_src
         else:
@@ -342,6 +391,10 @@ class AgregadorVentanas:
             k: ts for k, ts in self._arp_pendientes.items() if limite - ts <= TTL_ARP_US
         }
         self._dns = {k: v for k, v in self._dns.items() if limite - v.ts_us <= TTL_DNS_US}
+        self._echo_pendientes = {
+            k: ts for k, ts in self._echo_pendientes.items() if limite - ts <= TTL_ICMP_US
+        }
+        self._datagramas = {k: ts for k, ts in self._datagramas.items() if limite - ts <= TTL_ICMP_US}
 
     def _cerrar_ventana(self) -> list[dict]:
         evaluables, sin_synack, medio_abiertos = self._evaluar_syns()
@@ -397,6 +450,7 @@ class AgregadorVentanas:
             "arp_cambios_vinculo_60s": suma("arp_cambios_vinculo"),
             "syn_medio_abiertos_60s": suma("syn_medio_abiertos"),
             "dns_respuestas_sin_consulta_60s": suma("dns_respuestas_sin_consulta"),
+            "respuestas_no_solicitadas_60s": suma("respuestas_no_solicitadas"),
             "puertos_destino_distintos_60s": len(puertos),
             "ips_destino_distintas_60s": len(ips),
         }
@@ -425,6 +479,7 @@ class AgregadorVentanas:
             "tasa_llc": c["llc"] / n,
             "entropia_ethertype": _entropia(acc.ethertypes.values()),
             "tasa_syn": c["n_syn"] / n,
+            "tasa_respuestas_no_solicitadas": c["respuestas_no_solicitadas"] / n,
             "ratio_syn_medio_abiertos": (
                 c["syn_medio_abiertos"] / evaluables if evaluables else math.nan
             ),

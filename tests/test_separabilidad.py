@@ -31,6 +31,9 @@ ATAQUES = ["arp_spoofing", "dns_spoofing", "icmp_flood", "mac_flooding", "port_s
 DESVIACIONES_DECLARADAS: dict[str, str] = {
     "arp_spoofing": "0.977: arp_cambios_vinculo_60s > 0 delata todo envenenamiento (FPR 0.047)",
     "dns_spoofing": "0.979: dns_respuestas >= 2 desde una fila que no es servidor (FPR 0.042)",
+    # Esquema 3.0 (PEDIDO-EXTRACTOR-1, it. 1; dataset sha256 7f06d099…a945): la causa es el
+    # extractor, no el generador, que sigue congelado. Ver PROGRESO-EXTRACTOR.md.
+    "icmp_flood": "0.974: respuestas_no_solicitadas > 1, echo reply y errores ICMP sin petición (FPR 0.052)",
     "mac_flooding": "0.996: MAC falsa con <= 4 tramas en su ventana de 60 s (FPR 0.007)",
     "port_scan": "0.891: entropía de puertos baja con varios puertos distintos (FPR 0.097)",
     "syn_flood": "0.990: SYN medio abiertos acumulados en 60 s (FPR 0.012)",

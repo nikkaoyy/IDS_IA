@@ -1,4 +1,4 @@
-SEGUIR — iteración 1 en curso: familia compartida 1, «respuestas sin petición previa» (pedido v2).
+SEGUIR — siguiente vuelta: CIERRE (criterio de parada v2 cumplido en XGB, 3 de 6 tipos ≥ 0,25, con matices; presupuesto de 4 h casi agotado). No abrir otra familia.
 
 # Progreso — PEDIDO-EXTRACTOR-1
 
@@ -135,6 +135,77 @@ otros tres tipos no deberían moverse por esta familia.
 modelo **y** `icmp_flood` o `arp_spoofing` sube ≥ 0,10 al quedar excluido. Si no se cumple,
 `git revert` del commit de características y se anota la negativa con la cifra.
 
+## Iteración 1 — resultado (medido después de escribir la predicción)
+
+**Esquema 3.0.** `FEATURES_RESPUESTAS` (3 columnas) en `src/feature_schema.py`; extracción en
+`src/ventanas.py` (echo id/seq y datagrama citado por los errores ICMP, leídos de la trama).
+Dataset regenerado con el generador congelado: 78 988 ventanas, sha256 `7f06d099…a945`,
+ficha `reports/dataset_lab_2026-11-13.json`. El dataset 2.0 queda fuera de git en
+`data/dataset_lab_esquema2.0.csv`.
+
+Ventanas con `respuestas_no_solicitadas` > 0: benigno 0,06 %, icmp_flood 70,6 %,
+arp_spoofing 30,5 %, dns_spoofing 1,4 % (pocas ventanas, pero con ráfagas: media 11,6),
+port_scan 1,9 % y syn_flood 0,9 % (tramas de la MAC atacante fuera del ataque: 10 ARP reply
+en port_scan y 116 respuestas DNS + ICMP en syn_flood), mac_flooding 0 %.
+
+LOAO sin capa 2 (`reports/extractor/loao_it1_respuestas.json`), recall por episodio del
+tipo excluido:
+
+| Tipo excluido | RF antes → después | XGB antes → después |
+|---|---|---|
+| **arp_spoofing** (cubre) | 0,000 → **0,147** [0,029, 0,265] | 0,000 → **0,294** [0,147, 0,441] |
+| **dns_spoofing** (cubre, ≤ +0,10) | 0,100 → 0,100 [0,000, 0,233] | 0,033 → 0,100 [0,000, 0,233] |
+| **icmp_flood** (cubre) | 0,129 → 0,097 [0,000, 0,194] | 0,097 → 0,161 [0,064, 0,290] |
+| mac_flooding | 0,000 → 0,000 | 0,294 → 0,265 [0,146, 0,412] |
+| port_scan | 0,000 → 0,000 | 0,143 → 0,321 [0,143, 0,500] |
+| syn_flood | 0,032 → 0,065 [0,000, 0,161] | 0,129 → 0,226 [0,097, 0,387] |
+| **Media de los seis** | 0,044 → **0,068** [0,032, 0,105] | 0,116 → **0,228** [0,168, 0,286] |
+
+**Contraste con la predicción.**
+- `arp_spoofing` ≥ +0,10: **se cumple** (+0,147 en RF, +0,294 en XGB). Es la primera vez
+  que el tipo se detecta sin estar en el entrenamiento.
+- `icmp_flood` ≥ +0,15: **no se cumple** (+0,065 en XGB, −0,032 en RF). Con el tipo en el
+  entrenamiento el contador sí funciona (RF 0,29 → 0,74, XGB 0,26 → 0,84). Hipótesis, sin
+  verificar: excluido icmp_flood, los positivos del contador en el entrenamiento vienen de
+  arp_spoofing y van acompañados de sus contadores ARP. El árbol aprende «respuestas no
+  pedidas *y* ARP», no «respuestas no pedidas». Que sea un solo contador no basta para que
+  el modelo lo trate como compartido.
+- `dns_spoofing` ≤ +0,10: se cumple (+0,000 en RF, +0,067 en XGB).
+- **Tipos no cubiertos que se mueven:** port_scan +0,18 y syn_flood +0,10 en XGB. El
+  contador vale casi siempre 0 en sus ventanas, y port_scan *con* entrenamiento también
+  cambia (0,536 → 0,750) sin nada nuevo que ver. Lo leo como varianza de reentrenar con una
+  columna más (del orden de ±0,1–0,2 por tipo, con IC que se solapan con la línea base), no
+  como efecto de la familia.
+
+**Decisión (regla fijada de antemano): la familia se queda.** El LOAO medio sube en los dos
+modelos y arp_spoofing sube ≥ 0,10.
+
+**Criterio de parada v2: se cumple al pie de la letra en XGB, con matices.** Tres tipos
+quedan ≥ 0,25 al ser excluidos: arp_spoofing 0,294, mac_flooding 0,265 y port_scan 0,321.
+Pero mac_flooding ya estaba en 0,294 en la línea base, y la subida de port_scan no se puede
+atribuir a la familia. Solo arp_spoofing es transferencia atribuible. La media de XGB
+(0,228) se queda por debajo del objetivo de 0,266; la de RF (0,068), muy lejos de 0,194. El
+cierre tiene que decirlo así: el criterio se cumplió, pero lo que la familia transfiere
+de verdad es un tipo.
+
+**Puerta de separabilidad E1.** Con 3.0, un árbol de profundidad 2 sobre
+`respuestas_no_solicitadas` separa icmp_flood con exactitud balanceada 0,974 (FPR 0,052) en
+el dataset completo, por encima de 0,85. La causa es que el extractor ve por fin la
+violación (respuestas ICMP sin petición), no que el generador se haya vuelto trivial: está
+congelado. Se declara como sexta desviación en `tests/test_separabilidad.py`, con xfail
+estricto igual que las otras cinco. Ahora ningún tipo pasa la puerta univariada: cada uno
+tiene un contador que lo delata. El marcador sigue siendo el LOAO (regla 4).
+
+**E2 en 3.0.** Cifras recalculadas en `reports/evaluacion_e2.json` / `.md`; las de 2.0
+quedan en `reports/historico/evaluacion_e2_esquema2.0.*`.
+Con todas las características: recall por episodio RF 0,787 → **0,878** [0,834, 0,922] y
+XGB 0,787 → **0,894** [0,856, 0,936]; FA/dispositivo-día 1,19 y 0,89; PR-AUC 0,986 y 0,989.
+Mejora el reconocimiento de tipos conocidos (sobre todo icmp_flood); el holdout sigue cerrado.
+
+**Presupuesto.** ≈ 3 h 10 min consumidas. Otra familia necesita ≈ 6 min de regeneración y
+≈ 50 min de LOAO, así que no cabe en lo que queda. El criterio de parada y el presupuesto
+llevan los dos al cierre.
+
 ## Orden de las familias (por lo visto en el pcap)
 
 1. **ICMP por tipo**: `icmp_flood` es el peor tipo, también con entrenamiento (0,26–0,52), y
@@ -154,6 +225,7 @@ modelo **y** `icmp_flood` o `arp_spoofing` sube ≥ 0,10 al quedar excluido. Si 
 | It. | Qué | LOAO RF | LOAO XGB | ¿Mejora? | Commit |
 |---|---|---|---|---|---|
 | 0 | Diagnóstico + línea base sin capa 2 | 0,044 [0,016, 0,076] | 0,116 [0,074, 0,156] | (línea base) | ver `git log` |
+| 1 | Familia 1: respuestas sin petición previa (esquema 3.0) | 0,068 [0,032, 0,105] | 0,228 [0,168, 0,286] | Sí: se queda (arp_spoofing +0,15 / +0,29; icmp_flood falla la predicción) | ver `git log` |
 
 ### Cierre de la iteración 0
 
@@ -162,3 +234,9 @@ modelo **y** `icmp_flood` o `arp_spoofing` sube ≥ 0,10 al quedar excluido. Si 
   las características: 0,028 y 0,111.
 - Sigue la iteración 1: la familia «ICMP por tipo», con su justificación escrita aquí antes
   de medir.
+
+### Cierre de la iteración 1
+
+- Iteración 1: familia «respuestas sin petición previa» (esquema 3.0, dataset `7f06d099…a945`) — se queda.
+- LOAO medio: RF 0,068 [0,032, 0,105], XGB 0,228 [0,168, 0,286] (línea base 0,044 / 0,116); tipos declarados, RF/XGB: arp_spoofing 0,147/0,294, icmp_flood 0,097/0,161 (predicción fallida), dns_spoofing 0,100/0,100.
+- Sigue el cierre: criterio de parada cumplido por la letra (XGB: arp 0,294, mac 0,265, port_scan 0,321 ≥ 0,25), pero solo arp_spoofing es atribuible a la familia; informe `docs/INFORME_EXTRACTOR.md` y `PARAR`.

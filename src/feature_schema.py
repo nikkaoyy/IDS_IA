@@ -21,7 +21,7 @@ import pandas as pd
 ETIQUETA: Final[str] = "etiqueta"
 
 # Se incrementa cuando cambia el contrato; lo valida `inferir_ventana`.
-VERSION_ESQUEMA: Final[str] = "2.0"
+VERSION_ESQUEMA: Final[str] = "3.0"
 
 FEATURES_CAPA2: Final[list[str]] = [
     "n_tramas",
@@ -92,9 +92,21 @@ FEATURES_GLOBALES: Final[list[str]] = [
     "syn_medio_abiertos_max_destino",
 ]
 
+# Contadores compartidos entre ataques (esquema 3.0, PEDIDO-EXTRACTOR-1). Una respuesta de
+# protocolo sin su petición en los 5 s previos: ARP reply sin request, respuesta DNS sin
+# consulta, ICMP echo reply sin echo request y error ICMP que cita un datagrama que su
+# destinatario no envió. Un solo contador para los cuatro: lo que se aprende de un ataque
+# vale para otro (familia 1, «respuestas sin petición previa»).
+FEATURES_RESPUESTAS: Final[list[str]] = [
+    "respuestas_no_solicitadas",
+    "tasa_respuestas_no_solicitadas",
+    "respuestas_no_solicitadas_60s",
+]
+
 # Orden canónico para entrenamiento e inferencia.
 COLUMNAS_MODELO: Final[list[str]] = (
     FEATURES_CAPA2 + FEATURES_ARP + FEATURES_TCP + FEATURES_DNS + FEATURES_LARGAS + FEATURES_GLOBALES
+    + FEATURES_RESPUESTAS
 )
 
 # Alias para compatibilidad con código existente que use `COLUMNAS`

@@ -216,3 +216,67 @@ def test_capturar_ventanas_usa_el_mismo_nucleo(monkeypatch):
     monkeypatch.setattr(capture, "_obtener_sniff", lambda: lambda iface, prn, count, timeout: [prn(p) for p in pkts])
     filas = capture.capturar_ventanas("lo")
     assert filas[0]["n_syn"] == 3 and set(COLUMNAS_MODELO) <= set(filas[0])
+
+
+# --- Esquema 3.0, familia «respuestas sin petición previa» (PEDIDO-EXTRACTOR-1) -----------
+
+def _icmp(ts, tipo, src=A, ips=("10.0.0.9", "10.0.0.3"), id_seq=(7, 1), cita=None) -> Trama:
+    return _base(ts, src, ip_src=ips[0], ip_dst=ips[1], proto="icmp", icmp_tipo=tipo,
+                 icmp_id_seq=id_seq if tipo in (0, 8) else None, icmp_cita=cita)
+
+
+def _con_a(tramas: list[Trama]) -> list[Trama]:
+    """Una trama neutra de A al inicio, para que A no caiga en la fila de efímeras."""
+    return [_base(0.01)] + tramas
+
+
+def test_echo_reply_sin_request_es_respuesta_no_solicitada():
+    pedido = [_icmp(0.1, 8, src=B, ips=("10.0.0.3", "10.0.0.9")), _icmp(0.2, 0)]
+    assert _una_fila(_con_a(pedido), A)["respuestas_no_solicitadas"] == 0
+    otro_seq = [_icmp(0.1, 8, src=B, ips=("10.0.0.3", "10.0.0.9"), id_seq=(7, 2)), _icmp(0.2, 0)]
+    assert _una_fila(_con_a(otro_seq), A)["respuestas_no_solicitadas"] == 1
+    fila = _una_fila(_con_a([_icmp(0.1, 0), _icmp(0.2, 0)]), A)
+    assert fila["respuestas_no_solicitadas"] == 2 and fila["tasa_respuestas_no_solicitadas"] == 2 / 3
+
+
+def test_error_icmp_que_cita_un_datagrama_no_enviado():
+    """El error es una respuesta al datagrama que cita; si su destinatario no lo envió, nadie lo pidió."""
+    enviado = _base(0.1, B, ip_src="10.0.0.3", ip_dst="10.0.0.20", proto="udp", sport=5000, dport=161)
+    cita = ("10.0.0.3", "10.0.0.20", "udp", 5000, 161)
+    error = _icmp(0.2, 3, ips=("10.0.0.20", "10.0.0.3"), cita=cita)
+    assert _una_fila(_con_a([enviado, error]), A)["respuestas_no_solicitadas"] == 0
+    assert _una_fila(_con_a([error]), A)["respuestas_no_solicitadas"] == 1
+    # Cita un datagrama de otro equipo: el destinatario del error no lo envió.
+    ajeno = _icmp(0.2, 3, ips=("10.0.0.20", "10.0.0.4"), cita=cita)
+    assert _una_fila(_con_a([enviado, ajeno]), A)["respuestas_no_solicitadas"] == 1
+    caducado = [_icmp(6.0, 3, ips=("10.0.0.20", "10.0.0.3"), cita=cita), _base(6.1)]
+    filas = [f for f in extraer_ventanas(_con_a([enviado, *caducado]), CONFIG) if f["mac"] == A]
+    assert filas[-1]["respuestas_no_solicitadas"] == 1
+
+
+def test_arp_y_dns_no_solicitados_suman_al_contador_compartido():
+    arp = Trama(ts_us=100_000, longitud=60, mac_src=A, mac_dst=B, ethertype=0x0806, arp_op=2,
+                arp_psrc="10.0.0.1", arp_pdst="10.0.0.3", arp_hwsrc=A)
+    dns = _base(0.2, ip_src="10.0.0.2", ip_dst="10.0.0.3", proto="udp", sport=53, dport=4000, dns_qr=1, dns_id=9)
+    eco = _icmp(0.3, 0)
+    fila = _una_fila([arp, dns, eco], A)
+    assert fila["respuestas_no_solicitadas"] == 3
+    assert fila["arp_replies_no_solicitadas"] == 1 and fila["dns_respuestas_sin_consulta"] == 1
+
+
+def test_respuestas_no_solicitadas_60s_acumula_ventanas():
+    tramas = _con_a([_icmp(0.1 + 5 * k, 0) for k in range(4)] + [_base(21.0)])
+    filas = [f for f in extraer_ventanas(tramas, CONFIG) if f["mac"] == A]
+    assert [f["respuestas_no_solicitadas_60s"] for f in filas] == [1, 2, 3, 4, 4]
+
+
+def test_trama_desde_paquete_lee_echo_y_cita_icmp():
+    from scapy.all import ICMP
+    eco = Ether(src=A, dst=B) / IP(src="10.0.0.9", dst="10.0.0.3") / ICMP(type=0, id=7, seq=3)
+    eco.time = 1.0
+    assert trama_desde_paquete(eco).icmp_id_seq == (7, 3)
+    err = Ether(bytes(Ether(src=A, dst=B) / IP(src="10.0.0.20", dst="10.0.0.3") / ICMP(type=3, code=3)
+                      / IP(src="10.0.0.3", dst="10.0.0.20") / UDP(sport=5000, dport=161)))
+    err.time = 1.0
+    t = trama_desde_paquete(err)
+    assert t.proto == "icmp" and t.icmp_cita == ("10.0.0.3", "10.0.0.20", "udp", 5000, 161)
