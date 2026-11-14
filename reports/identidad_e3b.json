@@ -1,7 +1,7 @@
 {
   "etapa": "PEDIDO-E3B-1",
-  "fecha": "2026-11-14T01:41:08",
-  "commit": "01d5710365b0cdd1b15937c83054c3be527556f4",
+  "fecha": "2026-11-14T01:57:53",
+  "commit": "2b480965b3a1306e79b2f71c004c96babca430e9",
   "arbol_con_cambios": true,
   "config_archivo": "configs/identidad.json",
   "config": {
@@ -18,6 +18,12 @@
       "secciones": {
         "ipid": {
           "dir_pcap": "data/pcap_clones",
+          "inicio": 0,
+          "sesiones": 20,
+          "regenerar": false
+        },
+        "con_variacion": {
+          "dir_pcap": "data/pcap_variacion",
           "inicio": 0,
           "sesiones": 20,
           "regenerar": false
@@ -578,6 +584,289 @@
         ]
       }
     },
+    "ipid_por_flujo_reperfilado_24": {
+      "por_nivel": {
+        "ingenuo": {
+          "episodios": 40,
+          "deteccion": {
+            "valor": 0.975,
+            "ic95": [
+              0.925,
+              1.0
+            ],
+            "n": 40
+          },
+          "deteccion_acusables": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 39
+          },
+          "no_acusables": 1,
+          "latencia_s_mediana": {
+            "valor": 3.7401780883520814,
+            "ic95": [
+              2.9735005350357824,
+              4.558132341064095
+            ],
+            "n": 39
+          },
+          "latencia_s_p90": {
+            "valor": 6.0462331048836635,
+            "ic95": [
+              5.3166712853255165,
+              8.574343021188042
+            ],
+            "n": 39
+          },
+          "por_par_de_pilas": {
+            "android→iot": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "android→macos": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "android→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→linux": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "iot→macos": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "iot→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→android": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "linux→iot": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "linux→macos": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→windows": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "macos→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "macos→iot": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "macos→linux": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "macos→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→android": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "windows→iot": {
+              "episodios": 3,
+              "detectados": 2
+            },
+            "windows→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "windows→macos": {
+              "episodios": 1,
+              "detectados": 1
+            }
+          }
+        },
+        "ritmo": {
+          "episodios": 40,
+          "deteccion": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 40
+          },
+          "deteccion_acusables": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 39
+          },
+          "no_acusables": 1,
+          "latencia_s_mediana": {
+            "valor": 10.022541196509422,
+            "ic95": [
+              6.573596129376028,
+              17.037490227309718
+            ],
+            "n": 40
+          },
+          "latencia_s_p90": {
+            "valor": 33.33165642208261,
+            "ic95": [
+              22.21290853751327,
+              51.64359261149764
+            ],
+            "n": 40
+          },
+          "por_par_de_pilas": {
+            "android→iot": {
+              "episodios": 5,
+              "detectados": 5
+            },
+            "android→macos": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "android→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→android": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "iot→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→macos": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "iot→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "linux→iot": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "linux→macos": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→windows": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "macos→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "macos→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→android": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→iot": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "windows→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "windows→macos": {
+              "episodios": 2,
+              "detectados": 2
+            }
+          }
+        }
+      },
+      "legitimos": {
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 12.04784626446173,
+          "ic95": [
+            0.3767406267935643,
+            25.58499181302073
+          ]
+        },
+        "falsas_alarmas_totales": 32,
+        "fraccion_dispositivos_con_falsa_alarma": {
+          "valor": 0.015384615384615385,
+          "ic95": [
+            0.0038461538461538464,
+            0.03076923076923077
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0038461538461538464,
+          "ic95": [
+            0.0,
+            0.011538461538461539
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.14346279421080843,
+          "ic95": [
+            0.1381775363146791,
+            0.14909820601759205
+          ]
+        },
+        "dispositivos": 260,
+        "dispositivo_dias": 2.6560763888888888,
+        "peores": [
+          {
+            "sesion": "clones_009",
+            "mac": "02:6d:95:b5:26:52",
+            "falsas_alarmas": 13,
+            "segundos": 890.0,
+            "victima": true
+          },
+          {
+            "sesion": "clones_000",
+            "mac": "02:90:72:59:77:b9",
+            "falsas_alarmas": 11,
+            "segundos": 890.0,
+            "victima": true
+          },
+          {
+            "sesion": "clones_014",
+            "mac": "02:38:c9:21:fc:9d",
+            "falsas_alarmas": 7,
+            "segundos": 885.0,
+            "victima": true
+          },
+          {
+            "sesion": "clones_018",
+            "mac": "02:ff:6b:11:03:4d",
+            "falsas_alarmas": 1,
+            "segundos": 900.0,
+            "victima": false
+          }
+        ]
+      }
+    },
     "comparacion": {
       "falsas_alarmas_por_dispositivo_dia": {
         "antes": {
@@ -592,6 +881,13 @@
           "ic95": [
             0.0,
             1.1308919027553475
+          ]
+        },
+        "despues_con_reperfilado_24": {
+          "valor": 12.04784626446173,
+          "ic95": [
+            0.3767406267935643,
+            25.58499181302073
           ]
         }
       },
@@ -636,13 +932,994 @@
       "presupuesto_e2_fa_dispositivo_dia": 1.0
     }
   },
+  "con_variacion": {
+    "sesiones": [
+      "variacion_000",
+      "variacion_001",
+      "variacion_002",
+      "variacion_003",
+      "variacion_004",
+      "variacion_005",
+      "variacion_006",
+      "variacion_007",
+      "variacion_008",
+      "variacion_009",
+      "variacion_010",
+      "variacion_011",
+      "variacion_012",
+      "variacion_013",
+      "variacion_014",
+      "variacion_015",
+      "variacion_016",
+      "variacion_017",
+      "variacion_018",
+      "variacion_019"
+    ],
+    "por_variacion": {
+      "actualizacion": {
+        "dispositivos": 40,
+        "dispositivo_dias": 0.40954861111111107,
+        "falsas_alarmas_ventanas": 980,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 2392.878338278932,
+          "ic95": [
+            2021.809750819633,
+            2782.4060809021667
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 564.0356083086054,
+          "ic95": [
+            461.0072886517758,
+            668.6702275838551
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.975,
+          "ic95": [
+            0.925,
+            1.0
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.1569746699964324,
+          "ic95": [
+            0.14430016845133242,
+            0.1711479712713875
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "ttl": 562,
+          "tcp_window": 418
+        }
+      },
+      "vpn": {
+        "dispositivos": 40,
+        "dispositivo_dias": 0.40931712962962963,
+        "falsas_alarmas_ventanas": 103,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 251.63862575993213,
+          "ic95": [
+            90.51253718657038,
+            442.68653891444455
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 87.95136434327725,
+          "ic95": [
+            36.77117321605901,
+            143.74013529893844
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.225,
+          "ic95": [
+            0.1,
+            0.375
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.15613910574875797,
+          "ic95": [
+            0.13758599124452783,
+            0.17901279168234072
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "tcp_window": 96,
+          "ttl": 7
+        }
+      },
+      "dos_pilas": {
+        "dispositivos": 40,
+        "dispositivo_dias": 0.4119791666666667,
+        "falsas_alarmas_ventanas": 547,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 1327.7370417193426,
+          "ic95": [
+            1057.686537377738,
+            1623.323999020467
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 1019.4690265486726,
+          "ic95": [
+            818.2205349223344,
+            1207.655215301098
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.8,
+          "ic95": [
+            0.675,
+            0.925
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.12575021434695627,
+          "ic95": [
+            0.11551512545573442,
+            0.13810420590081607
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "ipid_salto_log2": 268,
+          "tcp_window": 151,
+          "ipid_continuidad": 94,
+          "ttl": 34
+        }
+      },
+      "descubrimiento": {
+        "dispositivos": 40,
+        "dispositivo_dias": 0.4150462962962963,
+        "falsas_alarmas_ventanas": 60,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 144.56218627997768,
+          "ic95": [
+            2.411706831467908,
+            325.49984131685846
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 125.287228109314,
+          "ic95": [
+            2.411706831467908,
+            277.36434550089905
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.1,
+          "ic95": [
+            0.025,
+            0.2
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.08393742846241893,
+          "ic95": [
+            0.08181480104127929,
+            0.08612252887062047
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "ttl": 59,
+          "ipid_continuidad": 1
+        }
+      },
+      "deriva_lenta": {
+        "dispositivos": 40,
+        "dispositivo_dias": 0.4067708333333333,
+        "falsas_alarmas_ventanas": 2,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 4.916773367477593,
+          "ic95": [
+            0.0,
+            12.307911617961512
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 4.916773367477593,
+          "ic95": [
+            0.0,
+            12.307911617961512
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.05,
+          "ic95": [
+            0.0,
+            0.125
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.15907447577729572,
+          "ic95": [
+            0.14043599548687397,
+            0.18518713450292396
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "ipid_continuidad": 2
+        }
+      },
+      "control": {
+        "dispositivos": 40,
+        "dispositivo_dias": 0.40856481481481477,
+        "falsas_alarmas_ventanas": 1,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 2.4475920679886687,
+          "ic95": [
+            0.0,
+            7.3511321332552155
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 2.4475920679886687,
+          "ic95": [
+            0.0,
+            7.3511321332552155
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.025,
+          "ic95": [
+            0.0,
+            0.075
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.14925373134328357,
+          "ic95": [
+            0.133936056409552,
+            0.16936267731198104
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "ipid_continuidad": 1
+        }
+      },
+      "gateway": {
+        "dispositivos": 20,
+        "dispositivo_dias": 0.2083333333333333,
+        "falsas_alarmas_ventanas": 0,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.06160739288714646,
+          "ic95": [
+            0.061401060563773376,
+            0.06184987348889514
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {}
+      }
+    },
+    "con_variacion": {
+      "dispositivos": 200,
+      "dispositivo_dias": 2.052662037037037,
+      "falsas_alarmas_ventanas": 1692,
+      "fa_ventanas_por_dispositivo_dia": {
+        "valor": 824.2954609529179,
+        "ic95": [
+          725.3893511509384,
+          918.0205723061804
+        ]
+      },
+      "fa_eventos_por_dispositivo_dia": {
+        "valor": 360.9946433605864,
+        "ic95": [
+          299.20830503058,
+          417.40043427355664
+        ]
+      },
+      "fraccion_dispositivos_con_fa": {
+        "valor": 0.43,
+        "ic95": [
+          0.385,
+          0.475
+        ]
+      },
+      "fraccion_ventanas_no_confiable": {
+        "valor": 0.12844465203176086,
+        "ic95": [
+          0.12402034498347039,
+          0.13318098265858958
+        ]
+      },
+      "fraccion_dispositivos_nunca_confiables": {
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.0
+        ]
+      },
+      "reperfilados": 0,
+      "fa_por_senal": {
+        "tcp_window": 665,
+        "ttl": 662,
+        "ipid_salto_log2": 268,
+        "ipid_continuidad": 97
+      }
+    },
+    "sin_variacion": {
+      "dispositivos": 60,
+      "dispositivo_dias": 0.6168981481481481,
+      "falsas_alarmas_ventanas": 1,
+      "fa_ventanas_por_dispositivo_dia": {
+        "valor": 1.6210131332082551,
+        "ic95": [
+          0.0,
+          4.86670312417533
+        ]
+      },
+      "fa_eventos_por_dispositivo_dia": {
+        "valor": 1.6210131332082551,
+        "ic95": [
+          0.0,
+          4.86670312417533
+        ]
+      },
+      "fraccion_dispositivos_con_fa": {
+        "valor": 0.016666666666666666,
+        "ic95": [
+          0.0,
+          0.05
+        ]
+      },
+      "fraccion_ventanas_no_confiable": {
+        "valor": 0.10124252185918085,
+        "ic95": [
+          0.0962751817141867,
+          0.10707332900713822
+        ]
+      },
+      "fraccion_dispositivos_nunca_confiables": {
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.0
+        ]
+      },
+      "reperfilados": 0,
+      "fa_por_senal": {
+        "ipid_continuidad": 1
+      }
+    },
+    "peores": [
+      {
+        "sesion": "variacion_000",
+        "mac": "02:86:86:0b:1d:9f",
+        "variacion": "dos_pilas",
+        "falsas_alarmas": 61,
+        "eventos_fa": 38,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_006",
+        "mac": "02:27:9c:4b:3a:cb",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 59,
+        "eventos_fa": 1,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_013",
+        "mac": "02:c2:a8:19:40:65",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 51,
+        "eventos_fa": 9,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_004",
+        "mac": "02:83:21:cf:0f:df",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 48,
+        "eventos_fa": 1,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_000",
+        "mac": "02:c5:36:6b:e4:3c",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 44,
+        "eventos_fa": 1,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_001",
+        "mac": "02:e2:ca:e7:3a:31",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 43,
+        "eventos_fa": 7,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_004",
+        "mac": "02:02:fe:32:cb:86",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 42,
+        "eventos_fa": 7,
+        "reperfilados": 0
+      },
+      {
+        "sesion": "variacion_007",
+        "mac": "02:75:c9:40:f0:97",
+        "variacion": "actualizacion",
+        "falsas_alarmas": 38,
+        "eventos_fa": 1,
+        "reperfilados": 0
+      }
+    ],
+    "reperfilado_24": {
+      "por_variacion": {
+        "actualizacion": {
+          "dispositivos": 40,
+          "dispositivo_dias": 0.40954861111111107,
+          "falsas_alarmas_ventanas": 878,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 2143.8236540907164,
+            "ic95": [
+              1880.973412428889,
+              2425.8443555794474
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 564.0356083086054,
+            "ic95": [
+              461.0072886517758,
+              668.6702275838551
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.975,
+            "ic95": [
+              0.925,
+              1.0
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.17838030681412773,
+            "ic95": [
+              0.16722993998362434,
+              0.1907681963816241
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 7,
+          "fa_por_senal": {
+            "ttl": 460,
+            "tcp_window": 418
+          }
+        },
+        "vpn": {
+          "dispositivos": 40,
+          "dispositivo_dias": 0.40931712962962963,
+          "falsas_alarmas_ventanas": 103,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 251.63862575993213,
+            "ic95": [
+              90.51253718657038,
+              442.68653891444455
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 87.95136434327725,
+            "ic95": [
+              36.77117321605901,
+              143.74013529893844
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.225,
+            "ic95": [
+              0.1,
+              0.375
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.15613910574875797,
+            "ic95": [
+              0.13758599124452783,
+              0.17901279168234072
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 0,
+          "fa_por_senal": {
+            "tcp_window": 96,
+            "ttl": 7
+          }
+        },
+        "dos_pilas": {
+          "dispositivos": 40,
+          "dispositivo_dias": 0.4119791666666667,
+          "falsas_alarmas_ventanas": 547,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 1327.7370417193426,
+            "ic95": [
+              1057.686537377738,
+              1623.323999020467
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 1019.4690265486726,
+            "ic95": [
+              818.2205349223344,
+              1207.655215301098
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.8,
+            "ic95": [
+              0.675,
+              0.925
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.12575021434695627,
+            "ic95": [
+              0.11551512545573442,
+              0.13810420590081607
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 0,
+          "fa_por_senal": {
+            "ipid_salto_log2": 268,
+            "tcp_window": 151,
+            "ipid_continuidad": 94,
+            "ttl": 34
+          }
+        },
+        "descubrimiento": {
+          "dispositivos": 40,
+          "dispositivo_dias": 0.4150462962962963,
+          "falsas_alarmas_ventanas": 60,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 144.56218627997768,
+            "ic95": [
+              2.411706831467908,
+              325.49984131685846
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 125.287228109314,
+            "ic95": [
+              2.411706831467908,
+              277.36434550089905
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.1,
+            "ic95": [
+              0.025,
+              0.2
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.08393742846241893,
+            "ic95": [
+              0.08181480104127929,
+              0.08612252887062047
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 0,
+          "fa_por_senal": {
+            "ttl": 59,
+            "ipid_continuidad": 1
+          }
+        },
+        "deriva_lenta": {
+          "dispositivos": 40,
+          "dispositivo_dias": 0.4067708333333333,
+          "falsas_alarmas_ventanas": 2,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 4.916773367477593,
+            "ic95": [
+              0.0,
+              12.307911617961512
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 4.916773367477593,
+            "ic95": [
+              0.0,
+              12.307911617961512
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.05,
+            "ic95": [
+              0.0,
+              0.125
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.15907447577729572,
+            "ic95": [
+              0.14043599548687397,
+              0.18518713450292396
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 0,
+          "fa_por_senal": {
+            "ipid_continuidad": 2
+          }
+        },
+        "control": {
+          "dispositivos": 40,
+          "dispositivo_dias": 0.40856481481481477,
+          "falsas_alarmas_ventanas": 1,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 2.4475920679886687,
+            "ic95": [
+              0.0,
+              7.3511321332552155
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 2.4475920679886687,
+            "ic95": [
+              0.0,
+              7.3511321332552155
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.025,
+            "ic95": [
+              0.0,
+              0.075
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.14925373134328357,
+            "ic95": [
+              0.133936056409552,
+              0.16936267731198104
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 0,
+          "fa_por_senal": {
+            "ipid_continuidad": 1
+          }
+        },
+        "gateway": {
+          "dispositivos": 20,
+          "dispositivo_dias": 0.2083333333333333,
+          "falsas_alarmas_ventanas": 0,
+          "fa_ventanas_por_dispositivo_dia": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "fa_eventos_por_dispositivo_dia": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "fraccion_dispositivos_con_fa": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "fraccion_ventanas_no_confiable": {
+            "valor": 0.06160739288714646,
+            "ic95": [
+              0.061401060563773376,
+              0.06184987348889514
+            ]
+          },
+          "fraccion_dispositivos_nunca_confiables": {
+            "valor": 0.0,
+            "ic95": [
+              0.0,
+              0.0
+            ]
+          },
+          "reperfilados": 0,
+          "fa_por_senal": {}
+        }
+      },
+      "con_variacion": {
+        "dispositivos": 200,
+        "dispositivo_dias": 2.052662037037037,
+        "falsas_alarmas_ventanas": 1590,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 774.6038906117845,
+          "ic95": [
+            693.7275951727463,
+            851.7025855297102
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 360.9946433605864,
+          "ic95": [
+            299.20830503058,
+            417.40043427355664
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.43,
+          "ic95": [
+            0.385,
+            0.475
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.13194768799626344,
+          "ic95": [
+            0.12648466753384943,
+            0.13810954075481188
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 7,
+        "fa_por_senal": {
+          "tcp_window": 665,
+          "ttl": 560,
+          "ipid_salto_log2": 268,
+          "ipid_continuidad": 97
+        }
+      },
+      "sin_variacion": {
+        "dispositivos": 60,
+        "dispositivo_dias": 0.6168981481481481,
+        "falsas_alarmas_ventanas": 1,
+        "fa_ventanas_por_dispositivo_dia": {
+          "valor": 1.6210131332082551,
+          "ic95": [
+            0.0,
+            4.86670312417533
+          ]
+        },
+        "fa_eventos_por_dispositivo_dia": {
+          "valor": 1.6210131332082551,
+          "ic95": [
+            0.0,
+            4.86670312417533
+          ]
+        },
+        "fraccion_dispositivos_con_fa": {
+          "valor": 0.016666666666666666,
+          "ic95": [
+            0.0,
+            0.05
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.10124252185918085,
+          "ic95": [
+            0.0962751817141867,
+            0.10707332900713822
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0,
+          "ic95": [
+            0.0,
+            0.0
+          ]
+        },
+        "reperfilados": 0,
+        "fa_por_senal": {
+          "ipid_continuidad": 1
+        }
+      },
+      "peores": [
+        {
+          "sesion": "variacion_000",
+          "mac": "02:86:86:0b:1d:9f",
+          "variacion": "dos_pilas",
+          "falsas_alarmas": 61,
+          "eventos_fa": 38,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_013",
+          "mac": "02:c2:a8:19:40:65",
+          "variacion": "actualizacion",
+          "falsas_alarmas": 51,
+          "eventos_fa": 9,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_001",
+          "mac": "02:e2:ca:e7:3a:31",
+          "variacion": "actualizacion",
+          "falsas_alarmas": 43,
+          "eventos_fa": 7,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_004",
+          "mac": "02:02:fe:32:cb:86",
+          "variacion": "actualizacion",
+          "falsas_alarmas": 42,
+          "eventos_fa": 7,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_005",
+          "mac": "02:eb:61:9e:eb:80",
+          "variacion": "dos_pilas",
+          "falsas_alarmas": 32,
+          "eventos_fa": 23,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_007",
+          "mac": "02:bb:25:69:5a:d1",
+          "variacion": "dos_pilas",
+          "falsas_alarmas": 32,
+          "eventos_fa": 18,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_014",
+          "mac": "02:c1:a4:05:31:a6",
+          "variacion": "actualizacion",
+          "falsas_alarmas": 32,
+          "eventos_fa": 7,
+          "reperfilados": 0
+        },
+        {
+          "sesion": "variacion_011",
+          "mac": "02:a8:26:5f:95:ed",
+          "variacion": "actualizacion",
+          "falsas_alarmas": 30,
+          "eventos_fa": 8,
+          "reperfilados": 0
+        }
+      ]
+    }
+  },
   "resumen": {
     "ipid": {
       "fa_antes": 16.19,
       "fa_despues": 0.38,
+      "fa_despues_con_reperfilado_24": 12.05,
       "deteccion_despues": {
         "ingenuo": 0.975,
         "ritmo": 1.0
+      }
+    },
+    "con_variacion": {
+      "con_variacion": {
+        "fa_ventanas_dia": 824.3,
+        "fa_eventos_dia": 360.99,
+        "no_confiable_ventanas": 0.128
+      },
+      "sin_variacion": {
+        "fa_ventanas_dia": 1.62,
+        "fa_eventos_dia": 1.62,
+        "no_confiable_ventanas": 0.101
       }
     }
   }

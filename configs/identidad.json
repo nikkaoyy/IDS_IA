@@ -15,6 +15,12 @@
         "inicio": 0,
         "sesiones": 20,
         "regenerar": false
+      },
+      "con_variacion": {
+        "dir_pcap": "data/pcap_variacion",
+        "inicio": 0,
+        "sesiones": 20,
+        "regenerar": false
       }
     }
   }

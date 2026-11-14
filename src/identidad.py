@@ -48,6 +48,15 @@ Decisiones fijadas antes de medir:
 - Actualización limitada: como mucho una ventana por llamada, `TOPE_ACTUALIZACIONES_DIA`
   por día una vez confiable, y una historia de `HISTORIA_MAX` ventanas. El perfil deriva
   despacio a propósito.
+- Reperfilado (PEDIDO-E3B-1, bloque 2): tras `REPERFILAR_REGISTRADO = 24` ventanas con
+  alarma seguidas (dos minutos de contradicción continua), el equipo vuelve a
+  `no_confiable` y rehace el perfil desde cero. Se registró como defensa por defecto para que
+  un cambio legítimo y persistente (una actualización) no quedara acusado para siempre.
+  Medido, **lava el clon**: si el clon dura más de dos minutos, el perfil se rehace con él
+  dentro y la víctima acumula falsas alarmas cuando se va (0,38 → 12,05 FA/disp-día en las
+  sesiones de E3A), y solo rescata 7 de 40 actualizaciones porque las ventanas sin SYN cortan
+  la racha. Queda **apagado por defecto** (`REPERFILAR_TRAS_ALARMAS = inf`, decisión tomada
+  después de medir y declarada así) y disponible para la ablación.
 """
 
 from __future__ import annotations
@@ -72,6 +81,8 @@ UMBRAL_DESVIACION: float = 6.0
 Z_FIRMA_NUEVA: float = 10.0
 VENTANAS_LIMPIAS_PARA_RECUPERAR: int = 3
 TOPE_ACTUALIZACIONES_DIA: int = 96
+REPERFILAR_REGISTRADO: int = 24  # valor registrado en E3B (2 min de alarma continua); lava el clon
+REPERFILAR_TRAS_ALARMAS: float = math.inf  # apagado por defecto tras medirlo (ver docstring)
 HISTORIA_MAX: int = 120
 SALTO_IPID_CONTINUO: int = 2048
 SALTO_SEQ_CONTINUO: int = 1 << 20
@@ -225,13 +236,31 @@ class SeguidorIdentidad:
 
     `observar` recibe las tramas de una ventana del equipo y devuelve puntaje, alarma y
     estado. No acusa mientras el perfil sea `no_confiable`.
+
+    Las tres defensas se pueden apagar para la ablación de PEDIDO-E3B-1 (bloque 4):
+    `congelar_en_alerta=False` aprende también las ventanas con alarma; `tope_diario=math.inf`
+    quita el tope; `min_ventanas=1` acusa desde la segunda ventana (sin `no_confiable`).
+    `reperfilar_tras` (E3B, bloque 2): tras ese número de ventanas con alarma seguidas, el
+    equipo vuelve a `no_confiable` y rehace el perfil; `math.inf` lo desactiva. `None` en
+    cualquiera de ellos toma la constante del módulo.
     """
 
+    congelar_en_alerta: bool = True
+    tope_diario: float | None = None
+    min_ventanas: int | None = None
+    reperfilar_tras: float | None = None
     historia: deque = field(default_factory=lambda: deque(maxlen=HISTORIA_MAX))
     estado: str = NO_CONFIABLE
     limpias_seguidas: int = 0
+    alarmas_seguidas: int = 0
+    reperfilados: int = 0
     actualizaciones_dia: dict[int, int] = field(default_factory=dict)
     _perfil: dict | None = None
+
+    def __post_init__(self) -> None:
+        self.tope_diario = TOPE_ACTUALIZACIONES_DIA if self.tope_diario is None else self.tope_diario
+        self.min_ventanas = MIN_VENTANAS_PERFIL if self.min_ventanas is None else self.min_ventanas
+        self.reperfilar_tras = REPERFILAR_TRAS_ALARMAS if self.reperfilar_tras is None else self.reperfilar_tras
 
     @property
     def perfil(self) -> dict:
@@ -240,8 +269,8 @@ class SeguidorIdentidad:
         return self._perfil
 
     def _aprender(self, s: dict, dia: int) -> bool:
-        confiable = len(self.historia) >= MIN_VENTANAS_PERFIL
-        if confiable and self.actualizaciones_dia.get(dia, 0) >= TOPE_ACTUALIZACIONES_DIA:
+        confiable = len(self.historia) >= self.min_ventanas
+        if confiable and self.actualizaciones_dia.get(dia, 0) >= self.tope_diario:
             return False
         self.historia.append(s)
         if confiable:
@@ -249,17 +278,24 @@ class SeguidorIdentidad:
         self._perfil = None
         return True
 
+    def _reperfilar(self) -> None:
+        self.historia.clear()
+        self._perfil = None
+        self.estado, self.alarmas_seguidas, self.limpias_seguidas = NO_CONFIABLE, 0, 0
+        self.reperfilados += 1
+
     def observar(self, tramas: Sequence[Trama], ts_us: int | None = None) -> dict:
-        """Procesa una ventana del equipo; aprende solo si no hay alerta."""
+        """Procesa una ventana del equipo; aprende solo si no hay alerta (salvo ablación)."""
         s = senales_ventana(tramas)
         ts = ts_us if ts_us is not None else (min(t.ts_us for t in tramas) if tramas else 0)
         dia = int(ts // 86_400_000_000)
-        salida = {"puntaje": math.nan, "alarma": False, "estado": self.estado, "aprendio": False}
+        salida = {"puntaje": math.nan, "alarma": False, "estado": self.estado, "aprendio": False,
+                  "reperfilado": False}
         if not tiene_senal(s):
             return salida
         if self.estado == NO_CONFIABLE:
             salida["aprendio"] = self._aprender(s, dia)
-            if len(self.historia) >= MIN_VENTANAS_PERFIL:
+            if len(self.historia) >= self.min_ventanas:
                 self.estado = CONFIABLE
             salida["estado"] = self.estado
             return salida
@@ -270,11 +306,19 @@ class SeguidorIdentidad:
         salida["alarma"] = alarma
         if alarma:
             self.estado, self.limpias_seguidas = SOSPECHOSO, 0
-        elif self.estado == SOSPECHOSO:
-            self.limpias_seguidas += 1
-            if self.limpias_seguidas >= VENTANAS_LIMPIAS_PARA_RECUPERAR:
-                self.estado = CONFIABLE
+            self.alarmas_seguidas += 1
+            if not self.congelar_en_alerta:
+                salida["aprendio"] = self._aprender(s, dia)
+            if self.alarmas_seguidas >= self.reperfilar_tras:
+                self._reperfilar()
+                salida["reperfilado"] = True
         else:
-            salida["aprendio"] = self._aprender(s, dia)
+            self.alarmas_seguidas = 0
+            if self.estado == SOSPECHOSO:
+                self.limpias_seguidas += 1
+                if self.limpias_seguidas >= VENTANAS_LIMPIAS_PARA_RECUPERAR:
+                    self.estado = CONFIABLE
+            else:
+                salida["aprendio"] = self._aprender(s, dia)
         salida["estado"] = self.estado
         return salida

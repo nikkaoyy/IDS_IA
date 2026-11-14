@@ -187,3 +187,59 @@ def test_un_flujo_con_ipid_aleatorio_en_un_equipo_por_flujo_dispara():
     for t in raro:
         t.ip_id = rng.randrange(65536)
     assert idn.desviacion(_perfil_linux_un_flujo(), raro)["puntaje"] > idn.UMBRAL_DESVIACION
+
+
+# --- PEDIDO-E3B-1, bloques 2 y 4: reperfilado y defensas apagables ----------------------
+
+def _confiable(**kw) -> idn.SeguidorIdentidad:
+    seg = idn.SeguidorIdentidad(**kw)
+    for k in range(idn.MIN_VENTANAS_PERFIL):
+        seg.observar(_ventana(k))
+    return seg
+
+
+R = idn.REPERFILAR_REGISTRADO
+
+
+def test_un_cambio_persistente_reperfila_tras_24_alarmas():
+    seg = _confiable(reperfilar_tras=R)
+    salidas = [seg.observar(_ventana(20 + k, ttl=128, window=64240)) for k in range(R + 14)]
+    assert sum(s["alarma"] for s in salidas) == R
+    assert salidas[R - 1]["reperfilado"] and seg.reperfilados == 1
+    assert seg.estado == idn.CONFIABLE and seg.perfil["ttl"]["mediana"] == 128
+
+
+def test_reperfilar_con_el_clon_presente_lo_lava():
+    """El hallazgo del bloque 2: si el clon dura más de R ventanas, el perfil nuevo es el suyo."""
+    seg = _confiable(reperfilar_tras=R)
+    for k in range(R + idn.MIN_VENTANAS_PERFIL):
+        seg.observar(_ventana(20 + k, ttl=128, window=64240, opciones=OPC_WIN))
+    assert seg.reperfilados == 1 and seg.perfil["ttl"]["mediana"] == 128
+    assert seg.observar(_ventana(100))["alarma"]  # la víctima, ya sin clon, pasa a ser la sospechosa
+
+
+def test_por_defecto_no_se_reperfila():
+    seg = _confiable()
+    for k in range(3 * R):
+        seg.observar(_ventana(20 + k, ttl=128, window=64240))
+    assert seg.reperfilados == 0 and seg.estado == idn.SOSPECHOSO
+
+
+def test_alarmas_intercaladas_no_reperfilan():
+    seg = _confiable(reperfilar_tras=R)
+    for k in range(60):
+        seg.observar(_ventana(20 + k, ttl=128 if k % 2 else 64))
+    assert seg.reperfilados == 0
+
+
+def test_sin_congelar_el_clon_se_aprende():
+    seg = _confiable(congelar_en_alerta=False)
+    salidas = [seg.observar(_ventana(20 + k, ttl=128, window=64240, opciones=OPC_WIN)) for k in range(10)]
+    assert salidas[0]["alarma"] and not salidas[-1]["alarma"]
+
+
+def test_sin_no_confiable_acusa_desde_la_segunda_ventana():
+    seg = idn.SeguidorIdentidad(min_ventanas=1)
+    seg.observar(_ventana(0))
+    assert seg.estado == idn.CONFIABLE and seg.observar(_ventana(1, ttl=128))["alarma"]
+

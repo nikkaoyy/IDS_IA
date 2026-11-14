@@ -20,6 +20,8 @@ data/*.pcap
 data/pcap/
 data/pcap_holdout/
 data/pcap_clones/
+data/pcap_variacion/
+data/pcap_e3b/
 data/*.parquet
 data/*.meta.json
 !data/.gitkeep

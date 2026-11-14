@@ -18,6 +18,8 @@ dispositivo-día con IC por sesiones, y la proporción de dispositivos `no_confi
 Parte B (PEDIDO-E3B-1, `--partes b`): secciones de `config["b"]`, cada una sobre sus propias
 sesiones, en `reports/identidad_e3b.json`:
 - `ipid`: el mismo protocolo de la parte A con el IP-ID por equipo (descartado) y por flujo.
+- `con_variacion`: sesiones benignas de `generar_variacion.py` (sin clones); falsas alarmas
+  por ventanas y por eventos, siempre junto a la proporción `no_confiable` y los reperfilados.
 
 Uso:
     python scripts/evaluar_identidad.py --config configs/identidad.json [--partes a,b]
@@ -29,6 +31,7 @@ import json
 import logging
 import math
 import sys
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -40,6 +43,7 @@ import numpy as np  # noqa: E402
 
 from scripts.evaluar import commit_actual, escribir_json, fmt_ic, leer_config, ruta_proyecto  # noqa: E402
 from scripts.lab import generar_clones as gc  # noqa: E402
+from scripts.lab import generar_variacion as gv  # noqa: E402
 from src import evaluacion as ev  # noqa: E402
 from src import identidad as idn  # noqa: E402
 from src.ventanas import leer_pcap  # noqa: E402
@@ -64,7 +68,9 @@ def seguir_sesion(tramas, ventana_s: float = idn.VENTANA_S, **seguidor) -> dict[
             estado_previo = seg.estado
             r = seg.observar(ventanas[k], ts_us=int(k * ventana_s * US))
             filas.append({"idx": k, "estado_previo": estado_previo, "estado": r["estado"],
-                          "puntaje": r["puntaje"], "alarma": bool(r["alarma"])})
+                          "puntaje": r["puntaje"], "alarma": bool(r["alarma"]),
+                          "reperfilado": bool(r.get("reperfilado", False)),
+                          "senal": max(r["por_senal"], key=r["por_senal"].get) if r["alarma"] else None})
         salida[mac] = filas
     return salida
 
@@ -86,11 +92,16 @@ def evaluar_sesion(nombre: str, seguimiento: dict[str, list[dict]], manifiesto: 
                           "latencia_s": latencia, "ventanas": len(filas), "ventanas_con_alarma": len(alarmas)})
     dispositivos = []
     for mac, filas in seguimiento.items():
-        fuera = [f for f in filas if not any(a <= f["idx"] <= b for a, b in en_episodio.get(mac, []))]
+        dentro = [any(a <= f["idx"] <= b for a, b in en_episodio.get(mac, [])) for f in filas]
+        fuera = [f for f, d in zip(filas, dentro) if not d]
+        eventos = sum(1 for i, (f, d) in enumerate(zip(filas, dentro))
+                      if f["alarma"] and not d and (i == 0 or not filas[i - 1]["alarma"]))
         span = (filas[-1]["idx"] - filas[0]["idx"] + 1) * ventana_s
         dispositivos.append({
             "sesion": nombre, "mac": mac, "victima": mac in en_episodio, "segundos": span,
-            "ventanas": len(fuera), "falsas_alarmas": sum(f["alarma"] for f in fuera),
+            "ventanas": len(fuera), "falsas_alarmas": sum(f["alarma"] for f in fuera), "eventos_fa": eventos,
+            "reperfilados": sum(f.get("reperfilado", False) for f in fuera),
+            "fa_por_senal": dict(Counter(f.get("senal") for f in fuera if f["alarma"])),
             "llego_a_confiable": any(f["estado"] != idn.NO_CONFIABLE for f in filas),
             "ventanas_no_confiable": sum(f["estado"] == idn.NO_CONFIABLE for f in filas),
             "ventanas_total": len(filas),
@@ -199,7 +210,28 @@ def markdown_b(informe: dict) -> str:
             lineas.append(f"| Detección {n} | {fmt_ic(a['por_nivel'][n]['deteccion'])} | {fmt_ic(d['por_nivel'][n]['deteccion'])} |")
             lineas.append(f"| Latencia mediana {n} (s) | {fmt_ic(a['por_nivel'][n]['latencia_s_mediana'], 1)} | "
                           f"{fmt_ic(d['por_nivel'][n]['latencia_s_mediana'], 1)} |")
+        r = ip["ipid_por_flujo_reperfilado_24"]
+        lineas.append(f"| FA/disp-día por flujo + reperfilado 24 (registrado, lava el clon) | | "
+                      f"{fmt_ic(r['legitimos']['falsas_alarmas_por_dispositivo_dia'], 2)} |")
         lineas.append("")
+    if "con_variacion" in informe:
+        cv = informe["con_variacion"]
+        for titulo, bloque in (("defensas por defecto (sin reperfilado)", cv),
+                               ("con el reperfilado registrado (24)", cv["reperfilado_24"])):
+            lineas += [f"## Bloque 2 — legítimos con variación real (sin clones), {titulo}", "",
+                       "| Grupo | Disp. | FA ventanas/disp-día | FA eventos/disp-día | Disp. con FA | Ventanas no_confiable "
+                       "| Nunca confiables | Reperfilados | FA por señal (ventanas) |",
+                       "|---|---|---|---|---|---|---|---|---|"]
+            grupos = [("con variación (todas)", bloque["con_variacion"]),
+                      ("sin variación (control + gateway)", bloque["sin_variacion"])]
+            grupos += [(t, v) for t, v in bloque["por_variacion"].items()]
+            for n, v in grupos:
+                lineas.append(f"| {n} | {v['dispositivos']} | {fmt_ic(v['fa_ventanas_por_dispositivo_dia'], 1)} | "
+                              f"{fmt_ic(v['fa_eventos_por_dispositivo_dia'], 1)} | {fmt_ic(v['fraccion_dispositivos_con_fa'], 2)} | "
+                              f"{fmt_ic(v['fraccion_ventanas_no_confiable'], 3)} | "
+                              f"{fmt_ic(v['fraccion_dispositivos_nunca_confiables'], 2)} | {v['reperfilados']} | "
+                              f"{', '.join(f'{s} {c}' for s, c in list(v['fa_por_senal'].items())[:3]) or '—'} |")
+            lineas.append("")
     return "\n".join(lineas) + "\n"
 
 
@@ -270,12 +302,17 @@ def seccion_ipid(cfg: dict, cfg_sec: dict) -> dict:
             idn.IPID_MODO = modo
             salida[f"ipid_por_{modo}"] = _medir(sesiones, n_rep, sem)
             logger.info("ipid %s hecho", modo)
+        # Bloque 2: el reperfilado registrado (24) sobre las mismas sesiones con clon.
+        salida["ipid_por_flujo_reperfilado_24"] = _medir(sesiones, n_rep, sem, reperfilar_tras=idn.REPERFILAR_REGISTRADO)
+        logger.info("ipid flujo + reperfilado hecho")
     finally:
         idn.IPID_MODO = original
     antes, despues = salida["ipid_por_equipo"], salida["ipid_por_flujo"]
     salida["comparacion"] = {
         "falsas_alarmas_por_dispositivo_dia": {"antes": antes["legitimos"]["falsas_alarmas_por_dispositivo_dia"],
-                                               "despues": despues["legitimos"]["falsas_alarmas_por_dispositivo_dia"]},
+                                               "despues": despues["legitimos"]["falsas_alarmas_por_dispositivo_dia"],
+                                               "despues_con_reperfilado_24": salida["ipid_por_flujo_reperfilado_24"][
+                                                   "legitimos"]["falsas_alarmas_por_dispositivo_dia"]},
         "deteccion": {n: {"antes": antes["por_nivel"][n]["deteccion"], "despues": despues["por_nivel"][n]["deteccion"]}
                       for n in despues["por_nivel"]},
         "presupuesto_e2_fa_dispositivo_dia": 1.0,
@@ -283,7 +320,73 @@ def seccion_ipid(cfg: dict, cfg_sec: dict) -> dict:
     return salida
 
 
-SECCIONES_B = {"ipid": seccion_ipid}
+def _sesiones_generadas(cfg_sec: dict, prefijo: str, generar, semilla_base: int) -> list[tuple[str, list, dict]]:
+    dir_pcap = ruta_proyecto(cfg_sec["dir_pcap"])
+    salida = []
+    for i in range(int(cfg_sec["inicio"]), int(cfg_sec["inicio"]) + int(cfg_sec["sesiones"])):
+        ruta = dir_pcap / f"{prefijo}_{i:03d}.pcap"
+        if cfg_sec.get("regenerar", False) or not ruta.exists():
+            gc.escribir_sesion(*generar(semilla_base + i), ruta)
+        salida.append((ruta.stem, list(leer_pcap(ruta)), json.loads(ruta.with_suffix(".clones.json").read_text())))
+    return salida
+
+
+def tabla_legitimos(dispositivos: list[dict], n_rep: int, semilla: int) -> dict:
+    """FA (ventanas y eventos) siempre junto a no_confiable y reperfilados, con IC por sesiones."""
+    sesiones = sorted({d["sesion"] for d in dispositivos})
+
+    def fila(campo, peso=lambda d: 1):
+        return np.array([[sum(campo(d) for d in dispositivos if d["sesion"] == s) for s in sesiones]], float)
+    dias = fila(lambda d: d["segundos"] / ev.SEGUNDOS_POR_DIA)
+    n = fila(lambda d: 1)
+    return {
+        "dispositivos": int(n.sum()),
+        "dispositivo_dias": float(dias.sum()),
+        "falsas_alarmas_ventanas": int(fila(lambda d: d["falsas_alarmas"]).sum()),
+        "fa_ventanas_por_dispositivo_dia": ev.ic_razon_por_sesion(fila(lambda d: d["falsas_alarmas"]), dias, n_rep, semilla),
+        "fa_eventos_por_dispositivo_dia": ev.ic_razon_por_sesion(fila(lambda d: d["eventos_fa"]), dias, n_rep, semilla),
+        "fraccion_dispositivos_con_fa": ev.ic_razon_por_sesion(fila(lambda d: d["falsas_alarmas"] > 0), n, n_rep, semilla),
+        "fraccion_ventanas_no_confiable": ev.ic_razon_por_sesion(
+            fila(lambda d: d["ventanas_no_confiable"]), fila(lambda d: d["ventanas_total"]), n_rep, semilla),
+        "fraccion_dispositivos_nunca_confiables": ev.ic_razon_por_sesion(
+            fila(lambda d: not d["llego_a_confiable"]), n, n_rep, semilla),
+        "reperfilados": int(fila(lambda d: d["reperfilados"]).sum()),
+        "fa_por_senal": dict(sum((Counter(d.get("fa_por_senal", {})) for d in dispositivos), Counter()).most_common()),
+    }
+
+
+def _dispositivos_por_variacion(sesiones, **seguidor) -> list[dict]:
+    salida = []
+    for nombre, tramas, man in sesiones:
+        tipo = {e["mac"]: e.get("variacion", "control") for e in man["equipos"]}
+        r = evaluar_sesion(nombre, seguir_sesion(tramas, **seguidor), man)
+        for d in r["dispositivos"]:
+            salida.append({**d, "variacion": tipo.get(d["mac"], "gateway")})
+    return salida
+
+
+def seccion_con_variacion(cfg: dict, cfg_sec: dict, **seguidor) -> dict:
+    """Bloque 2: legítimos con variación real de pila (sin clones): FA y no_confiable juntos."""
+    sesiones = _sesiones_generadas(cfg_sec, "variacion", gv.generar_sesion, gv.SEMILLA_BASE_VARIACION)
+    n_rep, sem = int(cfg["n_bootstrap"]), int(cfg["semilla_bootstrap"])
+    tipos = list(gv.TIPOS) + ["control", "gateway"]
+
+    def tablas(disp):
+        return {
+            "por_variacion": {t: tabla_legitimos([d for d in disp if d["variacion"] == t], n_rep, sem) for t in tipos},
+            "con_variacion": tabla_legitimos([d for d in disp if d["variacion"] in gv.TIPOS], n_rep, sem),
+            "sin_variacion": tabla_legitimos([d for d in disp if d["variacion"] in ("control", "gateway")], n_rep, sem),
+            "peores": sorted(({k: d[k] for k in ("sesion", "mac", "variacion", "falsas_alarmas", "eventos_fa", "reperfilados")}
+                              for d in disp if d["falsas_alarmas"]), key=lambda d: -d["falsas_alarmas"])[:8],
+        }
+    salida = {"sesiones": [s[0] for s in sesiones], **tablas(_dispositivos_por_variacion(sesiones, **seguidor))}
+    salida["reperfilado_24"] = tablas(_dispositivos_por_variacion(
+        sesiones, **{**seguidor, "reperfilar_tras": idn.REPERFILAR_REGISTRADO}))
+    logger.info("con_variacion hecho")
+    return salida
+
+
+SECCIONES_B = {"ipid": seccion_ipid, "con_variacion": seccion_con_variacion}
 
 
 def resumen_b(informe: dict) -> dict:
@@ -293,7 +396,15 @@ def resumen_b(informe: dict) -> dict:
         c = informe["ipid"]["comparacion"]
         r["ipid"] = {"fa_antes": round(c["falsas_alarmas_por_dispositivo_dia"]["antes"]["valor"], 2),
                      "fa_despues": round(c["falsas_alarmas_por_dispositivo_dia"]["despues"]["valor"], 2),
+                     "fa_despues_con_reperfilado_24": round(
+                         c["falsas_alarmas_por_dispositivo_dia"]["despues_con_reperfilado_24"]["valor"], 2),
                      "deteccion_despues": {n: round(v["despues"]["valor"], 3) for n, v in c["deteccion"].items()}}
+    if "con_variacion" in informe:
+        cv = informe["con_variacion"]
+        r["con_variacion"] = {k: {"fa_ventanas_dia": round(cv[k]["fa_ventanas_por_dispositivo_dia"]["valor"], 2),
+                                  "fa_eventos_dia": round(cv[k]["fa_eventos_por_dispositivo_dia"]["valor"], 2),
+                                  "no_confiable_ventanas": round(cv[k]["fraccion_ventanas_no_confiable"]["valor"], 3)}
+                              for k in ("con_variacion", "sin_variacion")}
     return r
 
 

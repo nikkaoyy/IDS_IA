@@ -98,11 +98,12 @@ def _equipo(rng: np.random.Generator, n: int, pila: str | None = None) -> Equipo
                   longitud_media=float(rng.lognormal(np.log(300.0), 0.7)), _ipid=int(rng.integers(0, 65536)))
 
 
-def _conexion(paquetes: list, rng, t: float, e: Equipo, ip_src: str, mac_src: str, longitud_media: float) -> None:
-    """SYN con la pila del emisor y unos segmentos de datos; el gateway responde SYN-ACK."""
+def _conexion(paquetes: list, rng, t: float, e: Equipo, ip_src: str, mac_src: str, longitud_media: float,
+              pila: dict | None = None) -> None:
+    """SYN con la pila del emisor (o `pila`, si se da) y unos segmentos; el gateway responde SYN-ACK."""
     from scapy.all import IP, TCP, Ether, Raw
 
-    pila = PILAS[e.pila]
+    pila = pila or PILAS[e.pila]
     sport, dport = int(rng.integers(32768, 61000)), int(rng.choice([443, 80, 8443, 22]))
     flujo = (ip_src, sport, dport)
     df = "DF" if e.pila != "iot" else 0
@@ -128,10 +129,10 @@ def _conexion(paquetes: list, rng, t: float, e: Equipo, ip_src: str, mac_src: st
         seq = (seq + n) % 2**32
 
 
-def _dns(paquetes: list, rng, t: float, e: Equipo, ip_src: str, mac_src: str) -> None:
+def _dns(paquetes: list, rng, t: float, e: Equipo, ip_src: str, mac_src: str, pila: dict | None = None) -> None:
     from scapy.all import DNS, DNSQR, IP, UDP, Ether
 
-    q = Ether(src=mac_src, dst=MAC_GATEWAY) / IP(src=ip_src, dst=IP_RESOLVER, ttl=PILAS[e.pila]["ttl"],
+    q = Ether(src=mac_src, dst=MAC_GATEWAY) / IP(src=ip_src, dst=IP_RESOLVER, ttl=(pila or PILAS[e.pila])["ttl"],
                                                  id=e.siguiente_ipid(rng, ("dns",))) / UDP(
         sport=int(rng.integers(32768, 61000)), dport=53) / DNS(id=int(rng.integers(0, 65536)), qd=DNSQR(qname="ejemplo.lab"))
     q.time = t
@@ -149,18 +150,21 @@ def _mdns(paquetes: list, rng, t: float, e: Equipo, ip_src: str, mac_src: str) -
 
 def _emitir(paquetes: list, rng, e: Equipo, desde: float, hasta: float, *, ip_src: str | None = None,
             mac_src: str | None = None, conexiones_por_min: float | None = None,
-            longitud_media: float | None = None) -> None:
-    """Tráfico de `e` en [desde, hasta): conexiones Poisson, DNS antes de algunas y mDNS periódico."""
+            longitud_media: float | None = None, pila: dict | None = None) -> None:
+    """Tráfico de `e` en [desde, hasta): conexiones Poisson, DNS antes de algunas y mDNS periódico.
+
+    `pila` sustituye a la de la familia de `e` (variaciones legítimas, PEDIDO-E3B-1).
+    """
     ip_src, mac_src = ip_src or e.ip, mac_src or e.mac
     tasa = (conexiones_por_min or e.conexiones_por_min) / 60.0
     longitud = longitud_media or e.longitud_media
     t = desde + float(rng.exponential(1 / tasa))
     while t < hasta:
         if rng.random() < 0.4:
-            _dns(paquetes, rng, t - 0.05, e, ip_src, mac_src)
-        _conexion(paquetes, rng, t, e, ip_src, mac_src, longitud)
+            _dns(paquetes, rng, t - 0.05, e, ip_src, mac_src, pila)
+        _conexion(paquetes, rng, t, e, ip_src, mac_src, longitud, pila)
         t += float(rng.exponential(1 / tasa))
-    if PILAS[e.pila]["mdns"]:
+    if (pila or PILAS[e.pila])["mdns"]:
         t = desde + float(rng.uniform(0, 30))
         while t < hasta:
             _mdns(paquetes, rng, t, e, ip_src, mac_src)
