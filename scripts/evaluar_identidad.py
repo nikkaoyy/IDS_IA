@@ -15,8 +15,12 @@ Métricas por nivel de clon, con IC al 95 % por bootstrap de episodios:
 Y sobre los legítimos: falsas alarmas (ventanas con alarma fuera de todo episodio) por
 dispositivo-día con IC por sesiones, y la proporción de dispositivos `no_confiable`.
 
+Parte B (PEDIDO-E3B-1, `--partes b`): secciones de `config["b"]`, cada una sobre sus propias
+sesiones, en `reports/identidad_e3b.json`:
+- `ipid`: el mismo protocolo de la parte A con el IP-ID por equipo (descartado) y por flujo.
+
 Uso:
-    python scripts/evaluar_identidad.py --config configs/identidad.json
+    python scripts/evaluar_identidad.py --config configs/identidad.json [--partes a,b]
 """
 from __future__ import annotations
 
@@ -44,14 +48,17 @@ logger = logging.getLogger("evaluar_identidad")
 US = 1_000_000
 
 
-def seguir_sesion(tramas, ventana_s: float = idn.VENTANA_S) -> dict[str, list[dict]]:
-    """Por MAC de origen, el resultado de su seguidor en cada ventana en la que emite."""
+def seguir_sesion(tramas, ventana_s: float = idn.VENTANA_S, **seguidor) -> dict[str, list[dict]]:
+    """Por MAC de origen, el resultado de su seguidor en cada ventana en la que emite.
+
+    `seguidor` son parámetros de `SeguidorIdentidad` (para la ablación de defensas).
+    """
     por_mac: dict[str, dict[int, list]] = {}
     for t in tramas:
         por_mac.setdefault(t.mac_src, {}).setdefault(int(t.ts_us // (ventana_s * US)), []).append(t)
     salida: dict[str, list[dict]] = {}
     for mac, ventanas in por_mac.items():
-        seg = idn.SeguidorIdentidad()
+        seg = idn.SeguidorIdentidad(**seguidor)
         filas = []
         for k in sorted(ventanas):
             estado_previo = seg.estado
@@ -174,6 +181,28 @@ def evaluar(cfg: dict, ruta_config: str | None = None) -> dict:
     }
 
 
+def markdown_b(informe: dict) -> str:
+    """Resumen legible de la parte B (solo cifras del JSON)."""
+    lineas = ["# E3B — cifras", "",
+              f"Generado por `scripts/evaluar_identidad.py --partes b` el {informe['fecha']} en el commit "
+              f"`{informe['commit']}`{' (árbol con cambios)' if informe.get('arbol_con_cambios') else ''}.", ""]
+    if "ipid" in informe:
+        ip = informe["ipid"]
+        lineas += ["## Bloque 1 — IP-ID por equipo (descartado) frente a por flujo", "",
+                   "| Medida | Por equipo (E3A) | Por flujo |", "|---|---|---|"]
+        a, d = ip["ipid_por_equipo"], ip["ipid_por_flujo"]
+        lineas.append(f"| FA/disp-día | {fmt_ic(a['legitimos']['falsas_alarmas_por_dispositivo_dia'], 2)} | "
+                      f"{fmt_ic(d['legitimos']['falsas_alarmas_por_dispositivo_dia'], 2)} |")
+        lineas.append(f"| Dispositivos con alguna FA | {fmt_ic(a['legitimos']['fraccion_dispositivos_con_falsa_alarma'])} | "
+                      f"{fmt_ic(d['legitimos']['fraccion_dispositivos_con_falsa_alarma'])} |")
+        for n in d["por_nivel"]:
+            lineas.append(f"| Detección {n} | {fmt_ic(a['por_nivel'][n]['deteccion'])} | {fmt_ic(d['por_nivel'][n]['deteccion'])} |")
+            lineas.append(f"| Latencia mediana {n} (s) | {fmt_ic(a['por_nivel'][n]['latencia_s_mediana'], 1)} | "
+                          f"{fmt_ic(d['por_nivel'][n]['latencia_s_mediana'], 1)} |")
+        lineas.append("")
+    return "\n".join(lineas) + "\n"
+
+
 def markdown(informe: dict) -> str:
     """Resumen legible del JSON."""
     r = informe["resumen"]
@@ -205,12 +234,96 @@ def markdown(informe: dict) -> str:
     return "\n".join(lineas) + "\n"
 
 
+# --------------------------------------------------------------------------------------------
+# Parte B (PEDIDO-E3B-1)
+# --------------------------------------------------------------------------------------------
+
+def _sesiones_clones(cfg_sec: dict) -> list[tuple[str, list, dict]]:
+    """(nombre, tramas, manifiesto) de las sesiones de clones de la parte A (mismas semillas)."""
+    dir_pcap = ruta_proyecto(cfg_sec["dir_pcap"])
+    salida = []
+    for i in range(int(cfg_sec["inicio"]), int(cfg_sec["inicio"]) + int(cfg_sec["sesiones"])):
+        ruta = dir_pcap / f"clones_{i:03d}.pcap"
+        if cfg_sec.get("regenerar", False) or not ruta.exists():
+            gc.escribir_sesion(*gc.generar_sesion(gc.SEMILLA_BASE_CLONES + i), ruta)
+        salida.append((ruta.stem, list(leer_pcap(ruta)), json.loads(ruta.with_suffix(".clones.json").read_text())))
+    return salida
+
+
+def _medir(sesiones: list[tuple[str, list, dict]], n_rep: int, semilla: int, **seguidor) -> dict:
+    episodios, dispositivos = [], []
+    for nombre, tramas, manifiesto in sesiones:
+        r = evaluar_sesion(nombre, seguir_sesion(tramas, **seguidor), manifiesto)
+        episodios += r["episodios"]
+        dispositivos += r["dispositivos"]
+    return resumir(episodios, dispositivos, n_rep, semilla)
+
+
+def seccion_ipid(cfg: dict, cfg_sec: dict) -> dict:
+    """Bloque 1: misma evaluación con el IP-ID por equipo (descartado) y por flujo."""
+    sesiones = _sesiones_clones(cfg_sec)
+    n_rep, sem = int(cfg["n_bootstrap"]), int(cfg["semilla_bootstrap"])
+    salida = {}
+    original = idn.IPID_MODO
+    try:
+        for modo in ("equipo", "flujo"):
+            idn.IPID_MODO = modo
+            salida[f"ipid_por_{modo}"] = _medir(sesiones, n_rep, sem)
+            logger.info("ipid %s hecho", modo)
+    finally:
+        idn.IPID_MODO = original
+    antes, despues = salida["ipid_por_equipo"], salida["ipid_por_flujo"]
+    salida["comparacion"] = {
+        "falsas_alarmas_por_dispositivo_dia": {"antes": antes["legitimos"]["falsas_alarmas_por_dispositivo_dia"],
+                                               "despues": despues["legitimos"]["falsas_alarmas_por_dispositivo_dia"]},
+        "deteccion": {n: {"antes": antes["por_nivel"][n]["deteccion"], "despues": despues["por_nivel"][n]["deteccion"]}
+                      for n in despues["por_nivel"]},
+        "presupuesto_e2_fa_dispositivo_dia": 1.0,
+    }
+    return salida
+
+
+SECCIONES_B = {"ipid": seccion_ipid}
+
+
+def resumen_b(informe: dict) -> dict:
+    """Cifras de cabecera de la parte B (las que imprime el criterio de aceptación)."""
+    r: dict = {}
+    if "ipid" in informe:
+        c = informe["ipid"]["comparacion"]
+        r["ipid"] = {"fa_antes": round(c["falsas_alarmas_por_dispositivo_dia"]["antes"]["valor"], 2),
+                     "fa_despues": round(c["falsas_alarmas_por_dispositivo_dia"]["despues"]["valor"], 2),
+                     "deteccion_despues": {n: round(v["despues"]["valor"], 3) for n, v in c["deteccion"].items()}}
+    return r
+
+
+def evaluar_b(cfg: dict, ruta_config: str | None = None) -> dict:
+    """Corre las secciones de `cfg["b"]` en orden y arma `identidad_e3b.json`."""
+    informe: dict = {"etapa": "PEDIDO-E3B-1", "fecha": datetime.now().isoformat(timespec="seconds"),
+                     **commit_actual(), "config_archivo": ruta_config, "config": cfg}
+    for nombre, cfg_sec in cfg["b"]["secciones"].items():
+        informe[nombre] = SECCIONES_B[nombre](cfg, cfg_sec)
+    informe["resumen"] = resumen_b(informe)
+    return informe
+
+
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Evaluación E3A: perfil de pila frente a clones de MAC.")
+    p = argparse.ArgumentParser(description="Evaluación E3: perfil de pila frente a clones de MAC.")
     p.add_argument("--config", required=True, type=Path)
+    p.add_argument("--partes", default="a", help="a (E3A), b (E3B) o a,b.")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
     cfg = leer_config(args.config)
+    partes = set(args.partes.split(","))
+    if "b" in partes:
+        informe_b = evaluar_b(cfg, str(args.config))
+        destino_b = ruta_proyecto(cfg["b"]["salida"])
+        escribir_json(informe_b, destino_b)
+        destino_b.with_suffix(".md").write_text(markdown_b(json.loads(destino_b.read_text())))
+        print(f"Escrito {destino_b} y {destino_b.with_suffix('.md')}")
+        print(json.dumps(informe_b["resumen"], ensure_ascii=False))
+    if "a" not in partes:
+        return 0
     informe = evaluar(cfg, str(args.config))
     destino = ruta_proyecto(cfg["salida"])
     escribir_json(informe, destino)

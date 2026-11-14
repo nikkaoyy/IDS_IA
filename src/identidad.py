@@ -12,9 +12,13 @@ Señales por ventana de 5 s (solo tramas emitidas por el equipo):
 - `tcp_window`: mediana de la ventana anunciada en SYN / SYN-ACK (la del arranque de la
   conexión es la que fija el sistema operativo; la de mitad de flujo varía con la carga).
 - `tcp_opciones`: firmas (tupla de nombres) vistas en SYN / SYN-ACK. Categórica.
-- `ipid_continuidad`: fracción de saltos de IP-ID entre tramas consecutivas en [1, 2048]
-  (contador global ≈ 1; aleatorio ≈ 0,03; cero con DF = 0).
-- `ipid_salto_log2`: log2(1 + salto mediano de IP-ID).
+- `ipid_continuidad`: fracción de saltos de IP-ID entre tramas consecutivas **del mismo
+  flujo** (destino, protocolo, puertos; flujos con ≥ 3 tramas) en [1, 2048]. Contador global
+  o por flujo ≈ 1; aleatorio ≈ 0,03; cero con DF = 0. Un valor por flujo (PEDIDO-E3B-1).
+- `ipid_salto_log2`: log2(1 + salto mediano de IP-ID dentro del flujo). Un valor por flujo.
+  **Descartada la versión por equipo** (E3A): medía el salto entre tramas consecutivas del
+  equipo y, con dos conexiones en la misma ventana, el salto era aleatorio. Dio 16,2 FA por
+  dispositivo-día. Queda accesible con `IPID_MODO = "equipo"` solo para reproducir esa cifra.
 - `seq_continuidad`: fracción de pares consecutivos del mismo flujo con SEQ que avanza menos
   de 2^20.
 
@@ -61,6 +65,9 @@ VENTANA_S: float = 5.0
 MIN_VENTANAS_PERFIL: int = 12
 MIN_APARICIONES_VALOR: int = 2
 SENALES_POR_VALOR: tuple[str, ...] = ("ttl", "tcp_window")
+SENALES_POR_FLUJO: tuple[str, ...] = ("ipid_continuidad", "ipid_salto_log2")
+MIN_TRAMAS_FLUJO_IPID: int = 3
+IPID_MODO: str = "flujo"  # "equipo": versión descartada de E3A, solo para comparar
 UMBRAL_DESVIACION: float = 6.0
 Z_FIRMA_NUEVA: float = 10.0
 VENTANAS_LIMPIAS_PARA_RECUPERAR: int = 3
@@ -102,11 +109,7 @@ def senales_ventana(tramas: Sequence[Trama]) -> dict:
         s["ttl"] = float(np.median([t.ip_ttl for t in ip]))
     if ventanas_tcp:
         s["tcp_window"] = float(np.median(ventanas_tcp))
-    ids = [t.ip_id for t in sorted(ip, key=lambda t: t.ts_us) if t.ip_id is not None]
-    if len(ids) >= 2:
-        saltos = np.array([(b - a) % 65536 for a, b in zip(ids, ids[1:])])
-        s["ipid_continuidad"] = float(np.mean((saltos >= 1) & (saltos <= SALTO_IPID_CONTINUO)))
-        s["ipid_salto_log2"] = float(np.log2(1 + np.median(saltos)))
+    _senales_ipid(ip, s)
     flujos: dict[tuple, list[int]] = {}
     for t in sorted((t for t in ip if t.tcp_seq is not None), key=lambda t: t.ts_us):
         flujos.setdefault((t.ip_dst, t.sport, t.dport), []).append(t.tcp_seq)
@@ -114,6 +117,32 @@ def senales_ventana(tramas: Sequence[Trama]) -> dict:
     if pares:
         s["seq_continuidad"] = float(np.mean(np.array(pares) < SALTO_SEQ_CONTINUO))
     return s
+
+
+def _continuidad_y_salto(ids: list[int]) -> tuple[float, float]:
+    saltos = np.array([(b - a) % 65536 for a, b in zip(ids, ids[1:])])
+    return (float(np.mean((saltos >= 1) & (saltos <= SALTO_IPID_CONTINUO))),
+            float(np.log2(1 + np.median(saltos))))
+
+
+def _senales_ipid(ip: Sequence[Trama], s: dict) -> None:
+    """Continuidad y salto de IP-ID: por flujo (vigente) o por equipo (descartada en E3B)."""
+    ordenadas = [t for t in sorted(ip, key=lambda t: t.ts_us) if t.ip_id is not None]
+    if IPID_MODO == "equipo":
+        if len(ordenadas) >= 2:
+            c, salto = _continuidad_y_salto([t.ip_id for t in ordenadas])
+            s["ipid_continuidad"], s["ipid_salto_log2"] = c, salto
+            s["ipid_continuidad_valores"], s["ipid_salto_log2_valores"] = (c,), (salto,)
+        return
+    flujos: dict[tuple, list[int]] = {}
+    for t in ordenadas:
+        flujos.setdefault((t.ip_dst, t.proto, t.sport, t.dport), []).append(t.ip_id)
+    pares = [_continuidad_y_salto(ids) for ids in flujos.values() if len(ids) >= MIN_TRAMAS_FLUJO_IPID]
+    if pares:
+        s["ipid_continuidad_valores"] = tuple(c for c, _ in pares)
+        s["ipid_salto_log2_valores"] = tuple(x for _, x in pares)
+        s["ipid_continuidad"] = float(np.median(s["ipid_continuidad_valores"]))
+        s["ipid_salto_log2"] = float(np.median(s["ipid_salto_log2_valores"]))
 
 
 def tiene_senal(s: dict) -> bool:
@@ -127,7 +156,10 @@ def perfil_desde_senales(ventanas: Sequence[dict]) -> dict:
     perfil: dict = {"n_ventanas": len(ventanas),
                     "estado": CONFIABLE if len(ventanas) >= MIN_VENTANAS_PERFIL else NO_CONFIABLE}
     for k in SENALES_NUMERICAS:
-        x = np.array([v[k] for v in ventanas if not math.isnan(v[k])])
+        if k in SENALES_POR_FLUJO:
+            x = np.array([x for v in ventanas for x in v.get(f"{k}_valores", ())])
+        else:
+            x = np.array([v[k] for v in ventanas if not math.isnan(v[k])])
         if len(x):
             med = float(np.median(x))
             perfil[k] = {"mediana": med, "mad": float(np.median(np.abs(x - med))),
@@ -172,6 +204,8 @@ def desviacion_senales(perfil: dict, s: dict) -> dict:
                 vistos = perfil.get(f"{k}_valores", {})
                 nuevos = [x for x in s.get(f"{k}_valores", ()) if vistos.get(x, 0) < MIN_APARICIONES_VALOR]
                 por_senal[k] = max((abs(x - p["mediana"]) / escala for x in nuevos), default=0.0)
+            elif k in SENALES_POR_FLUJO:
+                por_senal[k] = max(abs(x - p["mediana"]) / escala for x in s[f"{k}_valores"])
             else:
                 por_senal[k] = abs(s[k] - p["mediana"]) / escala
     if s["tcp_opciones"] and perfil.get("tcp_opciones"):

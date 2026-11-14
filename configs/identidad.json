@@ -6,5 +6,16 @@
   "regenerar": true,
   "n_bootstrap": 1000,
   "semilla_bootstrap": 42,
-  "salida": "reports/identidad_e3a.json"
+  "salida": "reports/identidad_e3a.json",
+  "b": {
+    "salida": "reports/identidad_e3b.json",
+    "secciones": {
+      "ipid": {
+        "dir_pcap": "data/pcap_clones",
+        "inicio": 0,
+        "sesiones": 20,
+        "regenerar": false
+      }
+    }
+  }
 }

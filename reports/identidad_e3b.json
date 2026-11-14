@@ -1,0 +1,649 @@
+{
+  "etapa": "PEDIDO-E3B-1",
+  "fecha": "2026-11-14T01:41:08",
+  "commit": "01d5710365b0cdd1b15937c83054c3be527556f4",
+  "arbol_con_cambios": true,
+  "config_archivo": "configs/identidad.json",
+  "config": {
+    "descripcion": "PEDIDO-E3A-1, bloque 3: perfil de pila (src/identidad.py) frente a clones ingenuo y de ritmo de scripts/lab/generar_clones.py. Sesiones propias con semilla base 77000; no comparten nada con el dataset de E2 ni con su holdout.",
+    "dir_pcap": "data/pcap_clones",
+    "inicio": 0,
+    "sesiones": 20,
+    "regenerar": true,
+    "n_bootstrap": 1000,
+    "semilla_bootstrap": 42,
+    "salida": "reports/identidad_e3a.json",
+    "b": {
+      "salida": "reports/identidad_e3b.json",
+      "secciones": {
+        "ipid": {
+          "dir_pcap": "data/pcap_clones",
+          "inicio": 0,
+          "sesiones": 20,
+          "regenerar": false
+        }
+      }
+    }
+  },
+  "ipid": {
+    "ipid_por_equipo": {
+      "por_nivel": {
+        "ingenuo": {
+          "episodios": 40,
+          "deteccion": {
+            "valor": 0.975,
+            "ic95": [
+              0.925,
+              1.0
+            ],
+            "n": 40
+          },
+          "deteccion_acusables": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 39
+          },
+          "no_acusables": 1,
+          "latencia_s_mediana": {
+            "valor": 4.244970493461096,
+            "ic95": [
+              2.987747120458039,
+              5.143558896623517
+            ],
+            "n": 39
+          },
+          "latencia_s_p90": {
+            "valor": 6.728887880173768,
+            "ic95": [
+              5.669884895518727,
+              21.770093020862305
+            ],
+            "n": 39
+          },
+          "por_par_de_pilas": {
+            "android→iot": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "android→macos": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "android→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→linux": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "iot→macos": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "iot→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→android": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "linux→iot": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "linux→macos": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→windows": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "macos→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "macos→iot": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "macos→linux": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "macos→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→android": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "windows→iot": {
+              "episodios": 3,
+              "detectados": 2
+            },
+            "windows→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "windows→macos": {
+              "episodios": 1,
+              "detectados": 1
+            }
+          }
+        },
+        "ritmo": {
+          "episodios": 40,
+          "deteccion": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 40
+          },
+          "deteccion_acusables": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 39
+          },
+          "no_acusables": 1,
+          "latencia_s_mediana": {
+            "valor": 10.022541196509422,
+            "ic95": [
+              6.573596129376028,
+              17.037490227309718
+            ],
+            "n": 40
+          },
+          "latencia_s_p90": {
+            "valor": 33.33165642208261,
+            "ic95": [
+              22.21290853751327,
+              51.64359261149764
+            ],
+            "n": 40
+          },
+          "por_par_de_pilas": {
+            "android→iot": {
+              "episodios": 5,
+              "detectados": 5
+            },
+            "android→macos": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "android→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→android": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "iot→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→macos": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "iot→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "linux→iot": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "linux→macos": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→windows": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "macos→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "macos→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→android": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→iot": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "windows→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "windows→macos": {
+              "episodios": 2,
+              "detectados": 2
+            }
+          }
+        }
+      },
+      "legitimos": {
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 16.18929341787045,
+          "ic95": [
+            9.414836321980891,
+            23.67493995458145
+          ]
+        },
+        "falsas_alarmas_totales": 43,
+        "fraccion_dispositivos_con_falsa_alarma": {
+          "valor": 0.09230769230769231,
+          "ic95": [
+            0.06153846153846154,
+            0.12307692307692308
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0038461538461538464,
+          "ic95": [
+            0.0,
+            0.011538461538461539
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.1392719653038351,
+          "ic95": [
+            0.1346339237017172,
+            0.14425052076650244
+          ]
+        },
+        "dispositivos": 260,
+        "dispositivo_dias": 2.6560763888888888,
+        "peores": [
+          {
+            "sesion": "clones_006",
+            "mac": "02:05:04:0d:12:dc",
+            "falsas_alarmas": 5,
+            "segundos": 895.0,
+            "victima": false
+          },
+          {
+            "sesion": "clones_000",
+            "mac": "02:ac:2b:f1:d5:27",
+            "falsas_alarmas": 4,
+            "segundos": 900.0,
+            "victima": false
+          },
+          {
+            "sesion": "clones_012",
+            "mac": "02:32:32:cf:af:5e",
+            "falsas_alarmas": 3,
+            "segundos": 905.0,
+            "victima": false
+          },
+          {
+            "sesion": "clones_012",
+            "mac": "02:7b:99:b7:23:d1",
+            "falsas_alarmas": 3,
+            "segundos": 905.0,
+            "victima": false
+          },
+          {
+            "sesion": "clones_016",
+            "mac": "02:8e:e1:1c:e5:2c",
+            "falsas_alarmas": 3,
+            "segundos": 895.0,
+            "victima": true
+          }
+        ]
+      }
+    },
+    "ipid_por_flujo": {
+      "por_nivel": {
+        "ingenuo": {
+          "episodios": 40,
+          "deteccion": {
+            "valor": 0.975,
+            "ic95": [
+              0.925,
+              1.0
+            ],
+            "n": 40
+          },
+          "deteccion_acusables": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 39
+          },
+          "no_acusables": 1,
+          "latencia_s_mediana": {
+            "valor": 3.7401780883520814,
+            "ic95": [
+              2.9735005350357824,
+              4.558132341064095
+            ],
+            "n": 39
+          },
+          "latencia_s_p90": {
+            "valor": 6.0462331048836635,
+            "ic95": [
+              5.3166712853255165,
+              8.574343021188042
+            ],
+            "n": 39
+          },
+          "por_par_de_pilas": {
+            "android→iot": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "android→macos": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "android→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→linux": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "iot→macos": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "iot→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→android": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "linux→iot": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "linux→macos": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→windows": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "macos→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "macos→iot": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "macos→linux": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "macos→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→android": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "windows→iot": {
+              "episodios": 3,
+              "detectados": 2
+            },
+            "windows→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "windows→macos": {
+              "episodios": 1,
+              "detectados": 1
+            }
+          }
+        },
+        "ritmo": {
+          "episodios": 40,
+          "deteccion": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 40
+          },
+          "deteccion_acusables": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 39
+          },
+          "no_acusables": 1,
+          "latencia_s_mediana": {
+            "valor": 10.022541196509422,
+            "ic95": [
+              6.573596129376028,
+              17.037490227309718
+            ],
+            "n": 40
+          },
+          "latencia_s_p90": {
+            "valor": 33.33165642208261,
+            "ic95": [
+              22.21290853751327,
+              51.64359261149764
+            ],
+            "n": 40
+          },
+          "por_par_de_pilas": {
+            "android→iot": {
+              "episodios": 5,
+              "detectados": 5
+            },
+            "android→macos": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "android→windows": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→android": {
+              "episodios": 3,
+              "detectados": 3
+            },
+            "iot→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "iot→macos": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "iot→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "linux→iot": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "linux→macos": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "linux→windows": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "macos→android": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "macos→windows": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→android": {
+              "episodios": 4,
+              "detectados": 4
+            },
+            "windows→iot": {
+              "episodios": 2,
+              "detectados": 2
+            },
+            "windows→linux": {
+              "episodios": 1,
+              "detectados": 1
+            },
+            "windows→macos": {
+              "episodios": 2,
+              "detectados": 2
+            }
+          }
+        }
+      },
+      "legitimos": {
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.3764951957644291,
+          "ic95": [
+            0.0,
+            1.1308919027553475
+          ]
+        },
+        "falsas_alarmas_totales": 1,
+        "fraccion_dispositivos_con_falsa_alarma": {
+          "valor": 0.0038461538461538464,
+          "ic95": [
+            0.0,
+            0.011538461538461539
+          ]
+        },
+        "fraccion_dispositivos_nunca_confiables": {
+          "valor": 0.0038461538461538464,
+          "ic95": [
+            0.0,
+            0.011538461538461539
+          ]
+        },
+        "fraccion_ventanas_no_confiable": {
+          "valor": 0.1392719653038351,
+          "ic95": [
+            0.1346339237017172,
+            0.14425052076650244
+          ]
+        },
+        "dispositivos": 260,
+        "dispositivo_dias": 2.6560763888888888,
+        "peores": [
+          {
+            "sesion": "clones_018",
+            "mac": "02:ff:6b:11:03:4d",
+            "falsas_alarmas": 1,
+            "segundos": 900.0,
+            "victima": false
+          }
+        ]
+      }
+    },
+    "comparacion": {
+      "falsas_alarmas_por_dispositivo_dia": {
+        "antes": {
+          "valor": 16.18929341787045,
+          "ic95": [
+            9.414836321980891,
+            23.67493995458145
+          ]
+        },
+        "despues": {
+          "valor": 0.3764951957644291,
+          "ic95": [
+            0.0,
+            1.1308919027553475
+          ]
+        }
+      },
+      "deteccion": {
+        "ingenuo": {
+          "antes": {
+            "valor": 0.975,
+            "ic95": [
+              0.925,
+              1.0
+            ],
+            "n": 40
+          },
+          "despues": {
+            "valor": 0.975,
+            "ic95": [
+              0.925,
+              1.0
+            ],
+            "n": 40
+          }
+        },
+        "ritmo": {
+          "antes": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 40
+          },
+          "despues": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 40
+          }
+        }
+      },
+      "presupuesto_e2_fa_dispositivo_dia": 1.0
+    }
+  },
+  "resumen": {
+    "ipid": {
+      "fa_antes": 16.19,
+      "fa_despues": 0.38,
+      "deteccion_despues": {
+        "ingenuo": 0.975,
+        "ritmo": 1.0
+      }
+    }
+  }
+}

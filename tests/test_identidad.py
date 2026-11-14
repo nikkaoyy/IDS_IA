@@ -145,3 +145,45 @@ def test_un_valor_legitimo_repetido_se_aprende():
     assert perfil["ttl_valores"][255] >= idn.MIN_APARICIONES_VALOR
     assert idn.desviacion(perfil, con_mdns(32))["por_senal"]["ttl"] == 0.0
 
+
+
+# --- PEDIDO-E3B-1, bloque 1: IP-ID por flujo ----------------------------------------------
+
+def _flujo_linux(k: int, sport: int, base: int, t0: float, n: int = 4) -> list[Trama]:
+    """Un flujo con su propio contador de IP-ID (Linux): base propia, +1 por trama."""
+    return [Trama(ts_us=int((5 * k + t0 + 0.2 * i) * 1_000_000), longitud=60, mac_src=VICTIMA, mac_dst="bb",
+                  ip_src="10.0.0.5", ip_dst="10.0.0.80", proto="tcp", sport=sport, dport=443,
+                  tcp_flags=0x02 if i == 0 else 0x10, ip_ttl=64, ip_id=(base + i) % 65536, ip_df=True,
+                  tcp_window=29200 if i == 0 else 501, tcp_options=OPC_LINUX if i == 0 else ("NOP",),
+                  tcp_seq=1000 * i, tcp_ack=1) for i in range(n)]
+
+
+def _perfil_linux_un_flujo() -> dict:
+    return idn.perfil_dispositivo([t for k in range(20) for t in _flujo_linux(k, 40000 + k, 997 * k + 13, 0.5)])
+
+
+def test_dos_flujos_simultaneos_del_mismo_equipo_no_disparan():
+    """Cada conexión lleva su contador: la mezcla de dos en una ventana no es una anomalía."""
+    perfil = _perfil_linux_un_flujo()
+    dos = sorted(_flujo_linux(30, 51000, 100, 0.5) + _flujo_linux(30, 52000, 40000, 0.6), key=lambda t: t.ts_us)
+    d = idn.desviacion(perfil, dos)
+    assert d["puntaje"] <= idn.UMBRAL_DESVIACION
+    assert len(idn.senales_ventana(dos)["ipid_continuidad_valores"]) == 2
+
+
+def test_la_version_por_equipo_si_disparaba_con_dos_flujos(monkeypatch):
+    """Documenta por qué se descartó: con IPID_MODO = "equipo" la misma ventana da alarma."""
+    monkeypatch.setattr(idn, "IPID_MODO", "equipo")
+    perfil = _perfil_linux_un_flujo()
+    dos = sorted(_flujo_linux(30, 51000, 100, 0.5) + _flujo_linux(30, 52000, 40000, 0.6), key=lambda t: t.ts_us)
+    assert idn.desviacion(perfil, dos)["puntaje"] > idn.UMBRAL_DESVIACION
+
+
+def test_un_flujo_con_ipid_aleatorio_en_un_equipo_por_flujo_dispara():
+    """El cambio no ciega la señal: un flujo cuyo IP-ID salta al azar sigue delatándose."""
+    import random
+    rng = random.Random(3)
+    raro = _flujo_linux(30, 53000, 0, 0.5, n=6)
+    for t in raro:
+        t.ip_id = rng.randrange(65536)
+    assert idn.desviacion(_perfil_linux_un_flujo(), raro)["puntaje"] > idn.UMBRAL_DESVIACION
