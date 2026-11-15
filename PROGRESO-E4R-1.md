@@ -1,4 +1,4 @@
-SEGUIR — bloques 1–3 hechos; sigue el cierre (correr aceptación, informe, ESTADO).
+PARAR — PEDIDO-E4R-1 cerrado: cuatro bloques, informe, ESTADO y aceptación.
 
 # Progreso — PEDIDO-E4R-1
 
@@ -63,3 +63,16 @@ sobre 2 sesiones adelanta que **las dos predicciones registradas van a fallar**,
   no el ARP en sí.)
 
 No se ajusta nada por ver esto: las cifras de cabecera son las de la corrida completa.
+
+## Resultado final (corrida completa, `reports/robustez_e4.json`)
+
+- Recall supervisado por intensidad: media 0,935 [0,871, 0,984], suave 0,891 [0,826, 0,957],
+  ráfaga 0,824 [0,676, 0,941]. **No baja de 0,5 a ninguna intensidad.** Curva **no monótona**:
+  `suave` supera a `rafaga` porque dura 120–400 s y deja más ventanas etiquetables.
+- Recall de cabecera 0,894 a 0,89 FA/disp-día: **reproduce E2** por el camino honesto
+  pcap → src/ventanas.py → modelo.
+- **0 de 188 episodios invisibles por construcción** (en `suave`, mínimo 3 tramas/ventana).
+- Canales: identidad 0,388 (las dos predicciones registradas fallaron y se reportan: identidad
+  NO es ≈0 por los orígenes "clon"; el vigilante es 0 en ARP por ser ciego a la capa 2). OR
+  +0,053 sobre el supervisado a cambio de +122 FA/disp-día.
+- Las dos predicciones previas fallaron; no se ajustó nada por verlo.

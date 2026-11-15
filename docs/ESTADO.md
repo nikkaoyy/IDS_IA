@@ -1,6 +1,6 @@
 # Estado del proyecto IDS (IEEE 802.3)
 
-> Dueño en esta ventana: PEDIDO-E3B-1. Actualizado el 2026-11-14, al cerrar E3B.
+> Dueño en esta ventana: PEDIDO-E4R-1. Actualizado el 2026-11-14, al cerrar E4R.
 > Cifras con IC al 95 %; el detalle de cada una está en su informe.
 
 ## Etapas
@@ -13,7 +13,8 @@
 | Anomalías (solo benigno) | Cerrado | `docs/INFORME_ANOMALIAS.md` | IF sin capa 2: **0,185 [0,132, 0,244]**; no sirve a este presupuesto |
 | **E3A — identidad, niveles 1–2** | **Cerrada** | `docs/INFORME_E3A.md` | Detección ingenuo **0,975**, ritmo **1,000**; latencia 4,2 s / 10,0 s; **FA 16,2/disp-día** (IP-ID) |
 | **E3B — pila completa, variación, contaminación** | **Cerrada** | `docs/INFORME_E3B.md` | IP-ID por flujo: FA **16,2 → 0,38**; con variación benigna **826 FA/disp-día**; pila completa **0,20** (0,325 en sesiones nuevas; 0/47 sin contador global); contaminación 20 %: absorción **0,80**, detección 0,83 |
-| E4–E6 | No empezadas | — | — |
+| **E4R — robustez del detector** | **Cerrada** | `docs/INFORME_E4R.md` | Recall supervisado por intensidad: media **0,935**, suave **0,891**, ráfaga **0,824** (no baja de 0,5); **0 invisibles por construcción**; OR de canales **+0,053** a **+122 FA/disp-día** |
+| E4 (evasión real), E5, E6 | No empezadas | — | — |
 
 ## Defensas del perfil de identidad (tras la ablación de E3B)
 
@@ -46,6 +47,13 @@
    suben a 826/disp-día sin que `no_confiable` las esconda (0,128 de las ventanas), y un clon
    presente durante el aprendizaje es absorbido (0,80 al 20 %), con la dueña legítima acusada
    después. Las cifras de FA de los niveles 1–2 son optimistas por este factor.
+6. **Robustez (E4R):** sobre el corpus congelado, el supervisado no baja de 0,5 de recall a
+   ninguna intensidad (ráfaga 0,824, suave 0,891, media 0,935; curva **no monótona** porque
+   `suave` dura más y deja más ventanas etiquetables) y **ningún episodio es invisible por
+   construcción**. El OR con los canales de identidad sube el recall solo **+0,053** y a cambio
+   de **+122 FA/disp-día** (826 con variación benigna): no compensa frente a floods ni escaneos.
+   El vigilante IP→MAC es ciego al ARP (capa 2). Medir evasión real exige una captura propia o un
+   generador de evasión, fuera del alcance de E4R.
 
 ## Restricciones que siguen en pie
 

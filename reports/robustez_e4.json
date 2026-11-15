@@ -1,0 +1,1570 @@
+{
+  "etapa": "E4R",
+  "fecha": "2026-11-14T19:31:06",
+  "commit": "cbcea22f95013a868a727a544537c9c806900f7c",
+  "arbol_con_cambios": false,
+  "config_archivo": "configs/robustez.json",
+  "config": {
+    "descripcion": "PEDIDO-E4R-1: robustez del detector supervisado frente a la intensidad del ataque, sobre el corpus congelado de E1/E2. No genera ataques nuevos; reutiliza data/pcap/sesion_000..019 y data/dataset_lab.csv.",
+    "dataset": "data/dataset_lab.csv",
+    "sha256_esperado": "7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945",
+    "modelo": "xgboost",
+    "n_folds": 5,
+    "n_folds_internos": 3,
+    "semillas": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "semilla_or": 42,
+    "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+    "n_bootstrap": 1000,
+    "semilla_bootstrap": 42,
+    "dir_pcap": "data/pcap",
+    "sesiones": 20,
+    "k_tramas_ataque": 2,
+    "fa_identidad_e3b_variacion": 826.24,
+    "salida": "reports/robustez_e4.json"
+  },
+  "dataset": {
+    "ruta": "data/dataset_lab.csv",
+    "sha256": "7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945",
+    "filas": 78988
+  },
+  "supervisado": {
+    "resumen": {
+      "episodios": {
+        "recall": {
+          "valor": 0.8936170212765957,
+          "ic95": [
+            0.8562500000000002,
+            0.9361702127659575
+          ],
+          "n": 188
+        },
+        "por_tipo": {
+          "arp_spoofing": {
+            "valor": 0.9117647058823529,
+            "ic95": [
+              0.8235294117647058,
+              1.0
+            ],
+            "n": 34
+          },
+          "dns_spoofing": {
+            "valor": 0.8666666666666667,
+            "ic95": [
+              0.7333333333333333,
+              0.9666666666666667
+            ],
+            "n": 30
+          },
+          "icmp_flood": {
+            "valor": 0.8064516129032258,
+            "ic95": [
+              0.6451612903225806,
+              0.9354838709677419
+            ],
+            "n": 31
+          },
+          "mac_flooding": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 0.7857142857142857,
+            "ic95": [
+              0.6428571428571429,
+              0.9285714285714286
+            ],
+            "n": 28
+          },
+          "syn_flood": {
+            "valor": 0.967741935483871,
+            "ic95": [
+              0.9032258064516129,
+              1.0
+            ],
+            "n": 31
+          }
+        },
+        "por_intensidad": {
+          "media": {
+            "valor": 0.9354838709677419,
+            "ic95": [
+              0.8709677419354839,
+              0.9838709677419355
+            ],
+            "n": 62
+          },
+          "rafaga": {
+            "valor": 0.8235294117647058,
+            "ic95": [
+              0.6764705882352942,
+              0.9411764705882353
+            ],
+            "n": 34
+          },
+          "suave": {
+            "valor": 0.8913043478260869,
+            "ic95": [
+              0.8260869565217391,
+              0.9565217391304348
+            ],
+            "n": 92
+          }
+        },
+        "por_tipo_e_intensidad": {
+          "arp_spoofing/media": {
+            "valor": 0.8666666666666667,
+            "ic95": [
+              0.6666666666666666,
+              1.0
+            ],
+            "n": 15
+          },
+          "arp_spoofing/rafaga": {
+            "valor": 0.875,
+            "ic95": [
+              0.625,
+              1.0
+            ],
+            "n": 8
+          },
+          "arp_spoofing/suave": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 11
+          },
+          "dns_spoofing/media": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 7
+          },
+          "dns_spoofing/rafaga": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 5
+          },
+          "dns_spoofing/suave": {
+            "valor": 0.7777777777777778,
+            "ic95": [
+              0.5555555555555556,
+              0.9444444444444444
+            ],
+            "n": 18
+          },
+          "icmp_flood/media": {
+            "valor": 0.9230769230769231,
+            "ic95": [
+              0.7692307692307693,
+              1.0
+            ],
+            "n": 13
+          },
+          "icmp_flood/rafaga": {
+            "valor": 0.75,
+            "ic95": [
+              0.25,
+              1.0
+            ],
+            "n": 4
+          },
+          "icmp_flood/suave": {
+            "valor": 0.7142857142857143,
+            "ic95": [
+              0.5,
+              0.9285714285714286
+            ],
+            "n": 14
+          },
+          "mac_flooding/media": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 10
+          },
+          "mac_flooding/rafaga": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 5
+          },
+          "mac_flooding/suave": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 19
+          },
+          "port_scan/media": {
+            "valor": 0.75,
+            "ic95": [
+              0.25,
+              1.0
+            ],
+            "n": 4
+          },
+          "port_scan/rafaga": {
+            "valor": 0.5714285714285714,
+            "ic95": [
+              0.14285714285714285,
+              0.8571428571428571
+            ],
+            "n": 7
+          },
+          "port_scan/suave": {
+            "valor": 0.8823529411764706,
+            "ic95": [
+              0.7058823529411765,
+              1.0
+            ],
+            "n": 17
+          },
+          "syn_flood/media": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 13
+          },
+          "syn_flood/rafaga": {
+            "valor": 0.8,
+            "ic95": [
+              0.4,
+              1.0
+            ],
+            "n": 5
+          },
+          "syn_flood/suave": {
+            "valor": 1.0,
+            "ic95": [
+              1.0,
+              1.0
+            ],
+            "n": 13
+          }
+        },
+        "tiempo_deteccion_s_mediana": {
+          "valor": 5.0,
+          "ic95": [
+            5.0,
+            5.0
+          ],
+          "n": 168
+        },
+        "tiempo_deteccion_s_p90": {
+          "valor": 35.0,
+          "ic95": [
+            25.0,
+            40.0
+          ],
+          "n": 168
+        },
+        "tiempo_deteccion_s_mediana_por_tipo": {
+          "arp_spoofing": {
+            "valor": 5.0,
+            "ic95": [
+              5.0,
+              10.0
+            ],
+            "n": 31
+          },
+          "dns_spoofing": {
+            "valor": 7.5,
+            "ic95": [
+              5.0,
+              10.0
+            ],
+            "n": 26
+          },
+          "icmp_flood": {
+            "valor": 5.0,
+            "ic95": [
+              5.0,
+              5.0
+            ],
+            "n": 25
+          },
+          "mac_flooding": {
+            "valor": 5.0,
+            "ic95": [
+              5.0,
+              5.0
+            ],
+            "n": 34
+          },
+          "port_scan": {
+            "valor": 20.0,
+            "ic95": [
+              15.0,
+              30.0
+            ],
+            "n": 22
+          },
+          "syn_flood": {
+            "valor": 5.0,
+            "ic95": [
+              5.0,
+              10.0
+            ],
+            "n": 30
+          }
+        }
+      },
+      "atacantes": {
+        "recall": {
+          "valor": 0.9381443298969072,
+          "ic95": [
+            0.8865979381443299,
+            0.979381443298969
+          ],
+          "n": 97
+        }
+      },
+      "dispositivos": {
+        "falsas_alarmas_por_dispositivo_dia": {
+          "valor": 0.8939086950898825,
+          "ic95": [
+            0.0,
+            2.0604872548241744
+          ]
+        },
+        "fraccion_con_alguna_alarma": {
+          "valor": 0.0034364261168384883,
+          "ic95": [
+            0.0,
+            0.007110705458173653
+          ]
+        },
+        "dispositivos": 873,
+        "dispositivo_dias": 6.712094907407407
+      },
+      "ventanas_referencia": {
+        "pr_auc": {
+          "valor": 0.988789720836697,
+          "ic95": [
+            0.9780831438858699,
+            0.9944540236605249
+          ]
+        },
+        "recall": {
+          "valor": 0.8407699037620298,
+          "ic95": [
+            0.7829435860808555,
+            0.8806495555417899
+          ]
+        },
+        "fpr": {
+          "valor": 8.273237455703707e-05,
+          "ic95": [
+            0.0,
+            0.00019268561838972417
+          ]
+        },
+        "recall_por_tipo": {
+          "arp_spoofing": 0.6535087719298246,
+          "dns_spoofing": 0.5507246376811594,
+          "icmp_flood": 0.7548387096774194,
+          "mac_flooding": 0.9915052667346245,
+          "port_scan": 0.5521327014218009,
+          "syn_flood": 0.8361408882082696
+        }
+      },
+      "conteos": {
+        "sesiones": 20,
+        "episodios": 188,
+        "atacantes": 97,
+        "ventanas": 78988,
+        "ventanas_maliciosas": 5715,
+        "ventanas_benignas_limpias": 72523,
+        "ventanas_ambiguas": 750
+      }
+    }
+  },
+  "invisibles": {
+    "total": {
+      "recall_etiquetables": 0.8936170212765957,
+      "n_etiquetables": 188,
+      "n_invisibles": 0,
+      "recall_todos": 0.8936170212765957
+    },
+    "por_tipo": {
+      "arp_spoofing": {
+        "recall_etiquetables": 0.9117647058823529,
+        "n_etiquetables": 34,
+        "n_invisibles": 0,
+        "recall_todos": 0.9117647058823529
+      },
+      "dns_spoofing": {
+        "recall_etiquetables": 0.8666666666666667,
+        "n_etiquetables": 30,
+        "n_invisibles": 0,
+        "recall_todos": 0.8666666666666667
+      },
+      "icmp_flood": {
+        "recall_etiquetables": 0.8064516129032258,
+        "n_etiquetables": 31,
+        "n_invisibles": 0,
+        "recall_todos": 0.8064516129032258
+      },
+      "mac_flooding": {
+        "recall_etiquetables": 1.0,
+        "n_etiquetables": 34,
+        "n_invisibles": 0,
+        "recall_todos": 1.0
+      },
+      "port_scan": {
+        "recall_etiquetables": 0.7857142857142857,
+        "n_etiquetables": 28,
+        "n_invisibles": 0,
+        "recall_todos": 0.7857142857142857
+      },
+      "syn_flood": {
+        "recall_etiquetables": 0.967741935483871,
+        "n_etiquetables": 31,
+        "n_invisibles": 0,
+        "recall_todos": 0.967741935483871
+      }
+    },
+    "por_intensidad": {
+      "media": {
+        "recall_etiquetables": 0.9354838709677419,
+        "n_etiquetables": 62,
+        "n_invisibles": 0,
+        "recall_todos": 0.9354838709677419
+      },
+      "rafaga": {
+        "recall_etiquetables": 0.8235294117647058,
+        "n_etiquetables": 34,
+        "n_invisibles": 0,
+        "recall_todos": 0.8235294117647058
+      },
+      "suave": {
+        "recall_etiquetables": 0.8913043478260869,
+        "n_etiquetables": 92,
+        "n_invisibles": 0,
+        "recall_todos": 0.8913043478260869
+      }
+    },
+    "episodios_invisibles": []
+  },
+  "canales": {
+    "por_episodio": {
+      "sesion_000#0": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_000#1": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_000#2": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_000#3": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_000#4": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_000#5": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_000#6": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_000#7": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_000#8": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_000#9": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_000#10": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_000#11": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#0": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_001#1": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#2": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#3": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#4": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#5": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_001#6": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_001#7": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#8": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_001#9": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_001#10": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_002#0": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_002#1": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#2": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#3": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#4": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_002#5": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_002#6": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#7": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#8": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#9": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_002#10": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_003#0": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_003#1": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_003#2": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_003#3": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_003#4": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_003#5": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_004#0": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_004#1": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_004#2": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_004#3": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_005#0": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_005#1": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_005#2": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_005#3": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_005#4": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_005#5": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_005#6": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_005#7": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_005#8": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_005#9": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_006#0": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_006#1": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_006#2": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_006#3": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_006#4": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_006#5": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_006#6": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_006#7": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#0": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_007#1": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_007#2": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#3": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_007#4": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#5": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#6": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#7": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_007#8": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_007#9": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#10": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_007#11": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#12": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#13": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_007#14": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_008#0": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#1": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_008#2": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#3": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#4": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_008#5": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#6": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#7": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#8": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#9": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_008#10": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_008#11": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#0": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#1": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#2": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#3": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_009#4": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#5": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#6": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#7": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#8": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_009#9": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_010#0": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_010#1": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_010#2": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_010#3": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_010#4": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_010#5": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_010#6": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_010#7": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_010#8": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_011#0": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_011#1": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_011#2": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_011#3": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_011#4": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_011#5": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_012#0": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_012#1": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_012#2": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_012#3": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_012#4": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_012#5": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_013#0": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_013#1": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_013#2": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_013#3": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_013#4": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_013#5": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#0": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#1": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#2": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_014#3": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_014#4": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#5": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_014#6": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_014#7": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#8": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#9": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_014#10": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_014#11": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#12": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#13": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#14": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_014#15": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_015#0": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_015#1": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_015#2": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_015#3": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_015#4": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_015#5": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_015#6": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_015#7": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_015#8": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_016#0": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_016#1": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_016#2": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_016#3": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_016#4": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_016#5": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_016#6": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_016#7": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_016#8": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_017#0": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_017#1": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_017#2": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_017#3": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_017#4": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_018#0": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_018#1": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_018#2": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_018#3": {
+        "tipo": "dns_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_018#4": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_018#5": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_018#6": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_018#7": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_018#8": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#0": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#1": {
+        "tipo": "arp_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#2": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#3": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_019#4": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#5": {
+        "tipo": "syn_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#6": {
+        "tipo": "icmp_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_019#7": {
+        "tipo": "mac_flooding",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#8": {
+        "tipo": "arp_spoofing",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_019#9": {
+        "tipo": "port_scan",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#10": {
+        "tipo": "syn_flood",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_019#11": {
+        "tipo": "dns_spoofing",
+        "det_identidad": false,
+        "det_vigilante": false
+      },
+      "sesion_019#12": {
+        "tipo": "port_scan",
+        "det_identidad": true,
+        "det_vigilante": false
+      },
+      "sesion_019#13": {
+        "tipo": "icmp_flood",
+        "det_identidad": false,
+        "det_vigilante": false
+      }
+    },
+    "identidad": {
+      "recall_global": 0.3882978723404255,
+      "recall_por_tipo": {
+        "arp_spoofing": 0.3235294117647059,
+        "dns_spoofing": 0.3333333333333333,
+        "icmp_flood": 0.45161290322580644,
+        "mac_flooding": 0.0,
+        "port_scan": 0.7142857142857143,
+        "syn_flood": 0.5806451612903226
+      },
+      "falsas_alarmas": 1344,
+      "fa_por_dispositivo_dia": 122.05980974424244
+    },
+    "vigilante": {
+      "recall_global": 0.0,
+      "recall_por_tipo": {
+        "arp_spoofing": 0.0,
+        "dns_spoofing": 0.0,
+        "icmp_flood": 0.0,
+        "mac_flooding": 0.0,
+        "port_scan": 0.0,
+        "syn_flood": 0.0
+      },
+      "falsas_alarmas": 0,
+      "fa_por_dispositivo_dia": 0.0
+    },
+    "dispositivo_dias": 11.011,
+    "or": {
+      "recall_supervisado_42": 0.8936170212765957,
+      "recall_or": 0.9468085106382979,
+      "extra_recall_or": 0.05319148936170215,
+      "recall_or_por_tipo": {
+        "arp_spoofing": 0.9705882352941176,
+        "dns_spoofing": 0.8666666666666667,
+        "icmp_flood": 0.9032258064516129,
+        "mac_flooding": 1.0,
+        "port_scan": 0.9285714285714286,
+        "syn_flood": 1.0
+      },
+      "recall_supervisado_42_por_tipo": {
+        "arp_spoofing": 0.9117647058823529,
+        "dns_spoofing": 0.8666666666666667,
+        "icmp_flood": 0.8064516129032258,
+        "mac_flooding": 1.0,
+        "port_scan": 0.7857142857142857,
+        "syn_flood": 0.967741935483871
+      },
+      "fa_por_dispositivo_dia": {
+        "supervisado": 0.89,
+        "identidad_en_estas_sesiones": 122.06,
+        "identidad_referencia_e3b_con_variacion": 826.24,
+        "vigilante": 0.0,
+        "or_total_en_estas_sesiones": 122.95
+      }
+    }
+  },
+  "invariantes": [
+    {
+      "ataque": "syn_flood",
+      "suave": "0,4–2,5 SYN/s, 120–400 s",
+      "invariante": "agotar el backlog (N) antes del primer reintento SYN-ACK (RTO)",
+      "suelo": "N/RTO ≈ 64/3 ≈ 21 medios-abiertos/s",
+      "lectura": "`suave` queda muy por debajo del suelo de backlog: no agota la cola",
+      "recall_suave": 1.0,
+      "episodios_suave_etiquetables": 13,
+      "invisibles_suave": 0,
+      "invisible_por_construccion": false
+    },
+    {
+      "ataque": "arp_spoofing",
+      "suave": "0,25–0,8 ARP/s, 120–400 s",
+      "invariante": "refrescar antes del gc_stale de la caché (≈60 s Linux, ≈30 s Windows)",
+      "suelo": "≥ 1/60 s ≈ 0,017 ARP/s",
+      "lectura": "`suave` por encima del suelo: sigue envenenando la caché",
+      "recall_suave": 1.0,
+      "episodios_suave_etiquetables": 11,
+      "invisibles_suave": 0,
+      "invisible_por_construccion": false
+    },
+    {
+      "ataque": "mac_flooding",
+      "suave": "1–6 MAC/s, 60–300 s",
+      "invariante": "inserciones/s ≥ tamaño de la tabla CAM / su tiempo de envejecimiento",
+      "suelo": "≈ 8192/300 ≈ 27 MAC/s",
+      "lectura": "`suave` muy por debajo: no desborda la CAM (no fuerza el modo hub)",
+      "recall_suave": 1.0,
+      "episodios_suave_etiquetables": 19,
+      "invisibles_suave": 0,
+      "invisible_por_construccion": false
+    },
+    {
+      "ataque": "port_scan",
+      "suave": "0,3–0,6 sondas/s, 40–120 puertos",
+      "invariante": "puertos distintos/hora suficientes para cubrir el rango objetivo",
+      "suelo": "depende del rango; top-puertos se cubre lento",
+      "lectura": "`suave` conserva el efecto: recorre los puertos comunes, solo más despacio",
+      "recall_suave": 0.8823529411764706,
+      "episodios_suave_etiquetables": 17,
+      "invisibles_suave": 0,
+      "invisible_por_construccion": false
+    },
+    {
+      "ataque": "dns_spoofing",
+      "suave": "0,3–0,7 resp/s, 120–400 s",
+      "invariante": "la respuesta forjada llega antes que la legítima (ventana de RTT)",
+      "suelo": "1 respuesta por consulta dentro de la ventana de RTT",
+      "lectura": "el efecto lo pone la carrera por consulta, no la tasa agregada",
+      "recall_suave": 0.7777777777777778,
+      "episodios_suave_etiquetables": 18,
+      "invisibles_suave": 0,
+      "invisible_por_construccion": false
+    },
+    {
+      "ataque": "icmp_flood",
+      "suave": "0,5–2 ICMP/s, 60–300 s",
+      "invariante": "saturar el ancho de banda o la CPU del objetivo (BlackNurse: tipo 3/3)",
+      "suelo": "depende del enlace; muy por encima de unas pocas/s",
+      "lectura": "`suave` no satura: es más sonda que inundación",
+      "recall_suave": 0.7142857142857143,
+      "episodios_suave_etiquetables": 14,
+      "invisibles_suave": 0,
+      "invisible_por_construccion": false
+    }
+  ],
+  "resumen": {
+    "recall_episodio": 0.894,
+    "recall_por_intensidad": {
+      "media": 0.935,
+      "rafaga": 0.824,
+      "suave": 0.891
+    },
+    "fa_dispositivo_dia": 0.89,
+    "invisibles_total": 0,
+    "recall_suave_etiquetable": 0.891,
+    "recall_suave_todos": 0.891,
+    "invisibles_por_tipo": {},
+    "_suave_tipo_debug": {
+      "suave": 0.891
+    },
+    "canales": {
+      "recall_supervisado_42": 0.894,
+      "recall_or": 0.947,
+      "extra_recall_or": 0.053,
+      "recall_identidad": 0.3882978723404255,
+      "recall_vigilante": 0.0,
+      "fa_por_dispositivo_dia": {
+        "supervisado": 0.89,
+        "identidad_en_estas_sesiones": 122.06,
+        "identidad_referencia_e3b_con_variacion": 826.24,
+        "vigilante": 0.0,
+        "or_total_en_estas_sesiones": 122.95
+      }
+    }
+  }
+}
