@@ -1,0 +1,446 @@
+{
+  "etapa": "E4C",
+  "fecha": "2026-11-14T20:24:20",
+  "commit": "afd9c8b9bdee0b200ddc413ed3de95ab9ddb9bdf",
+  "arbol_con_cambios": true,
+  "config_archivo": "configs/robustez_e4c.json",
+  "config": {
+    "descripcion": "PEDIDO-E4C-1: régimen invisible del ARP lento (y DNS nativo) sobre el corpus retemporizado; vigilante con ARP (bloque 1).",
+    "fase": "e4c",
+    "dataset": "data/dataset_lab.csv",
+    "sha256_esperado": "7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945",
+    "modelo": "xgboost",
+    "semilla_modelo": 42,
+    "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+    "dir_pcap": "data/pcap",
+    "sesiones": 20,
+    "k_tramas_ataque": 2,
+    "pasos_arp_s": [
+      5,
+      15,
+      30,
+      60
+    ],
+    "jitter": 0.1,
+    "semilla_retemporizar": 81000,
+    "episodios_por_tipo": 2,
+    "variantes_arp": [
+      "respuesta",
+      "gratuito",
+      "peticion"
+    ],
+    "variacion": {
+      "dir_pcap": "data/pcap_variacion",
+      "sesiones": 20
+    },
+    "n_bootstrap": 1000,
+    "semilla_bootstrap": 42,
+    "salida": "reports/robustez_e4c.json",
+    "red_local": "10.0.0.0/24",
+    "incluir_nativo_arp": true,
+    "horizonte_s": 300
+  },
+  "dataset": {
+    "ruta": "data/dataset_lab.csv",
+    "sha256": "7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945",
+    "filas": 78988
+  },
+  "umbral_operacion": 0.9085773229598999,
+  "episodios_arp": [
+    {
+      "sesion": 0,
+      "episodio": 9,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_host",
+      "intensidad": "media"
+    },
+    {
+      "sesion": 1,
+      "episodio": 4,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_gateway",
+      "intensidad": "media"
+    }
+  ],
+  "episodios_dns": [
+    {
+      "sesion": 0,
+      "episodio": 4,
+      "tipo": "dns_spoofing",
+      "variante": "kaminsky",
+      "intensidad": "rafaga"
+    },
+    {
+      "sesion": 0,
+      "episodio": 7,
+      "tipo": "dns_spoofing",
+      "variante": "mitm_clona",
+      "intensidad": "suave"
+    }
+  ],
+  "medidas": [
+    {
+      "paso": null,
+      "sesion": 0,
+      "episodio": 9,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_host",
+      "ventanas_etiquetadas": 8,
+      "max_tramas_ventana": 35,
+      "invisible": false,
+      "horizonte_s": 45.0,
+      "supervisado": true,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 5.0,
+      "sesion": 0,
+      "episodio": 9,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_host",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 305.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 15.0,
+      "sesion": 0,
+      "episodio": 9,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_host",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 310.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 30.0,
+      "sesion": 0,
+      "episodio": 9,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_host",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 310.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 60.0,
+      "sesion": 0,
+      "episodio": 9,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_host",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 305.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": null,
+      "sesion": 1,
+      "episodio": 4,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_gateway",
+      "ventanas_etiquetadas": 14,
+      "max_tramas_ventana": 17,
+      "invisible": false,
+      "horizonte_s": 75.0,
+      "supervisado": true,
+      "identidad": false,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 5.0,
+      "sesion": 1,
+      "episodio": 4,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_gateway",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 305.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 15.0,
+      "sesion": 1,
+      "episodio": 4,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_gateway",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 310.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 30.0,
+      "sesion": 1,
+      "episodio": 4,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_gateway",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 305.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": 60.0,
+      "sesion": 1,
+      "episodio": 4,
+      "tipo": "arp_spoofing",
+      "variante": "respuesta_gateway",
+      "ventanas_etiquetadas": 0,
+      "max_tramas_ventana": 1,
+      "invisible": true,
+      "horizonte_s": 305.0,
+      "supervisado": false,
+      "identidad": true,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": null,
+      "sesion": 0,
+      "episodio": 4,
+      "tipo": "dns_spoofing",
+      "variante": "kaminsky",
+      "ventanas_etiquetadas": 3,
+      "max_tramas_ventana": 1358,
+      "invisible": false,
+      "horizonte_s": 20.0,
+      "supervisado": true,
+      "identidad": true,
+      "vigilante": false,
+      "or": true,
+      "latencia_s": 5.0
+    },
+    {
+      "paso": null,
+      "sesion": 0,
+      "episodio": 7,
+      "tipo": "dns_spoofing",
+      "variante": "mitm_clona",
+      "ventanas_etiquetadas": 26,
+      "max_tramas_ventana": 9,
+      "invisible": false,
+      "horizonte_s": 180.0,
+      "supervisado": true,
+      "identidad": false,
+      "vigilante": true,
+      "or": true,
+      "latencia_s": 95.0
+    }
+  ],
+  "curva_arp": {
+    "nativo": {
+      "supervisado": 1.0,
+      "identidad": 0.5,
+      "vigilante": 1.0,
+      "or": 1.0,
+      "n_episodios": 2,
+      "invisibles": 0,
+      "ventanas_etiquetadas_media": 11.0,
+      "horizonte_s_media": 60.0,
+      "latencia_s_mediana": 5.0
+    },
+    "5s": {
+      "supervisado": 0.0,
+      "identidad": 1.0,
+      "vigilante": 1.0,
+      "or": 1.0,
+      "n_episodios": 2,
+      "invisibles": 2,
+      "ventanas_etiquetadas_media": 0.0,
+      "horizonte_s_media": 305.0,
+      "latencia_s_mediana": 5.0
+    },
+    "15s": {
+      "supervisado": 0.0,
+      "identidad": 1.0,
+      "vigilante": 1.0,
+      "or": 1.0,
+      "n_episodios": 2,
+      "invisibles": 2,
+      "ventanas_etiquetadas_media": 0.0,
+      "horizonte_s_media": 310.0,
+      "latencia_s_mediana": 5.0
+    },
+    "30s": {
+      "supervisado": 0.0,
+      "identidad": 1.0,
+      "vigilante": 1.0,
+      "or": 1.0,
+      "n_episodios": 2,
+      "invisibles": 2,
+      "ventanas_etiquetadas_media": 0.0,
+      "horizonte_s_media": 307.5,
+      "latencia_s_mediana": 5.0
+    },
+    "60s": {
+      "supervisado": 0.0,
+      "identidad": 1.0,
+      "vigilante": 1.0,
+      "or": 1.0,
+      "n_episodios": 2,
+      "invisibles": 2,
+      "ventanas_etiquetadas_media": 0.0,
+      "horizonte_s_media": 305.0,
+      "latencia_s_mediana": 5.0
+    }
+  },
+  "dns_nativo": {
+    "supervisado": 1.0,
+    "identidad": 0.5,
+    "vigilante": 0.5,
+    "or": 1.0,
+    "n_episodios": 2,
+    "invisibles": 0,
+    "ventanas_etiquetadas_media": 14.5,
+    "horizonte_s_media": 100.0,
+    "latencia_s_mediana": 50.0
+  },
+  "fa_vigilante_variacion": {
+    "alertas": 0,
+    "dispositivo_dias": 2.71,
+    "fa_por_dispositivo_dia": 0.0
+  },
+  "invariantes": [
+    {
+      "ataque": "syn_flood",
+      "suave": "0,4–2,5 SYN/s, 120–400 s",
+      "invariante": "agotar el backlog (N) antes del primer reintento SYN-ACK (RTO)",
+      "suelo": "N/RTO ≈ 64/3 ≈ 21 medios-abiertos/s",
+      "lectura": "`suave` queda muy por debajo del suelo de backlog: no agota la cola"
+    },
+    {
+      "ataque": "arp_spoofing",
+      "suave": "0,25–0,8 ARP/s, 120–400 s",
+      "invariante": "refrescar antes del gc_stale de la caché (≈60 s Linux, ≈30 s Windows)",
+      "suelo": "≥ 1/60 s ≈ 0,017 ARP/s",
+      "lectura": "`suave` por encima del suelo: sigue envenenando la caché"
+    },
+    {
+      "ataque": "mac_flooding",
+      "suave": "1–6 MAC/s, 60–300 s",
+      "invariante": "inserciones/s ≥ tamaño de la tabla CAM / su tiempo de envejecimiento",
+      "suelo": "≈ 8192/300 ≈ 27 MAC/s",
+      "lectura": "`suave` muy por debajo: no desborda la CAM (no fuerza el modo hub)"
+    },
+    {
+      "ataque": "port_scan",
+      "suave": "0,3–0,6 sondas/s, 40–120 puertos",
+      "invariante": "puertos distintos/hora suficientes para cubrir el rango objetivo",
+      "suelo": "depende del rango; top-puertos se cubre lento",
+      "lectura": "`suave` conserva el efecto: recorre los puertos comunes, solo más despacio"
+    },
+    {
+      "ataque": "dns_spoofing",
+      "suave": "0,3–0,7 resp/s, 120–400 s",
+      "invariante": "la respuesta forjada llega antes que la legítima (ventana de RTT)",
+      "suelo": "1 respuesta por consulta dentro de la ventana de RTT",
+      "lectura": "el efecto lo pone la carrera por consulta, no la tasa agregada"
+    },
+    {
+      "ataque": "icmp_flood",
+      "suave": "0,5–2 ICMP/s, 60–300 s",
+      "invariante": "saturar el ancho de banda o la CPU del objetivo (BlackNurse: tipo 3/3)",
+      "suelo": "depende del enlace; muy por encima de unas pocas/s",
+      "lectura": "`suave` no satura: es más sonda que inundación"
+    }
+  ],
+  "resumen": {
+    "recall_arp_por_paso": {
+      "nativo": {
+        "supervisado": 1.0,
+        "identidad": 0.5,
+        "vigilante": 1.0,
+        "or": 1.0,
+        "invisibles": 0,
+        "n": 2
+      },
+      "5s": {
+        "supervisado": 0.0,
+        "identidad": 1.0,
+        "vigilante": 1.0,
+        "or": 1.0,
+        "invisibles": 2,
+        "n": 2
+      },
+      "15s": {
+        "supervisado": 0.0,
+        "identidad": 1.0,
+        "vigilante": 1.0,
+        "or": 1.0,
+        "invisibles": 2,
+        "n": 2
+      },
+      "30s": {
+        "supervisado": 0.0,
+        "identidad": 1.0,
+        "vigilante": 1.0,
+        "or": 1.0,
+        "invisibles": 2,
+        "n": 2
+      },
+      "60s": {
+        "supervisado": 0.0,
+        "identidad": 1.0,
+        "vigilante": 1.0,
+        "or": 1.0,
+        "invisibles": 2,
+        "n": 2
+      }
+    },
+    "paso_supervisado_ciego_s": "5s",
+    "dns_nativo": {
+      "supervisado": 1.0,
+      "identidad": 0.5,
+      "vigilante": 0.5,
+      "or": 1.0
+    },
+    "fa_vigilante_variacion_por_dispositivo_dia": 0.0,
+    "P1_arp_invisible_supervisado_paso_30": true,
+    "P2_vigilante_detecta_arp_lento": true
+  }
+}

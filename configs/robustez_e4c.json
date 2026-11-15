@@ -1,0 +1,36 @@
+{
+  "descripcion": "PEDIDO-E4C-1: régimen invisible del ARP lento (y DNS nativo) sobre el corpus retemporizado; vigilante con ARP (bloque 1).",
+  "fase": "e4c",
+  "dataset": "data/dataset_lab.csv",
+  "sha256_esperado": "7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945",
+  "modelo": "xgboost",
+  "semilla_modelo": 42,
+  "objetivo_falsas_alarmas_dispositivo_dia": 1.0,
+  "dir_pcap": "data/pcap",
+  "sesiones": 20,
+  "k_tramas_ataque": 2,
+  "pasos_arp_s": [
+    5,
+    15,
+    30,
+    60
+  ],
+  "jitter": 0.1,
+  "semilla_retemporizar": 81000,
+  "episodios_por_tipo": 2,
+  "variantes_arp": [
+    "respuesta",
+    "gratuito",
+    "peticion"
+  ],
+  "variacion": {
+    "dir_pcap": "data/pcap_variacion",
+    "sesiones": 20
+  },
+  "n_bootstrap": 1000,
+  "semilla_bootstrap": 42,
+  "salida": "reports/robustez_e4c.json",
+  "red_local": "10.0.0.0/24",
+  "incluir_nativo_arp": true,
+  "horizonte_s": 300
+}

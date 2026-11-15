@@ -35,6 +35,7 @@ if str(_RAIZ) not in sys.path:
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
+from scripts import pcap_to_features  # noqa: E402
 from scripts.evaluar import (  # noqa: E402
     cargar_dataset_estricto,
     commit_actual,
@@ -44,9 +45,11 @@ from scripts.evaluar import (  # noqa: E402
     ruta_proyecto,
 )
 from scripts.evaluar_identidad import seguir_sesion, vigilar_sesion  # noqa: E402
+from scripts.lab import retemporizar as rt  # noqa: E402
 from scripts.lab.ficha_dataset import sha256_archivo  # noqa: E402
 from src import evaluacion as ev  # noqa: E402
 from src.data import nombre_sesion  # noqa: E402
+from src.feature_schema import COLUMNAS_MODELO  # noqa: E402
 from src.ventanas import leer_pcap  # noqa: E402
 
 logger = logging.getLogger("evaluar_robustez")
@@ -506,12 +509,285 @@ def _markdown_canales(canales: dict) -> list[str]:
     return lineas
 
 
+# --------------------------------------------------------------------------------------------
+# Fase E4C: el régimen invisible medido sobre el corpus retemporizado (PEDIDO-E4C-1)
+# --------------------------------------------------------------------------------------------
+
+def _seleccionar_episodios(dir_pcap: Path, n_sesiones: int, tipo: str, variantes_ok: tuple[str, ...] | None,
+                           n: int) -> list[dict]:
+    """Primeros `n` episodios de `tipo` (variante en `variantes_ok` si se da), en orden de sesión."""
+    elegidos = []
+    for s in range(n_sesiones):
+        epis = dir_pcap / f"{nombre_sesion(s)}.episodios.csv"
+        if not epis.exists():
+            continue
+        for _, r in pd.read_csv(epis).iterrows():
+            if r["tipo"] == tipo and (variantes_ok is None or str(r["variante"]).startswith(variantes_ok)):
+                elegidos.append({"sesion": s, "episodio": int(r["episodio"]), "tipo": tipo,
+                                 "variante": str(r["variante"]), "intensidad": str(r["intensidad"])})
+                if len(elegidos) >= n:
+                    return elegidos
+    return elegidos
+
+
+def _rango_y_mac(man: pd.DataFrame, episodio: int, ventana_s: float) -> tuple[int, int, str]:
+    """Ventanas absolutas que cubre el episodio y MAC del atacante, desde el manifiesto de tramas."""
+    fil = man[man["episodio"] == episodio]
+    us = int(ventana_s * 1_000_000)
+    return int(fil["ts_us"].min() // us), int(fil["ts_us"].max() // us), str(fil["mac_src"].mode().iloc[0])
+
+
+def _episodio_reducido(pcap: Path, episodio: int, tipo: str, m: int, salida: Path) -> Path:
+    """Copia la sesión con solo los primeros `m` refrescos del episodio (los demás frames de ataque
+    del episodio se descartan). Es sub-muestreo, no fabricación: modela un atacante de baja tasa
+    que emite menos refrescos. El resto del tráfico queda idéntico, bit a bit."""
+    frames = rt.leer_pcap_crudo(pcap)
+    man = pd.read_csv(pcap.with_suffix(".tramas.csv"))
+    atk = sorted(int(i) for i in man[(man["episodio"] == episodio) & (man["tipo"] == tipo)]["n_trama"])
+    descartar = set(atk[m:])
+    kept = [(i, ts, raw) for i, (ts, raw) in enumerate(frames) if i not in descartar]
+    rt.escribir_pcap_crudo(salida, [(ts, raw) for _, ts, raw in kept])
+    nueva_pos = {orig: p for p, (orig, _, _) in enumerate(kept)}
+    man2 = man[~man["n_trama"].isin(descartar)].copy()
+    man2["n_trama"] = [nueva_pos[int(i)] for i in man2["n_trama"]]
+    man2.sort_values("n_trama").to_csv(salida.with_suffix(".tramas.csv"), index=False)
+    for ext in (".episodios.csv", ".config.json"):
+        src = pcap.with_suffix(ext)
+        if src.exists():
+            salida.with_suffix(ext).write_text(src.read_text())
+    return salida
+
+
+def _medir_episodio(cfg: dict, predict, umbral: float, ep: dict, paso: float | None, k: int,
+                    ventana_s: float) -> dict:
+    """Mide los cuatro canales sobre un episodio (retemporizado a `paso`, o nativo si `paso` es None).
+
+    Con `paso`, la duración se controla: se dejan `m = horizonte/paso + 1` refrescos, de modo que
+    todos los pasos cubren el mismo horizonte (la lección de E4R: sin controlar la duración, la
+    curva no dice nada).
+    """
+    dir_pcap = ruta_proyecto(cfg["dir_pcap"])
+    pcap = dir_pcap / f"{nombre_sesion(ep['sesion'])}.pcap"
+    if paso is None:
+        ret, stem = pcap, nombre_sesion(ep["sesion"])
+    else:
+        m = max(2, int(float(cfg["horizonte_s"]) // paso) + 1)
+        reducido = _episodio_reducido(pcap, ep["episodio"], ep["tipo"], m,
+                                      pcap.with_name(f"{pcap.stem}_e{ep['episodio']}red{m}.pcap"))
+        ret = rt.retemporizar(reducido, ep["episodio"], ep["tipo"], paso_s=paso, jitter=float(cfg["jitter"]),
+                              semilla=int(cfg["semilla_retemporizar"]))
+        stem = ret.stem
+    df = pcap_to_features.procesar_sesion(ret, stem)
+    epi = df[df["episodio"] == ep["episodio"]]
+    etiquetadas = epi[epi["etiqueta"] == 1]
+    n_etiquetadas = int(len(etiquetadas))
+    maximo = int(epi["n_tramas_ataque"].max()) if len(epi) else 0
+    invisible = maximo < k
+    sup_det = bool((predict(etiquetadas[COLUMNAS_MODELO]) > umbral).any()) if n_etiquetadas else False
+
+    tramas = list(leer_pcap(ret))
+    man = pd.read_csv(ret.with_suffix(".tramas.csv"))
+    a, b, atacante = _rango_y_mac(man, ep["episodio"], ventana_s)
+    arp = [t for t in tramas if t.mac_src == atacante and t.arp_op in (1, 2) and t.arp_psrc]
+    victima_ip = pd.Series([t.arp_psrc for t in arp]).mode().iloc[0] if arp else None
+
+    seg = seguir_sesion(tramas).get(atacante, [])
+    id_idx = [f["idx"] for f in seg if f["alarma"] and a <= f["idx"] <= b]
+    # El corpus de ataques usa 10.0.0.0/24; el vigilante nace con la red del lab de identidad
+    # (10.20.0.0/16), así que hay que darle la red correcta o no ve ninguna IP local.
+    alertas = vigilar_sesion(tramas, red=cfg["red_local"])
+    vig_idx = [x["idx"] for x in alertas if a <= x["idx"] <= b and (victima_ip is None or x.get("ip") == victima_ip)]
+    lat = (min(id_idx + vig_idx) - a + 1) * ventana_s if (id_idx or vig_idx) else None
+    return {"paso": paso, "sesion": ep["sesion"], "episodio": ep["episodio"], "tipo": ep["tipo"],
+            "variante": ep["variante"], "ventanas_etiquetadas": n_etiquetadas, "max_tramas_ventana": maximo,
+            "invisible": invisible, "horizonte_s": round((b - a + 1) * ventana_s, 1),
+            "supervisado": sup_det, "identidad": bool(id_idx), "vigilante": bool(vig_idx),
+            "or": bool(sup_det or id_idx or vig_idx), "latencia_s": lat}
+
+
+def _fa_vigilante_variacion(cfg: dict, ventana_s: float) -> dict:
+    """FA del vigilante (con el ARP del bloque 1) sobre las 20 sesiones de variación benigna de E3B."""
+    v = cfg.get("variacion")
+    if not v:
+        return {}
+    dir_var = ruta_proyecto(v["dir_pcap"])
+    total_alertas, disp_dias = 0, 0.0
+    for i in range(int(v["sesiones"])):
+        pcap = dir_var / f"variacion_{i:03d}.pcap"
+        if not pcap.exists():
+            continue
+        tramas = list(leer_pcap(pcap))
+        total_alertas += len(vigilar_sesion(tramas))  # sin episodios: toda alerta es falsa
+        macs = {t.mac_src for t in tramas}
+        span = (max(t.ts_us for t in tramas) - min(t.ts_us for t in tramas)) / 1_000_000
+        disp_dias += len(macs) * span / ev.SEGUNDOS_POR_DIA
+    return {"alertas": total_alertas, "dispositivo_dias": round(disp_dias, 2),
+            "fa_por_dispositivo_dia": round(total_alertas / disp_dias, 3) if disp_dias else None}
+
+
+def _curva(filas: list[dict], pasos: list[float | None]) -> dict:
+    """Recall por canal y paso (media sobre los episodios del paso), más invisibles y horizonte."""
+    out = {}
+    for paso in pasos:
+        sub = [f for f in filas if f["paso"] == paso]
+        if not sub:
+            continue
+        clave = "nativo" if paso is None else f"{int(paso)}s"
+        out[clave] = {c: round(float(np.mean([f[c] for f in sub])), 3)
+                      for c in ("supervisado", "identidad", "vigilante", "or")}
+        out[clave].update({"n_episodios": len(sub),
+                           "invisibles": int(sum(f["invisible"] for f in sub)),
+                           "ventanas_etiquetadas_media": round(float(np.mean([f["ventanas_etiquetadas"] for f in sub])), 2),
+                           "horizonte_s_media": round(float(np.mean([f["horizonte_s"] for f in sub])), 1),
+                           "latencia_s_mediana": _mediana([f["latencia_s"] for f in sub])})
+    return out
+
+
+def _mediana(valores: list) -> float | None:
+    v = [x for x in valores if x is not None]
+    return round(float(np.median(v)), 1) if v else None
+
+
+def evaluar_e4c(cfg: dict, ruta_config: str | None = None) -> dict:
+    """Mide el régimen invisible: retemporiza ARP a varios pasos y DNS nativo, canal por canal."""
+    df = verificar_dataset(cfg)
+    k = int(cfg.get("k_tramas_ataque", K_DEFECTO))
+    ventana_s = float(ev.VENTANA_CORTA_S)
+    dir_pcap = ruta_proyecto(cfg["dir_pcap"])
+    n_ses = int(cfg["sesiones"])
+
+    # Modelo único al punto de operación de E2 (entrenado sobre el corpus congelado completo).
+    sem = int(cfg["semilla_modelo"])
+    predict = ev.ajustar_modelo(cfg["modelo"], df[COLUMNAS_MODELO], df[ev.ETIQUETA].to_numpy(), sem)
+    umbral = ev.umbral_para_objetivo(df, predict(df[COLUMNAS_MODELO]),
+                                     float(cfg["objetivo_falsas_alarmas_dispositivo_dia"]))
+
+    arp = _seleccionar_episodios(dir_pcap, n_ses, "arp_spoofing",
+                                 tuple(cfg.get("variantes_arp", ("respuesta", "gratuito", "peticion"))),
+                                 int(cfg["episodios_por_tipo"]))
+    dns = _seleccionar_episodios(dir_pcap, n_ses, "dns_spoofing", None, int(cfg["episodios_por_tipo"]))
+    pasos = [float(p) for p in cfg["pasos_arp_s"]]
+    # El paso nativo (None) es la referencia densa: el episodio sin retemporizar, donde el
+    # supervisado todavía lo ve. La curva muestra el derrumbe al estirarlo.
+    pasos_arp = ([None] if cfg.get("incluir_nativo_arp", True) else []) + pasos
+
+    filas_arp, filas_dns = [], []
+    for ep in arp:
+        for paso in pasos_arp:
+            filas_arp.append(_medir_episodio(cfg, predict, umbral, ep, paso, k, ventana_s))
+            logger.info("arp sesion %d ep %d paso %s: etiq=%d invis=%s sup=%s vig=%s",
+                        ep["sesion"], ep["episodio"], paso, filas_arp[-1]["ventanas_etiquetadas"],
+                        filas_arp[-1]["invisible"], filas_arp[-1]["supervisado"], filas_arp[-1]["vigilante"])
+    for ep in dns:  # DNS: suelo de efecto = la carrera, no la tasa; se mide en su tiempo nativo.
+        filas_dns.append(_medir_episodio(cfg, predict, umbral, ep, None, k, ventana_s))
+    filas = filas_arp + filas_dns
+
+    informe: dict = {
+        "etapa": "E4C",
+        "fecha": datetime.now().isoformat(timespec="seconds"),
+        **commit_actual(),
+        "config_archivo": ruta_config,
+        "config": cfg,
+        "dataset": {"ruta": cfg["dataset"], "sha256": sha256_archivo(ruta_proyecto(cfg["dataset"])),
+                    "filas": int(len(df))},
+        "umbral_operacion": float(umbral),
+        "episodios_arp": arp,
+        "episodios_dns": dns,
+        "medidas": filas,
+        "curva_arp": _curva(filas_arp, pasos_arp),
+        "dns_nativo": _curva(filas_dns, [None]).get("nativo", {}),
+        "fa_vigilante_variacion": _fa_vigilante_variacion(cfg, ventana_s),
+        "invariantes": INVARIANTES,
+    }
+    informe["resumen"] = _resumen_e4c(informe)
+    return informe
+
+
+def _resumen_e4c(informe: dict) -> dict:
+    """Cifras de cabecera del E4C y el veredicto de las dos predicciones registradas."""
+    curva = informe["curva_arp"]
+    fa = informe["fa_vigilante_variacion"]
+    # P1: con paso >= 30 s el ARP no deja ninguna ventana etiquetada (invisible para el supervisado).
+    p1 = all(curva.get(f"{p}s", {}).get("ventanas_etiquetadas_media", 1) == 0 for p in (30, 60) if f"{p}s" in curva)
+    # P2: el vigilante detecta el ARP lento a esos pasos.
+    p2 = all(curva.get(f"{p}s", {}).get("vigilante", 0) >= 0.999 for p in (30, 60) if f"{p}s" in curva)
+    # Paso en que el supervisado se vuelve ciego (recall 0), entre los pasos numéricos.
+    numericos = sorted((c for c in curva if c != "nativo"), key=lambda c: int(c[:-1]))
+    ciego = next((c for c in numericos if curva[c]["supervisado"] == 0), None)
+    return {
+        "recall_arp_por_paso": {p: {"supervisado": curva[p]["supervisado"], "identidad": curva[p]["identidad"],
+                                    "vigilante": curva[p]["vigilante"], "or": curva[p]["or"],
+                                    "invisibles": curva[p]["invisibles"], "n": curva[p]["n_episodios"]}
+                                for p in curva},
+        "paso_supervisado_ciego_s": ciego,
+        "dns_nativo": {c: informe["dns_nativo"].get(c) for c in ("supervisado", "identidad", "vigilante", "or")}
+        if informe["dns_nativo"] else {},
+        "fa_vigilante_variacion_por_dispositivo_dia": fa.get("fa_por_dispositivo_dia"),
+        "P1_arp_invisible_supervisado_paso_30": bool(p1),
+        "P2_vigilante_detecta_arp_lento": bool(p2),
+    }
+
+
+def markdown_e4c(informe: dict) -> str:
+    """Resumen legible del E4C (solo cifras del JSON)."""
+    r = informe["resumen"]
+    fa = informe["fa_vigilante_variacion"]
+    lineas = [
+        "# Régimen invisible del ARP lento (E4C) — cifras", "",
+        f"Generado por `scripts/evaluar_robustez.py` el {informe['fecha']} en el commit "
+        f"`{informe['commit']}`{' (árbol con cambios)' if informe.get('arbol_con_cambios') else ''}.",
+        f"Dataset `{informe['dataset']['ruta']}` sha256 `{informe['dataset']['sha256']}`. "
+        f"Umbral de operación {informe['umbral_operacion']:.4f} (XGB, 1 FA/disp-día de E2).", "",
+        "Episodios ARP retemporizados sobre el corpus congelado; DNS en su tiempo nativo (la carrera "
+        "es su suelo de efecto, no la tasa). Detección por canal: supervisado sobre ventanas "
+        "etiquetadas; identidad y vigilante por solape temporal.", "",
+        "## ARP: recall por canal frente al paso entre tramas", "",
+        "| Paso | n | Ventanas etiq. (media) | Invisibles | Supervisado | Identidad | Vigilante | OR | Horizonte (s) |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    for clave, v in sorted(informe["curva_arp"].items(), key=lambda kv: -1 if kv[0] == "nativo" else int(kv[0][:-1])):
+        lineas.append(f"| {clave} | {v['n_episodios']} | {v['ventanas_etiquetadas_media']} | {v['invisibles']} | "
+                      f"{v['supervisado']:.3f} | {v['identidad']:.3f} | {v['vigilante']:.3f} | {v['or']:.3f} | "
+                      f"{v['horizonte_s_media']} |")
+    d = informe.get("dns_nativo") or {}
+    if d:
+        lineas += ["", "## DNS spoofing (tiempo nativo, la carrera)", "",
+                   f"Supervisado {d['supervisado']:.3f} · identidad {d['identidad']:.3f} · "
+                   f"vigilante {d['vigilante']:.3f} · OR {d['or']:.3f} "
+                   f"(n={d['n_episodios']}, {d['invisibles']} invisibles)."]
+    lineas += ["", "## Veredicto de las predicciones registradas", "",
+               f"- **P1** (con paso ≥ 30 s el ARP es invisible para el supervisado): "
+               f"**{'se cumple' if r['P1_arp_invisible_supervisado_paso_30'] else 'FALLA'}**. "
+               f"El supervisado queda ciego a partir de **{r['paso_supervisado_ciego_s'] or '—'}**.",
+               f"- **P2** (el vigilante con el bloque 1 sí ve el ARP lento): "
+               f"**{'se cumple' if r['P2_vigilante_detecta_arp_lento'] else 'FALLA'}**.", ""]
+    if fa:
+        lineas += [f"FA del vigilante sobre las 20 sesiones de variación benigna de E3B: "
+                   f"**{fa.get('fa_por_dispositivo_dia')}/disp-día** ({fa.get('alertas')} alertas en "
+                   f"{fa.get('dispositivo_dias')} disp-día). Sesgo declarado: el generador de variación no "
+                   f"tiene DHCP ni failover, así que esta cifra es optimista.", ""]
+    lineas += ["## Invariantes de efecto (citados, no medidos)", "",
+               "| Ataque | `suave` | Invariante | Suelo | Lectura |", "|---|---|---|---|---|"]
+    for x in informe["invariantes"]:
+        if x["ataque"] in ("arp_spoofing", "dns_spoofing"):
+            lineas.append(f"| {x['ataque']} | {x['suave']} | {x['invariante']} | {x['suelo']} | {x['lectura']} |")
+    return "\n".join(lineas) + "\n"
+
+
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Prueba de robustez del detector (E4R).")
+    p = argparse.ArgumentParser(description="Prueba de robustez del detector (E4R / E4C).")
     p.add_argument("--config", required=True, type=Path)
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(message)s")
     cfg = leer_config(args.config)
+    if cfg.get("fase") == "e4c":
+        informe = evaluar_e4c(cfg, str(args.config))
+        destino = ruta_proyecto(cfg["salida"])
+        escribir_json(informe, destino)
+        destino.with_suffix(".md").write_text(markdown_e4c(json.loads(destino.read_text())))
+        print(f"Escrito {destino} y {destino.with_suffix('.md')}")
+        print(json.dumps(informe["resumen"], ensure_ascii=False))
+        return 0
     informe = evaluar(cfg, str(args.config))
     destino = ruta_proyecto(cfg["salida"])
     escribir_json(informe, destino)

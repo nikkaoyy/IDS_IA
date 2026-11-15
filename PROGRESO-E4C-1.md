@@ -1,4 +1,4 @@
-SEGUIR — bloques 1 y 2 hechos; sigue el bloque 3 (régimen invisible medido).
+SEGUIR — bloques 1-3 hechos; sigue el bloque 4 (informe y cierre).
 
 # Progreso — PEDIDO-E4C-1
 
@@ -51,3 +51,35 @@ Primera línea: semáforo (`SEGUIR` con el siguiente paso, o `PARAR` con el moti
 - `tests/test_retemporizar.py` (6): determinismo, bytes invariantes, rechazo de tipo, rechazo de
   ruta, y la integración con `pcap_to_features`: a paso 30 s el episodio queda por debajo de K
   (0 ventanas etiquetadas, invisible); a paso 0,5 s sí se etiqueta.
+
+## Bloque 3 — régimen invisible medido (hecho)
+
+- `scripts/evaluar_robustez.py` gana la fase `e4c` (dispatch por `cfg["fase"]`, sin tocar la ruta
+  de E4R): entrena XGB sobre el corpus congelado al umbral de E2 (0,9086) y mide, por episodio y
+  canal, el ARP retemporizado a pasos {5,15,30,60} s y el DNS en tiempo nativo.
+- Dos correcciones de diseño registradas y necesarias:
+  1. **Red del corpus**: el vigilante nace con la red del lab de identidad (10.20.0.0/16), pero el
+     corpus de ataques usa 10.0.0.0/24. Se le pasa `red=10.0.0.0/24` a `vigilar_sesion`. Sin esto
+     el vigilante no ve ninguna IP local (era parte de por qué E4R midió 0,000 en ARP).
+  2. **Duración controlada** (lección de E4R): para cada paso se dejan `m = horizonte/paso + 1`
+     refrescos (horizonte 300 s), descartando los frames de ataque sobrantes del episodio
+     (sub-muestreo, no fabricación; modela un atacante de baja tasa). Así todos los pasos cubren
+     el mismo horizonte (~305 s) y la curva compara peras con peras.
+
+Resultado (`reports/robustez_e4c.json`):
+
+| Paso | Ventanas etiq. | Invisibles | Supervisado | Identidad | Vigilante | OR |
+|---|---|---|---|---|---|---|
+| nativo (rápido) | 11,0 | 0 | **1,000** | 0,500 | 1,000 | 1,000 |
+| 5 s | 0,0 | 2/2 | **0,000** | 1,000 | **1,000** | 1,000 |
+| 15 s | 0,0 | 2/2 | 0,000 | 1,000 | 1,000 | 1,000 |
+| 30 s | 0,0 | 2/2 | 0,000 | 1,000 | 1,000 | 1,000 |
+| 60 s | 0,0 | 2/2 | 0,000 | 1,000 | 1,000 | 1,000 |
+
+- **P1 se cumple**: a paso ≥ 5 s ninguna ventana alcanza K=2, el ARP es invisible para el
+  supervisado (recall 0). El supervisado queda ciego a partir de 5 s (el tamaño de la ventana).
+- **P2 se cumple**: el vigilante con el bloque 1 detecta el ARP lento en los cuatro pasos (1,000),
+  latencia 5 s (primera ventana).
+- **FA del vigilante** sobre las 20 sesiones de variación benigna de E3B: **0,0/disp-día** (0
+  alertas en 2,71 disp-día), dentro del presupuesto de E2. Sesgo declarado: sin DHCP ni failover.
+- DNS nativo: supervisado 1,000, vigilante 0,500, OR 1,000 (la carrera, no la tasa).
