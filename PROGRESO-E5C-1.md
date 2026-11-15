@@ -1,4 +1,4 @@
-SEGUIR — bloques 1-2 hechos; sigue el bloque 3 (informe, cierre y push).
+PARAR — PEDIDO-E5C-1 cerrado: tres bloques, informe, ESTADO, aceptación y push.
 
 # Progreso — PEDIDO-E5C-1
 

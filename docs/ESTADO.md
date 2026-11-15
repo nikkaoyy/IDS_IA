@@ -1,6 +1,6 @@
 # Estado del proyecto IDS (IEEE 802.3)
 
-> Dueño en esta ventana: PEDIDO-E4C-1. Actualizado el 2026-11-14, al cerrar E4C.
+> Dueño en esta ventana: PEDIDO-E5C-1. Actualizado el 2026-11-14, al cerrar E5C.
 > Cifras con IC al 95 %; el detalle de cada una está en su informe.
 
 ## Etapas
@@ -15,6 +15,7 @@
 | **E3B — pila completa, variación, contaminación** | **Cerrada** | `docs/INFORME_E3B.md` | IP-ID por flujo: FA **16,2 → 0,38**; con variación benigna **826 FA/disp-día**; pila completa **0,20** (0,325 en sesiones nuevas; 0/47 sin contador global); contaminación 20 %: absorción **0,80**, detección 0,83 |
 | **E4R — robustez del detector** | **Cerrada** | `docs/INFORME_E4R.md` | Recall supervisado por intensidad: media **0,935**, suave **0,891**, ráfaga **0,824** (no baja de 0,5); **0 invisibles por construcción**; OR de canales **+0,053** a **+122 FA/disp-día** |
 | **E4C — régimen invisible del ARP lento** | **Cerrada** | `docs/INFORME_E4C.md` | ARP a paso ≥ 5 s: supervisado **1,000 → 0,000** (invisible por construcción); el vigilante IP→MAC (ahora lee ARP) lo detecta **1,000** con **0,0 FA/disp-día** sobre variación benigna |
+| **E5C — adoptar un cambio sin absorber un clon** | **Cerrada** | `docs/INFORME_E5C.md` | FA con variación **826 → 382/disp-día** (−54 %, IC sin solape, `no_confiable` igual); detección casi intacta (ritmo 1,000 → 0,975); `dos_pilas` casi no mejora (límite) |
 | E4 (evasión real), E5, E6 | No empezadas | — | — |
 
 ## Defensas del perfil de identidad (tras la ablación de E3B)
@@ -61,6 +62,13 @@
    identidad), lo detecta al **1,000** en los pasos 5/15/30/60 s con **0,0 FA/disp-día** sobre la
    variación benigna de E3B. La defensa contra el ataque lento no es un mejor clasificador de volumen,
    sino una señal de identidad que no depende de la tasa.
+8. **Tercera vía de aprendizaje (E5C):** adoptar un valor de pila nuevo solo cuando persiste de
+   forma **exclusiva** (el equipo deja de usar el viejo) y eximir los que ya mostraba al construir el
+   perfil baja las FA con variación benigna de **826 a 382/disp-día** (−54 %, IC sin solape, sin
+   apagarse en `no_confiable`) sin perder la detección de clones de pila distinta (ingenuo 0,975,
+   ritmo 0,975, pila completa 0,20). Precio: un clon de ritmo de 40 se absorbe si la víctima calla
+   30 s. La mitad de la FA que queda es de un equipo con **dos pilas concurrentes**, indistinguible
+   de un clon a nivel de huella: el límite de fondo del canal de identidad.
 
 ## Restricciones que siguen en pie
 
@@ -74,8 +82,11 @@
 
 ## Pendiente para Nico
 
-- Decidir el mensaje del artículo con los siete resultados de arriba.
-- Para E5 (laboratorio real): FA del vigilante con **DHCP y failover reales** (su 0,0 es optimista
+- Decidir el mensaje del artículo con los ocho resultados de arriba.
+- Para E6 (laboratorio real y ambigüedad de fondo): discriminar `dos_pilas` de un clon por el
+  **lapso** de aparición (una pila legítima sale salpicada toda la sesión; un clon es una racha
+  contigua tardía), registrado antes de medir y en sesiones nuevas; acotar la regresión de ritmo de
+  E5C; y lo del laboratorio real: FA del vigilante con **DHCP y failover reales** (su 0,0 es optimista
   porque el lab no los tiene); los RST de la víctima frente a un clon de pila completa en un switch;
   juzgar los contadores de IP-ID **entre ventanas**; un mecanismo para aprender cambios legítimos sin
   aprender clones (registrado antes de medir y medido en sesiones nuevas); defensa para la fase

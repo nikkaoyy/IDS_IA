@@ -1,6 +1,6 @@
 # Adopción sin absorber el clon (E5C) — cifras
 
-Generado por `scripts/evaluar_adopcion.py` el 2026-11-14T21:21:36 en el commit `242d99aacf2ebc0573753f34103e071b774e7d29` (árbol con cambios).
+Generado por `scripts/evaluar_adopcion.py` el 2026-11-14T21:26:23 en el commit `2a6cfd0a9af70d1bfd2123653bef6b3129e31ba4` (árbol con cambios).
 `VENTANAS_ADOPCION = 6`.
 
 ## Falsas alarmas con variación benigna (ventanas/disp-día)
