@@ -67,3 +67,43 @@ punta a punta desde ya.
 ├── models/             # modelos entrenados (.joblib, no versionados)
 └── requirements.txt
 ```
+
+## Etapas E1–E7 y cómo reproducir
+
+El proyecto avanzó por etapas, cada una con su informe en `docs/` y sus cifras congeladas en
+`reports/`. El cuaderno de cierre las recorre de punta a punta:
+
+```bash
+# Cuaderno de cierre (CRISP-DM, OE1–OE3): abrir en Jupyter y ejecutar en orden
+jupyter notebook notebooks/cierre_e7.ipynb
+
+# Evaluación supervisada (E2) y de identidad (E3)
+.venv/bin/python scripts/evaluar.py --config configs/e2.json
+.venv/bin/python scripts/evaluar_identidad.py --config configs/identidad.json --partes b
+
+# Robustez / evasión a nivel de pcap (E4)
+.venv/bin/python scripts/evaluar_robustez.py --config configs/robustez.json      # E4R
+.venv/bin/python scripts/evaluar_robustez.py --config configs/robustez_e4c.json  # E4C (ARP lento)
+
+# Menos falsas alarmas sin absorber el clon (E5C)
+.venv/bin/python scripts/evaluar_adopcion.py --config configs/adopcion_e5c.json
+
+# Captura en streaming (E5): offline (sin root) o en vivo
+.venv/bin/python scripts/captura_en_vivo.py --pcap data/pcap/sesion_000.pcap --dataset data/dataset_lab.csv
+sudo .venv/bin/python scripts/captura_en_vivo.py --iface eth0 --red-local 10.0.0.0/24 --dataset data/dataset_lab.csv
+
+# Pruebas
+.venv/bin/python -m pytest -o addopts="" -q
+```
+
+| Etapa | Qué resuelve | Informe |
+|---|---|---|
+| E1–E2 | Dataset del laboratorio y clasificador por episodio (OE2) | `docs/INFORME_E1.md`, `docs/INFORME_E2.md` |
+| E3 | Identidad del dispositivo: perfil de pila y vínculo IP→MAC | `docs/INFORME_E3A.md`, `docs/INFORME_E3B.md` |
+| E4 | Evasión a nivel de pcap (OE3): robustez y régimen invisible | `docs/INFORME_E4.md` (+ E4R, E4C) |
+| E5 | Captura en streaming en vivo (`src/streaming.py`) | `docs/INFORME_E5.md` |
+| E5C | Tercera vía: menos FA con variación benigna sin absorber clones | `docs/INFORME_E5C.md` |
+| E6 | Mitigación (dry-run) y pronóstico de alertas (OE3) | `docs/INFORME_E6.md` |
+| E7 | Cierre: cuaderno CRISP-DM de punta a punta | `notebooks/cierre_e7.ipynb` |
+
+Estado y conclusiones vigentes: `docs/ESTADO.md`.

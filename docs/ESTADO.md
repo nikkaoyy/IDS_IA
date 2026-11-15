@@ -1,6 +1,6 @@
 # Estado del proyecto IDS (IEEE 802.3)
 
-> Dueño en esta ventana: cierre E4–E7. Actualizado el 2026-11-15; E4 consolidada.
+> Dueño en esta ventana: cierre E4–E7. Actualizado el 2026-11-15; E4–E7 cerradas.
 > Cifras con IC al 95 %; el detalle de cada una está en su informe.
 
 ## Etapas
@@ -19,7 +19,7 @@
 | **E5C — adoptar un cambio sin absorber un clon** | **Cerrada** | `docs/INFORME_E5C.md` | FA con variación **826 → 382/disp-día** (−54 %, IC sin solape, `no_confiable` igual); detección casi intacta (ritmo 1,000 → 0,975); `dos_pilas` casi no mejora (límite) |
 | **E5 — Streaming (captura→ventanas→modelo→alerta)** | **Cerrada** | `docs/INFORME_E5.md` | `MotorStreaming` con **paridad** probada con el lote; CLI `captura_en_vivo.py` (AsyncSniffer en vivo o replay offline); identidad + supervisado por ventana |
 | **E6 — Mitigación (`dry-run`) y pronóstico** | **Cerrada** | `docs/INFORME_E6.md` | Mitigación escalable log→alerta→bloqueo→cuarentena, **dry-run por defecto** (no toca la red sin ejecutor explícito); pronóstico Holt de la tasa de alertas con aviso temprano y backtesting |
-| E7 — Cierre (notebook `.ipynb`, README, OE1) | No empezada | — | — |
+| **E7 — Cierre (notebook `.ipynb`)** | **Cerrada** | `docs/INFORME_E7.md` | `notebooks/cierre_e7.ipynb` CRISP-DM de punta a punta (celdas validadas); README con los comandos de E1–E7 |
 
 ## Defensas del perfil de identidad (tras la ablación de E3B)
 
