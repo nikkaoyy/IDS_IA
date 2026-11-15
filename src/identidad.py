@@ -78,6 +78,11 @@ VENTANA_S: float = 5.0
 MIN_VENTANAS_PERFIL: int = 12
 MIN_APARICIONES_VALOR: int = 2
 SENALES_POR_VALOR: tuple[str, ...] = ("ttl", "tcp_window")
+# PEDIDO-E5C-1: tercera vía para aprender un cambio legítimo sin aprender un clon.
+# "persistencia" (por defecto): exime un valor si lo vio en la construcción o lo adopta por
+# persistencia exclusiva; "apariciones": comportamiento de E3B (reproduce las 826 FA/disp-día).
+ADOPCION_MODO: str = "persistencia"
+VENTANAS_ADOPCION: int = 6  # ventanas exclusivas seguidas (30 s) para adoptar un valor nuevo
 SENALES_POR_FLUJO: tuple[str, ...] = ("ipid_continuidad", "ipid_salto_log2")
 MIN_TRAMAS_FLUJO_IPID: int = 3
 IPID_MODO: str = "flujo"  # "equipo": versión descartada de E3A, solo para comparar
@@ -246,12 +251,16 @@ def perfil_desde_senales(ventanas: Sequence[dict]) -> dict:
     for v in ventanas:
         firmas |= v["tcp_opciones"]
     perfil["tcp_opciones"] = frozenset(firmas)
+    construccion = ventanas[:MIN_VENTANAS_PERFIL]
     for k in SENALES_POR_VALOR:
         apariciones: dict[float, int] = {}
         for v in ventanas:
             for x in v.get(f"{k}_valores", ()):
                 apariciones[x] = apariciones.get(x, 0) + 1
         perfil[f"{k}_valores"] = apariciones
+        # Regla 1 (E5C): los valores vistos durante la construcción son del equipo (clones aparte,
+        # que empiezan a los 300 s, mucho después de los 60 s de construcción).
+        perfil[f"{k}_construccion"] = {x for v in construccion for x in v.get(f"{k}_valores", ())}
     multi = [v for v in ventanas if v.get("ipid_multiflujo")]
     cruzan = [v for v in multi if v.get("ipid_cruce") and v.get("ipid_contadores_extra", 0) == 0]
     perfil["ipid_global"] = len(multi) >= MIN_VENTANAS_CRUCE and len(cruzan) >= FRACCION_CRUCE * len(multi)
@@ -274,6 +283,17 @@ def perfil_dispositivo(tramas: Iterable[Trama], ventana_s: float = VENTANA_S) ->
     return perfil_desde_senales([senales_ventana(g) for g in agrupar_por_ventana(tramas, ventana_s)])
 
 
+def valores_eximidos(perfil: dict, k: str) -> set:
+    """Valores de la señal `k` que no disparan: vistos ≥ `MIN_APARICIONES_VALOR` y, en modo
+    `persistencia` (E5C), los de la construcción (regla 1) y los adoptados (regla 2)."""
+    vistos = perfil.get(f"{k}_valores", {})
+    eximidos = {x for x, n in vistos.items() if n >= MIN_APARICIONES_VALOR}
+    if ADOPCION_MODO == "persistencia":
+        eximidos |= perfil.get(f"{k}_construccion", set())
+        eximidos |= perfil.get(f"{k}_adoptados", set())
+    return eximidos
+
+
 def desviacion_senales(perfil: dict, s: dict) -> dict:
     """Puntaje de una ventana de señales frente al perfil; solo señales presentes en ambos."""
     por_senal: dict[str, float] = {}
@@ -282,8 +302,8 @@ def desviacion_senales(perfil: dict, s: dict) -> dict:
             p = perfil[k]
             escala = max(ESCALA_MAD * p["mad"], PISOS[k], PISO_RELATIVO * abs(p["mediana"]))
             if k in SENALES_POR_VALOR:
-                vistos = perfil.get(f"{k}_valores", {})
-                nuevos = [x for x in s.get(f"{k}_valores", ()) if vistos.get(x, 0) < MIN_APARICIONES_VALOR]
+                eximidos = valores_eximidos(perfil, k)
+                nuevos = [x for x in s.get(f"{k}_valores", ()) if x not in eximidos]
                 por_senal[k] = max((abs(x - p["mediana"]) / escala for x in nuevos), default=0.0)
             elif k in SENALES_POR_FLUJO:
                 por_senal[k] = max(abs(x - p["mediana"]) / escala for x in s[f"{k}_valores"])
@@ -327,6 +347,8 @@ class SeguidorIdentidad:
     alarmas_seguidas: int = 0
     reperfilados: int = 0
     actualizaciones_dia: dict[int, int] = field(default_factory=dict)
+    candidatos: dict = field(default_factory=dict)  # (señal, valor) -> ventanas exclusivas seguidas
+    adoptados: dict = field(default_factory=dict)   # señal -> conjunto de valores adoptados (E5C)
     _perfil: dict | None = None
 
     def __post_init__(self) -> None:
@@ -338,7 +360,33 @@ class SeguidorIdentidad:
     def perfil(self) -> dict:
         if self._perfil is None:
             self._perfil = perfil_desde_senales(list(self.historia))
+            for k, vals in self.adoptados.items():  # los adoptados sobreviven al reconstruir (E5C)
+                self._perfil[f"{k}_adoptados"] = set(vals)
         return self._perfil
+
+    def _seguir_candidatos(self, s: dict) -> None:
+        """Regla 2 (E5C): adopta un valor nuevo tras `VENTANAS_ADOPCION` ventanas exclusivas (sin el
+        valor viejo) y lo inyecta en el perfil. Un clon coexiste con la víctima, así que su valor
+        nunca es exclusivo y no se adopta; un cambio limpio (actualización, VPN) sí."""
+        if ADOPCION_MODO != "persistencia":
+            return
+        p = self.perfil
+        for k in SENALES_POR_VALOR:
+            if k not in p:
+                continue
+            valores = set(s.get(f"{k}_valores", ()))
+            eximidos = valores_eximidos(p, k)
+            viejo_presente = any(abs(x - p[k]["mediana"]) < 1e-9 for x in valores)
+            for x in valores - eximidos:
+                clave = (k, x)
+                if viejo_presente:
+                    self.candidatos.pop(clave, None)
+                    continue
+                self.candidatos[clave] = self.candidatos.get(clave, 0) + 1
+                if self.candidatos[clave] >= VENTANAS_ADOPCION:
+                    self.adoptados.setdefault(k, set()).add(x)
+                    p.setdefault(f"{k}_adoptados", set()).add(x)
+                    del self.candidatos[clave]
 
     def _aprender(self, s: dict, dia: int) -> bool:
         confiable = len(self.historia) >= self.min_ventanas
@@ -371,6 +419,7 @@ class SeguidorIdentidad:
                 self.estado = CONFIABLE
             salida["estado"] = self.estado
             return salida
+        self._seguir_candidatos(s)  # E5C: adopción por persistencia exclusiva antes de juzgar
         d = desviacion_senales(self.perfil, s)
         salida["puntaje"] = d["puntaje"]
         salida["por_senal"] = d["por_senal"]

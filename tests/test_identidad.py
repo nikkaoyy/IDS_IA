@@ -201,7 +201,10 @@ def _confiable(**kw) -> idn.SeguidorIdentidad:
 R = idn.REPERFILAR_REGISTRADO
 
 
-def test_un_cambio_persistente_reperfila_tras_24_alarmas():
+def test_un_cambio_persistente_reperfila_tras_24_alarmas(monkeypatch):
+    # El reperfilado es una capa de E3B independiente de la adopción de E5C; se prueba en el modo
+    # viejo, donde un cambio de valor sigue disparando (en "persistencia" se adoptaría a las 6).
+    monkeypatch.setattr(idn, "ADOPCION_MODO", "apariciones")
     seg = _confiable(reperfilar_tras=R)
     salidas = [seg.observar(_ventana(20 + k, ttl=128, window=64240)) for k in range(R + 14)]
     assert sum(s["alarma"] for s in salidas) == R
@@ -218,11 +221,58 @@ def test_reperfilar_con_el_clon_presente_lo_lava():
     assert seg.observar(_ventana(100))["alarma"]  # la víctima, ya sin clon, pasa a ser la sospechosa
 
 
-def test_por_defecto_no_se_reperfila():
+def test_por_defecto_no_se_reperfila(monkeypatch):
+    monkeypatch.setattr(idn, "ADOPCION_MODO", "apariciones")  # ver nota del test anterior
     seg = _confiable()
     for k in range(3 * R):
         seg.observar(_ventana(20 + k, ttl=128, window=64240))
     assert seg.reperfilados == 0 and seg.estado == idn.SOSPECHOSO
+
+
+# --- PEDIDO-E5C-1, bloque 1: adoptar un cambio legítimo sin adoptar un clon --------------------
+
+def _confiable_ttl64() -> idn.SeguidorIdentidad:
+    seg = idn.SeguidorIdentidad()
+    for k in range(idn.MIN_VENTANAS_PERFIL):
+        seg.observar(_ventana(k, ttl=64, window=29200))
+    assert seg.estado == idn.CONFIABLE
+    return seg
+
+
+def test_valor_de_la_construccion_minoritario_no_dispara():
+    """Regla 1: una segunda pila presente desde la construcción (una sola aparición) se exime."""
+    seg = idn.SeguidorIdentidad()
+    for k in range(idn.MIN_VENTANAS_PERFIL):
+        tramas = _ventana(k, ttl=64, window=29200)
+        if k == 3:  # la segunda pila aparece una sola vez durante la construcción
+            tramas = tramas + _ventana(k, ttl=128, window=64240)
+        seg.observar(tramas)
+    assert not seg.observar(_ventana(30, ttl=128, window=64240))["alarma"]
+
+
+def test_cambio_limpio_persistente_se_adopta_y_deja_de_disparar():
+    """Regla 2: un cambio exclusivo (sin el valor viejo) se adopta tras VENTANAS_ADOPCION."""
+    seg = _confiable_ttl64()
+    salidas = [seg.observar(_ventana(20 + k, ttl=128, window=64240)) for k in range(idn.VENTANAS_ADOPCION + 4)]
+    assert salidas[0]["alarma"] and not salidas[-1]["alarma"]
+    assert sum(s["alarma"] for s in salidas) <= idn.VENTANAS_ADOPCION
+    assert 128 in seg.adoptados.get("ttl", set())
+
+
+def test_un_clon_que_coexiste_con_la_victima_no_se_adopta():
+    """Regla 2, a prueba de clones: si el valor viejo sigue presente, nunca es exclusivo."""
+    seg = _confiable_ttl64()
+    salidas = [seg.observar(_ventana(20 + k, ttl=64, window=29200) + _ventana(20 + k, ttl=128, window=64240))
+               for k in range(idn.VENTANAS_ADOPCION + 10)]
+    assert all(s["alarma"] for s in salidas)  # coexistencia: sigue acusando
+    assert 128 not in seg.adoptados.get("ttl", set())
+
+
+def test_modo_apariciones_reproduce_el_comportamiento_viejo(monkeypatch):
+    monkeypatch.setattr(idn, "ADOPCION_MODO", "apariciones")
+    seg = _confiable_ttl64()
+    salidas = [seg.observar(_ventana(20 + k, ttl=128, window=64240)) for k in range(idn.VENTANAS_ADOPCION + 10)]
+    assert all(s["alarma"] for s in salidas) and not seg.adoptados
 
 
 def test_alarmas_intercaladas_no_reperfilan():
