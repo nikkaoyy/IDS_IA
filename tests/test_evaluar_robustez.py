@@ -70,3 +70,43 @@ def test_verificar_dataset_rechaza_sha_distinto(monkeypatch, tmp_path):
     monkeypatch.setattr(er, "ruta_proyecto", lambda p: ruta)
     with pytest.raises(ValueError, match="sha256"):
         er.verificar_dataset({"dataset": str(ruta), "sha256_esperado": "otro"})
+
+
+# --- Bloque 2: canales y OR -------------------------------------------------------------
+
+def test_canal_or_combina_los_tres_por_episodio():
+    tabla = pd.DataFrame([
+        {"sesion": "s0", "episodio": 0, "tipo": "syn_flood", "detectado": True},
+        {"sesion": "s0", "episodio": 1, "tipo": "arp_spoofing", "detectado": False},
+        {"sesion": "s0", "episodio": 2, "tipo": "arp_spoofing", "detectado": False},
+    ])
+    canales = {
+        "por_episodio": {
+            "s0#1": {"tipo": "arp_spoofing", "det_identidad": False, "det_vigilante": True},
+            "s0#2": {"tipo": "arp_spoofing", "det_identidad": False, "det_vigilante": False},
+        },
+        "identidad": {"fa_por_dispositivo_dia": 10.0},
+        "vigilante": {"fa_por_dispositivo_dia": 2.0},
+    }
+    sup = {"dispositivos": {"falsas_alarmas_por_dispositivo_dia": {"valor": 0.9}}}
+    o = er.canal_or(tabla, canales, {"fa_identidad_e3b_variacion": 826.24}, sup)
+    # Supervisado detecta 1/3; el vigilante rescata el episodio 1 -> OR 2/3.
+    assert o["recall_supervisado_42"] == pytest.approx(1 / 3)
+    assert o["recall_or"] == pytest.approx(2 / 3)
+    assert o["extra_recall_or"] == pytest.approx(1 / 3)
+    assert o["recall_or_por_tipo"]["arp_spoofing"] == pytest.approx(0.5)
+    fa = o["fa_por_dispositivo_dia"]
+    assert fa["supervisado"] == 0.9 and fa["vigilante"] == 2.0
+    assert fa["or_total_en_estas_sesiones"] == pytest.approx(0.9 + 10.0 + 2.0)
+
+
+def test_episodios_sesion_mapea_ventanas_y_macs(tmp_path, monkeypatch):
+    """El rango de ventanas del episodio sale de ts_us // (5e6), igual que seguir/vigilar."""
+    d = tmp_path
+    (d / "sesion_000.tramas.csv").write_text(
+        "n_trama,ts_us,mac_src,atacante,episodio,tipo,variante,intensidad,capa\n"
+        "1,1000000000000,aa:bb,aa:bb,0,syn_flood,x,media,transporte\n"
+        "2,1000005000000,aa:bb,aa:bb,0,syn_flood,x,media,transporte\n")
+    epis = er._episodios_sesion(d, "sesion_000", 5.0)
+    assert set(epis) == {0} and epis[0]["macs"] == {"aa:bb"} and epis[0]["tipo"] == "syn_flood"
+    assert epis[0]["idx"] == {200000, 200001}  # 1e12//5e6 y (1e12+5e6·10³)//5e6

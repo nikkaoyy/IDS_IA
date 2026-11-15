@@ -1,4 +1,4 @@
-SEGUIR — bloque 1 en curso (canal supervisado + invisibles por construcción).
+SEGUIR — bloques 1 y 2 hechos; sigue el bloque 3 (invariantes de efecto) y el cierre.
 
 # Progreso — PEDIDO-E4R-1
 
@@ -46,3 +46,20 @@ Expectativas registradas (para contrastar, no para ajustar):
   `ts_us // (5·10⁶)` que usan `seguir_sesion`/`vigilar_sesion`). Limitación declarada: una alerta
   benigna que caiga en una ventana del episodio se acredita como detección; por eso las FA del
   vigilante se cuentan aparte (alertas fuera de todo rango de episodio, por disp-día).
+
+## Bloque 2 — nota antes del cierre (dos predicciones que apuntan a fallar)
+
+El código de canales está fijado; las cifras definitivas salen de la corrida completa. Smoke test
+sobre 2 sesiones adelanta que **las dos predicciones registradas van a fallar**, y se reportará así
+(el pedido lo permite explícitamente):
+
+- **Identidad NO es ≈ 0 en floods/escaneos.** El 35 % de los episodios del generador usan un origen
+  "clon" (`_origen_ataque`: MAC de una víctima, IP del host atacante), así que el perfil de pila de
+  esa MAC ve una pila ajena y alarma. Es detección genuina de suplantación de MAC, pero su "recall"
+  viene con una FA altísima (≈123/disp-día en el smoke), así que solo tiene sentido junto a su FA.
+- **El vigilante IP→MAC NO dispara en `arp_spoofing`.** `VigilanteIP` inspecciona la IP de origen de
+  capa 3; las tramas ARP no tienen capa IP, así que el envenenamiento ARP le es invisible. Límite
+  real del vigilante, se declara. (Detectaría una suplantación que emita tráfico IP con la IP ajena,
+  no el ARP en sí.)
+
+No se ajusta nada por ver esto: las cifras de cabecera son las de la corrida completa.

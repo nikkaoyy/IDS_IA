@@ -32,6 +32,7 @@ _RAIZ = Path(__file__).resolve().parent.parent
 if str(_RAIZ) not in sys.path:
     sys.path.insert(0, str(_RAIZ))
 
+import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from scripts.evaluar import (  # noqa: E402
@@ -42,9 +43,11 @@ from scripts.evaluar import (  # noqa: E402
     leer_config,
     ruta_proyecto,
 )
+from scripts.evaluar_identidad import seguir_sesion, vigilar_sesion  # noqa: E402
 from scripts.lab.ficha_dataset import sha256_archivo  # noqa: E402
 from src import evaluacion as ev  # noqa: E402
 from src.data import nombre_sesion  # noqa: E402
+from src.ventanas import leer_pcap  # noqa: E402
 
 logger = logging.getLogger("evaluar_robustez")
 
@@ -174,6 +177,114 @@ def resumen_invisibles(resumen_sup: dict, inv: pd.DataFrame) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
+# Canales de identidad y vigilante IP->MAC, y el OR
+# --------------------------------------------------------------------------------------------
+
+def _episodios_sesion(dir_pcap: Path, nombre: str, ventana_s: float) -> dict[int, dict]:
+    """Por episodio de la sesión: MACs atacantes, ventanas que toca (idx absoluto) y tipo.
+
+    El índice de ventana es `ts_us // (ventana_s · 10⁶)`, el mismo que usan `seguir_sesion` y
+    `vigilar_sesion`, así que el solape temporal se calcula sin depender de `t0`.
+    """
+    tramas = pd.read_csv(dir_pcap / f"{nombre}.tramas.csv")
+    epis: dict[int, dict] = {}
+    for ep, g in tramas.groupby("episodio"):
+        idx = {int(x) for x in (g["ts_us"] // int(ventana_s * 1_000_000)).astype("int64")}
+        epis[int(ep)] = {"macs": set(g["mac_src"].astype(str)), "idx": idx, "tipo": ev._moda(g["tipo"])}
+    return epis
+
+
+def canales_identidad_vigilante(cfg: dict) -> dict:
+    """Recall de los canales de identidad y vigilante IP→MAC sobre los pcaps de ataque, y sus FA.
+
+    Detección por solape temporal: un episodio está detectado por un canal si ese canal alarma en
+    una ventana que el episodio toca (y, para identidad, en una MAC del atacante). Las FA son las
+    alarmas en ventanas fuera de todo episodio, por dispositivo-día. Limitación declarada: una
+    alarma benigna que caiga en una ventana de episodio se acredita como detección.
+    """
+    dir_pcap = ruta_proyecto(cfg["dir_pcap"])
+    ventana_s = ev.VENTANA_CORTA_S
+    por_episodio: dict[str, dict] = {}
+    fa_identidad = fa_vigilante = 0
+    dispositivo_dias = 0.0
+    for i in range(int(cfg["sesiones"])):
+        nombre = nombre_sesion(i)
+        tramas = list(leer_pcap(dir_pcap / f"{nombre}.pcap"))
+        epis = _episodios_sesion(dir_pcap, nombre, ventana_s)
+        seg = seguir_sesion(tramas)
+        alertas = vigilar_sesion(tramas)
+        union_idx: set[int] = set().union(*[e["idx"] for e in epis.values()]) if epis else set()
+
+        alarmas_por_mac = {mac: {f["idx"] for f in filas if f["alarma"]} for mac, filas in seg.items()}
+        for mac, filas in seg.items():
+            idxs = [f["idx"] for f in filas]
+            dispositivo_dias += (max(idxs) - min(idxs) + 1) * ventana_s / ev.SEGUNDOS_POR_DIA
+            fa_identidad += len(alarmas_por_mac[mac] - union_idx)
+        fa_vigilante += sum(1 for a in alertas if a["idx"] not in union_idx)
+
+        for ep, info in epis.items():
+            det_id = any(alarmas_por_mac.get(m, set()) & info["idx"] for m in info["macs"])
+            det_vig = any(a["idx"] in info["idx"] for a in alertas)
+            por_episodio[f"{nombre}#{ep}"] = {"tipo": info["tipo"], "det_identidad": det_id,
+                                              "det_vigilante": det_vig}
+        logger.info("canales: %s (%d episodios)", nombre, len(epis))
+
+    tipos = sorted({v["tipo"] for v in por_episodio.values()})
+
+    def recall(canal: str, tipo: str | None = None) -> float | None:
+        vals = [v[canal] for v in por_episodio.values() if tipo is None or v["tipo"] == tipo]
+        return float(np.mean(vals)) if vals else None
+
+    def por_dia(fa: int) -> float | None:
+        return float(fa / dispositivo_dias) if dispositivo_dias else None
+
+    return {
+        "por_episodio": por_episodio,
+        "identidad": {"recall_global": recall("det_identidad"),
+                      "recall_por_tipo": {t: recall("det_identidad", t) for t in tipos},
+                      "falsas_alarmas": int(fa_identidad), "fa_por_dispositivo_dia": por_dia(fa_identidad)},
+        "vigilante": {"recall_global": recall("det_vigilante"),
+                      "recall_por_tipo": {t: recall("det_vigilante", t) for t in tipos},
+                      "falsas_alarmas": int(fa_vigilante), "fa_por_dispositivo_dia": por_dia(fa_vigilante)},
+        "dispositivo_dias": round(dispositivo_dias, 3),
+    }
+
+
+def canal_or(tabla_sup42: pd.DataFrame, canales: dict, cfg: dict, sup: dict) -> dict:
+    """OR booleano por episodio: supervisado(semilla 42) ∨ identidad ∨ vigilante, con su FA sumada.
+
+    El canal supervisado entra con la detección por episodio de la semilla de referencia 42 (no la
+    media de las 5): así el OR es un ∨ limpio sobre los mismos episodios etiquetables. El recall
+    supervisado de cabecera sigue siendo la media de las 5 semillas (en `supervisado.resumen`).
+    """
+    por_ep = canales["por_episodio"]
+    filas = []
+    for _, fila in tabla_sup42.iterrows():
+        c = por_ep.get(f"{fila['sesion']}#{int(fila['episodio'])}", {})
+        filas.append({"tipo": str(fila["tipo"]), "sup": bool(fila["detectado"]),
+                      "or": bool(fila["detectado"]) or bool(c.get("det_identidad")) or bool(c.get("det_vigilante"))})
+    d = pd.DataFrame(filas)
+    tipos = sorted(d["tipo"].unique())
+    fa_sup = float(sup["dispositivos"]["falsas_alarmas_por_dispositivo_dia"]["valor"])
+    fa_id = canales["identidad"]["fa_por_dispositivo_dia"]
+    fa_vig = canales["vigilante"]["fa_por_dispositivo_dia"]
+    return {
+        "recall_supervisado_42": float(d["sup"].mean()),
+        "recall_or": float(d["or"].mean()),
+        "extra_recall_or": float(d["or"].mean() - d["sup"].mean()),
+        "recall_or_por_tipo": {t: float(d[d["tipo"] == t]["or"].mean()) for t in tipos},
+        "recall_supervisado_42_por_tipo": {t: float(d[d["tipo"] == t]["sup"].mean()) for t in tipos},
+        "fa_por_dispositivo_dia": {
+            "supervisado": round(fa_sup, 2),
+            "identidad_en_estas_sesiones": round(fa_id, 2) if fa_id is not None else None,
+            "identidad_referencia_e3b_con_variacion": cfg.get("fa_identidad_e3b_variacion"),
+            "vigilante": round(fa_vig, 2) if fa_vig is not None else None,
+            "or_total_en_estas_sesiones": round(fa_sup + (fa_id or 0) + (fa_vig or 0), 2),
+        },
+    }
+
+
+# --------------------------------------------------------------------------------------------
 # Orquestación y salida
 # --------------------------------------------------------------------------------------------
 
@@ -185,6 +296,11 @@ def evaluar(cfg: dict, ruta_config: str | None = None) -> dict:
     resumen_sup = ev.resumir(df, predicciones, int(cfg["n_bootstrap"]), int(cfg["semilla_bootstrap"]))
     inv = episodios_invisibles(df, k, tipos_por_episodio(ruta_proyecto(cfg["dir_pcap"]), cfg["sesiones"]))
 
+    canales = canales_identidad_vigilante(cfg)
+    idx_or = list(cfg["semillas"]).index(int(cfg.get("semilla_or", cfg["semillas"][0])))
+    tabla42 = ev.tabla_episodios(df, predicciones[idx_or].alarma)
+    canales["or"] = canal_or(tabla42, canales, cfg, resumen_sup)
+
     informe: dict = {
         "etapa": "E4R",
         "fecha": datetime.now().isoformat(timespec="seconds"),
@@ -195,6 +311,7 @@ def evaluar(cfg: dict, ruta_config: str | None = None) -> dict:
                     "filas": int(len(df))},
         "supervisado": {"resumen": resumen_sup},
         "invisibles": resumen_invisibles(resumen_sup, inv),
+        "canales": canales,
     }
     informe["resumen"] = resumen_robustez(informe)
     return informe
@@ -218,7 +335,15 @@ def resumen_robustez(informe: dict) -> dict:
     }
     r["_suave_tipo_debug"] = suave_tipo
     if "canales" in informe:
-        r["canales"] = informe["canales"].get("resumen", {})
+        c = informe["canales"]
+        r["canales"] = {
+            "recall_supervisado_42": round(c["or"]["recall_supervisado_42"], 3),
+            "recall_or": round(c["or"]["recall_or"], 3),
+            "extra_recall_or": round(c["or"]["extra_recall_or"], 3),
+            "recall_identidad": c["identidad"]["recall_global"],
+            "recall_vigilante": round(c["vigilante"]["recall_global"], 3),
+            "fa_por_dispositivo_dia": c["or"]["fa_por_dispositivo_dia"],
+        }
     return r
 
 
@@ -265,7 +390,39 @@ def markdown(informe: dict) -> str:
                f"en todas sus ventanas): **{inv['total']['n_invisibles']}** episodios.",
                "El IC mostrado es el de los episodios etiquetables (de `ev.resumir`); la columna "
                "«sobre todos» añade los invisibles como no detectados y no lleva IC propio.", ""]
+    if "canales" in informe:
+        lineas += _markdown_canales(informe["canales"])
     return "\n".join(lineas) + "\n"
+
+
+def _celda(por_tipo: dict, t: str) -> str:
+    v = por_tipo.get(t)
+    return f"{v:.3f}" if v is not None else "—"
+
+
+def _markdown_canales(canales: dict) -> list[str]:
+    """Recall por canal y tipo, y el OR con su costo en FA."""
+    o = canales["or"]
+    tipos = sorted(set(o["recall_or_por_tipo"]) | set(canales["identidad"]["recall_por_tipo"]))
+    lineas = ["## Canales por separado y el OR", "",
+              "Detección por episodio etiquetable; el supervisado entra en el OR con la semilla 42. "
+              "Identidad y vigilante por solape temporal sobre los pcaps de ataque.", "",
+              "| Tipo | Supervisado(42) | Identidad | Vigilante | OR |", "|---|---|---|---|---|"]
+    for t in tipos:
+        lineas.append(
+            f"| {t} | {_celda(o['recall_supervisado_42_por_tipo'], t)} "
+            f"| {_celda(canales['identidad']['recall_por_tipo'], t)} "
+            f"| {_celda(canales['vigilante']['recall_por_tipo'], t)} | {_celda(o['recall_or_por_tipo'], t)} |")
+    fa = o["fa_por_dispositivo_dia"]
+    lineas += [
+        f"| **global** | {o['recall_supervisado_42']:.3f} | "
+        f"{(canales['identidad']['recall_global'] or 0):.3f} | {canales['vigilante']['recall_global']:.3f} | "
+        f"{o['recall_or']:.3f} |", "",
+        f"El OR añade **{o['extra_recall_or']:+.3f}** de recall sobre el supervisado. Costo en FA/disp-día "
+        f"sobre estas sesiones: supervisado {fa['supervisado']}, vigilante {fa['vigilante']}, "
+        f"identidad {fa['identidad_en_estas_sesiones']} (referencia E3B con variación benigna: "
+        f"{fa['identidad_referencia_e3b_con_variacion']}); OR total {fa['or_total_en_estas_sesiones']}.", ""]
+    return lineas
 
 
 def main(argv: list[str] | None = None) -> int:
