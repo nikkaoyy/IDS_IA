@@ -1,4 +1,4 @@
-SEGUIR — bloques 1 y 2 hechos; sigue el bloque 3 (invariantes de efecto) y el cierre.
+SEGUIR — bloques 1–3 hechos; sigue el cierre (correr aceptación, informe, ESTADO).
 
 # Progreso — PEDIDO-E4R-1
 

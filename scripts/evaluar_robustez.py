@@ -53,6 +53,37 @@ logger = logging.getLogger("evaluar_robustez")
 
 K_DEFECTO = 2
 
+# Invariante de efecto por ataque (bloque 3): la tasa mínima que lo mantiene siendo ataque la pone
+# la física del objetivo, no el detector. `suave` son las tasas reales de `RANGOS_ATAQUE` en
+# `scripts/lab/generar_trafico.py` (generador congelado). `suelo` es la tasa mínima teórica con la
+# que el invariante aún se cumple. `lectura` compara ambas. Tabla estática, citada, no medida.
+INVARIANTES: list[dict] = [
+    {"ataque": "syn_flood", "suave": "0,4–2,5 SYN/s, 120–400 s",
+     "invariante": "agotar el backlog (N) antes del primer reintento SYN-ACK (RTO)",
+     "suelo": "N/RTO ≈ 64/3 ≈ 21 medios-abiertos/s",
+     "lectura": "`suave` queda muy por debajo del suelo de backlog: no agota la cola"},
+    {"ataque": "arp_spoofing", "suave": "0,25–0,8 ARP/s, 120–400 s",
+     "invariante": "refrescar antes del gc_stale de la caché (≈60 s Linux, ≈30 s Windows)",
+     "suelo": "≥ 1/60 s ≈ 0,017 ARP/s",
+     "lectura": "`suave` por encima del suelo: sigue envenenando la caché"},
+    {"ataque": "mac_flooding", "suave": "1–6 MAC/s, 60–300 s",
+     "invariante": "inserciones/s ≥ tamaño de la tabla CAM / su tiempo de envejecimiento",
+     "suelo": "≈ 8192/300 ≈ 27 MAC/s",
+     "lectura": "`suave` muy por debajo: no desborda la CAM (no fuerza el modo hub)"},
+    {"ataque": "port_scan", "suave": "0,3–0,6 sondas/s, 40–120 puertos",
+     "invariante": "puertos distintos/hora suficientes para cubrir el rango objetivo",
+     "suelo": "depende del rango; top-puertos se cubre lento",
+     "lectura": "`suave` conserva el efecto: recorre los puertos comunes, solo más despacio"},
+    {"ataque": "dns_spoofing", "suave": "0,3–0,7 resp/s, 120–400 s",
+     "invariante": "la respuesta forjada llega antes que la legítima (ventana de RTT)",
+     "suelo": "1 respuesta por consulta dentro de la ventana de RTT",
+     "lectura": "el efecto lo pone la carrera por consulta, no la tasa agregada"},
+    {"ataque": "icmp_flood", "suave": "0,5–2 ICMP/s, 60–300 s",
+     "invariante": "saturar el ancho de banda o la CPU del objetivo (BlackNurse: tipo 3/3)",
+     "suelo": "depende del enlace; muy por encima de unas pocas/s",
+     "lectura": "`suave` no satura: es más sonda que inundación"},
+]
+
 
 # --------------------------------------------------------------------------------------------
 # Dataset y canal supervisado
@@ -285,6 +316,53 @@ def canal_or(tabla_sup42: pd.DataFrame, canales: dict, cfg: dict, sup: dict) -> 
 
 
 # --------------------------------------------------------------------------------------------
+# Invariantes de efecto (bloque 3)
+# --------------------------------------------------------------------------------------------
+
+def invariantes_efecto(resumen_sup: dict, inv: pd.DataFrame) -> list[dict]:
+    """Cruza la tabla estática de invariantes con el recall supervisado en `suave` y los invisibles.
+
+    Donde `suave` cae bajo el suelo de efecto **y** el recall en `suave` es 0 por etiqueta (ninguna
+    ventana alcanza K), se marca «invisible por construcción»: no cuenta como evasión del modelo.
+    """
+    por_ti = resumen_sup["episodios"].get("por_tipo_e_intensidad", {})
+    inv_suave = (inv[(inv["invisible"]) & (inv["intensidad"] == "suave")]["tipo"].value_counts().to_dict()
+                 if len(inv) else {})
+    salida = []
+    for base in INVARIANTES:
+        clave = f"{base['ataque']}/suave"
+        bloque = por_ti.get(clave)
+        recall = bloque["valor"] if bloque and bloque.get("valor") is not None else None
+        n_suave = bloque.get("n") if bloque else 0
+        n_inv_suave = int(inv_suave.get(base["ataque"], 0))
+        invisible = (recall == 0 or recall is None) and n_inv_suave > 0
+        salida.append({
+            **base, "recall_suave": recall, "episodios_suave_etiquetables": n_suave,
+            "invisibles_suave": n_inv_suave,
+            "invisible_por_construccion": bool(invisible),
+        })
+    return salida
+
+
+def _markdown_invariantes(invariantes: list[dict]) -> list[str]:
+    """Tabla de invariantes con el recall supervisado medido en `suave`."""
+    lineas = ["## Invariantes de efecto (el suelo lo pone la física, no el detector)", "",
+              "Tasa `suave` real del generador congelado (`RANGOS_ATAQUE`) frente al suelo teórico que "
+              "conserva el efecto, y el recall del supervisado medido en `suave`.", "",
+              "| Ataque | `suave` (generador) | Invariante | Suelo de efecto | Recall `suave` | Invisibles `suave` |",
+              "|---|---|---|---|---|---|"]
+    for r in invariantes:
+        rec = f"{r['recall_suave']:.3f}" if r["recall_suave"] is not None else "—"
+        if r["invisible_por_construccion"]:
+            rec += " (invisible por construcción)"
+        lineas.append(f"| {r['ataque']} | {r['suave']} | {r['invariante']} | {r['suelo']} | {rec} "
+                      f"| {r['invisibles_suave']} |")
+    lineas += ["", "Donde la `suave` cae bajo el suelo de efecto y el recall es 0 por etiqueta, el "
+               "ataque es «invisible por construcción» y no cuenta como evasión del modelo.", ""]
+    return lineas
+
+
+# --------------------------------------------------------------------------------------------
 # Orquestación y salida
 # --------------------------------------------------------------------------------------------
 
@@ -312,6 +390,7 @@ def evaluar(cfg: dict, ruta_config: str | None = None) -> dict:
         "supervisado": {"resumen": resumen_sup},
         "invisibles": resumen_invisibles(resumen_sup, inv),
         "canales": canales,
+        "invariantes": invariantes_efecto(resumen_sup, inv),
     }
     informe["resumen"] = resumen_robustez(informe)
     return informe
@@ -392,6 +471,8 @@ def markdown(informe: dict) -> str:
                "«sobre todos» añade los invisibles como no detectados y no lleva IC propio.", ""]
     if "canales" in informe:
         lineas += _markdown_canales(informe["canales"])
+    if "invariantes" in informe:
+        lineas += _markdown_invariantes(informe["invariantes"])
     return "\n".join(lineas) + "\n"
 
 

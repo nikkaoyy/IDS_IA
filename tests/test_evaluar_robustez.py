@@ -110,3 +110,23 @@ def test_episodios_sesion_mapea_ventanas_y_macs(tmp_path, monkeypatch):
     epis = er._episodios_sesion(d, "sesion_000", 5.0)
     assert set(epis) == {0} and epis[0]["macs"] == {"aa:bb"} and epis[0]["tipo"] == "syn_flood"
     assert epis[0]["idx"] == {200000, 200001}  # 1e12//5e6 y (1e12+5e6·10³)//5e6
+
+
+# --- Bloque 3: invariantes de efecto ----------------------------------------------------
+
+def test_invariantes_cruza_recall_suave_y_marca_invisible():
+    resumen_sup = {"episodios": {"por_tipo_e_intensidad": {
+        "syn_flood/suave": {"valor": 0.8, "n": 5},
+        "arp_spoofing/suave": {"valor": 0.0, "n": 0},
+    }}}
+    inv = pd.DataFrame([
+        {"sesion": "s0", "episodio": 1, "tipo": "arp_spoofing", "intensidad": "suave",
+         "max_tramas": 1, "ventanas_tocadas": 2, "invisible": True},
+    ])
+    tabla = er.invariantes_efecto(resumen_sup, inv)
+    por = {r["ataque"]: r for r in tabla}
+    assert por["syn_flood"]["recall_suave"] == 0.8 and not por["syn_flood"]["invisible_por_construccion"]
+    # arp en suave: recall 0 y hay un invisible -> invisible por construcción.
+    assert por["arp_spoofing"]["invisibles_suave"] == 1 and por["arp_spoofing"]["invisible_por_construccion"]
+    # Cubre los seis ataques del catálogo.
+    assert len(tabla) == 6
