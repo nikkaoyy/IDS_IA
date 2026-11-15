@@ -1,4 +1,4 @@
-SEGUIR — bloque 1 hecho (vigilante ARP); sigue el bloque 2 (retemporizador).
+SEGUIR — bloques 1 y 2 hechos; sigue el bloque 3 (régimen invisible medido).
 
 # Progreso — PEDIDO-E4C-1
 
@@ -39,3 +39,15 @@ Primera línea: semáforo (`SEGUIR` con el siguiente paso, o `PARAR` con el moti
   para el supervisado por el etiquetado K=2, no por el modelo.
 - P2 (bloque 3): el vigilante con el bloque 1 sí detecta el ARP lento, latencia ≈ la ventana de
   cruce. Si falla cualquiera de las dos, se reporta que falló y por qué.
+
+## Bloque 2 — retemporizador (hecho)
+
+- `scripts/lab/retemporizar.py`: lee una sesión existente y solo cambia `pkt.time` de las tramas
+  de un episodio ARP/DNS. Verifica cuatro invariantes y falla si se rompen: (i) multiconjunto de
+  bytes idéntico; (ii) nº de tramas igual; (iii) timestamps no decrecientes; (iv) orden relativo
+  de movidas y quietas conservado. Reescribe los sidecars (`.tramas.csv`/`.episodios.csv` con los
+  `ts_us` nuevos) para que `pcap_to_features` siga etiquetando. Rechaza tipos ≠ ARP/DNS, pcaps
+  fuera de `data/pcap/` y escrituras fuera de ahí. Semilla fija ⇒ pcap byte a byte.
+- `tests/test_retemporizar.py` (6): determinismo, bytes invariantes, rechazo de tipo, rechazo de
+  ruta, y la integración con `pcap_to_features`: a paso 30 s el episodio queda por debajo de K
+  (0 ventanas etiquetadas, invisible); a paso 0,5 s sí se etiqueta.
