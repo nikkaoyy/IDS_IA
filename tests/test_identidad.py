@@ -340,6 +340,50 @@ def test_ip_externa_no_se_vigila():
     assert vig.observar(_tramas_ip(0, VICTIMA, "93.184.216.34") + _tramas_ip(0, CLON, "93.184.216.34"), 0) == []
 
 
+# --- PEDIDO-E4C-1, bloque 1: el vigilante alimenta el mapa ip->MAC también con el ARP ---------
+
+def _arp(k: int, mac_src: str, psrc: str, hwsrc: str, op: int = 2) -> list[Trama]:
+    """Una trama ARP (sin capa 3): declara `psrc -> hwsrc`; `mac_src` es el Ether.src real."""
+    return [Trama(ts_us=int((5 * k + 1) * 1_000_000), longitud=60, mac_src=mac_src, mac_dst="ff:ff:ff:ff:ff:ff",
+                  ethertype=0x0806, arp_op=op, arp_psrc=psrc, arp_hwsrc=hwsrc, arp_pdst="10.20.0.1")]
+
+
+def _vigilante_con_vinculo_arp() -> idn.VigilanteIP:
+    """Vínculo 10.20.0.5 -> VICTIMA aprendido solo de anuncios ARP (sin capa 3)."""
+    vig = idn.VigilanteIP()
+    for k in range(idn.MIN_VENTANAS_PERFIL):
+        assert vig.observar(_arp(k, VICTIMA, "10.20.0.5", VICTIMA, op=1), int(5 * k * 1e6)) == []
+    assert vig.vinculo["10.20.0.5"] == VICTIMA
+    return vig
+
+
+def test_arp_spoofing_lento_una_trama_dispara_el_vigilante():
+    """(a): un ARP falso que reclama la IP de la víctima con otra MAC alarma, con una sola trama."""
+    vig = _vigilante_con_vinculo_arp()
+    a = vig.observar(_arp(30, CLON, "10.20.0.5", CLON), int(150e6))  # víctima callada, 1 trama
+    assert [x["tipo"] for x in a] == ["reasignacion"] and a[0]["mac_anterior"] == VICTIMA
+
+
+def test_arp_gratuito_del_mismo_equipo_no_dispara():
+    """(b): GARP legítimo (misma IP, misma MAC, Ether.src = hwsrc) no es suplantación."""
+    vig = _vigilante_con_vinculo_arp()
+    assert vig.observar(_arp(30, VICTIMA, "10.20.0.5", VICTIMA), int(150e6)) == []
+
+
+def test_arp_cambio_secuencial_es_reasignacion_no_conflicto():
+    """(c): dos MAC a la vez es conflicto; una MAC nueva con la anterior callada (dentro de la
+    gracia de 600 s, que no se toca) es reasignación. Pasada la gracia sigue siendo traspaso
+    silencioso (E3B); por eso el caso se mide dentro de la gracia."""
+    conflicto = idn.VigilanteIP()
+    for k in range(idn.MIN_VENTANAS_PERFIL):
+        conflicto.observar(_arp(k, VICTIMA, "10.20.0.5", VICTIMA, op=1), int(5 * k * 1e6))
+    a = conflicto.observar(_arp(20, VICTIMA, "10.20.0.5", VICTIMA) + _arp(20, CLON, "10.20.0.5", CLON), int(100e6))
+    assert [x["tipo"] for x in a] == ["conflicto"]
+    reasig = _vigilante_con_vinculo_arp()
+    b = reasig.observar(_arp(40, CLON, "10.20.0.5", CLON), int(200e6))
+    assert [x["tipo"] for x in b] == ["reasignacion"]
+
+
 def test_dos_conexiones_solapadas_de_un_contador_global_no_son_dos_contadores(monkeypatch):
     """IDs intercalados de un mismo bloque contiguo: un contador (grupos); las cadenas registradas fallaban."""
     ventanas, c = _historia_global()

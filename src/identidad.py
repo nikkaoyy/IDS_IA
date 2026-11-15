@@ -432,11 +432,26 @@ class VigilanteIP:
             return False
 
     def observar(self, tramas: Sequence[Trama], ts_us: int) -> list[dict]:
-        """Procesa las tramas de una ventana (de todos los equipos); devuelve sus alertas."""
+        """Procesa las tramas de una ventana (de todos los equipos); devuelve sus alertas.
+
+        El mapa `ip → MAC` se alimenta de dos fuentes con el mismo criterio (PEDIDO-E4C-1,
+        bloque 1): el emisor IP de capa 3 (`ip_src → mac_src`) y el vínculo que declara cada
+        ARP local (`arp_psrc → arp_hwsrc`, `arp_op` 1 o 2). Así una suplantación ARP —que no
+        tiene capa 3 y antes era invisible para el vigilante— reclama una IP ya vinculada a
+        otra MAC y dispara conflicto o reasignación igual que la de capa 3, sin umbrales nuevos.
+        """
         por_ip: dict[str, set[str]] = {}
+        contradicciones: dict[str, dict] = {}
         for t in tramas:
             if self._local(t.ip_src):
                 por_ip.setdefault(t.ip_src, set()).add(t.mac_src)
+            if t.arp_op in (1, 2) and t.arp_hwsrc and self._local(t.arp_psrc):
+                por_ip.setdefault(t.arp_psrc, set()).add(t.arp_hwsrc)
+                # Contradicción propia: el ARP declara un emisor que no es el Ether.src real.
+                if t.arp_hwsrc != t.mac_src and t.arp_psrc not in contradicciones:
+                    contradicciones[t.arp_psrc] = {
+                        "tipo": "arp_ether_discrepante", "ip": t.arp_psrc,
+                        "arp_hwsrc": t.arp_hwsrc, "mac_src": t.mac_src}
         alertas = []
         for ip, macs in sorted(por_ip.items()):
             if len(macs) >= 2:
@@ -453,8 +468,11 @@ class VigilanteIP:
                                 "silencio_s": silencio_s})
             else:
                 self._contar(ip, mac)
+        alertas += [contradicciones[ip] for ip in sorted(contradicciones) if ip not in {a["ip"] for a in alertas}]
         for t in tramas:
             self.ultima_us[t.mac_src] = max(self.ultima_us.get(t.mac_src, 0), t.ts_us)
+            if t.arp_op in (1, 2) and t.arp_hwsrc:
+                self.ultima_us[t.arp_hwsrc] = max(self.ultima_us.get(t.arp_hwsrc, 0), t.ts_us)
         return alertas
 
     def _contar(self, ip: str, mac: str) -> None:
