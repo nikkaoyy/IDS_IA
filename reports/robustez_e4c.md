@@ -1,6 +1,6 @@
 # Régimen invisible del ARP lento (E4C) — cifras
 
-Generado por `scripts/evaluar_robustez.py` el 2026-11-14T20:24:20 en el commit `afd9c8b9bdee0b200ddc413ed3de95ab9ddb9bdf` (árbol con cambios).
+Generado por `scripts/evaluar_robustez.py` el 2026-11-14T20:38:58 en el commit `bddff3e7e3c3d5b5f77210534e10b4491e785662` (árbol con cambios).
 Dataset `data/dataset_lab.csv` sha256 `7f06d099477a474b12db73001f3ee56a8e14e93bb41501c8b49ee94e4032a945`. Umbral de operación 0.9086 (XGB, 1 FA/disp-día de E2).
 
 Episodios ARP retemporizados sobre el corpus congelado; DNS en su tiempo nativo (la carrera es su suelo de efecto, no la tasa). Detección por canal: supervisado sobre ventanas etiquetadas; identidad y vigilante por solape temporal.

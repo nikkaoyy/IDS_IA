@@ -1,4 +1,4 @@
-SEGUIR — bloques 1-3 hechos; sigue el bloque 4 (informe y cierre).
+PARAR — PEDIDO-E4C-1 cerrado: cuatro bloques, informe, ESTADO y aceptación.
 
 # Progreso — PEDIDO-E4C-1
 

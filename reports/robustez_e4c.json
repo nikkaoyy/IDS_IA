@@ -1,7 +1,7 @@
 {
   "etapa": "E4C",
-  "fecha": "2026-11-14T20:24:20",
-  "commit": "afd9c8b9bdee0b200ddc413ed3de95ab9ddb9bdf",
+  "fecha": "2026-11-14T20:38:58",
+  "commit": "bddff3e7e3c3d5b5f77210534e10b4491e785662",
   "arbol_con_cambios": true,
   "config_archivo": "configs/robustez_e4c.json",
   "config": {

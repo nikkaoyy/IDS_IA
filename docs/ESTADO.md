@@ -1,6 +1,6 @@
 # Estado del proyecto IDS (IEEE 802.3)
 
-> Dueño en esta ventana: PEDIDO-E4R-1. Actualizado el 2026-11-14, al cerrar E4R.
+> Dueño en esta ventana: PEDIDO-E4C-1. Actualizado el 2026-11-14, al cerrar E4C.
 > Cifras con IC al 95 %; el detalle de cada una está en su informe.
 
 ## Etapas
@@ -14,6 +14,7 @@
 | **E3A — identidad, niveles 1–2** | **Cerrada** | `docs/INFORME_E3A.md` | Detección ingenuo **0,975**, ritmo **1,000**; latencia 4,2 s / 10,0 s; **FA 16,2/disp-día** (IP-ID) |
 | **E3B — pila completa, variación, contaminación** | **Cerrada** | `docs/INFORME_E3B.md` | IP-ID por flujo: FA **16,2 → 0,38**; con variación benigna **826 FA/disp-día**; pila completa **0,20** (0,325 en sesiones nuevas; 0/47 sin contador global); contaminación 20 %: absorción **0,80**, detección 0,83 |
 | **E4R — robustez del detector** | **Cerrada** | `docs/INFORME_E4R.md` | Recall supervisado por intensidad: media **0,935**, suave **0,891**, ráfaga **0,824** (no baja de 0,5); **0 invisibles por construcción**; OR de canales **+0,053** a **+122 FA/disp-día** |
+| **E4C — régimen invisible del ARP lento** | **Cerrada** | `docs/INFORME_E4C.md` | ARP a paso ≥ 5 s: supervisado **1,000 → 0,000** (invisible por construcción); el vigilante IP→MAC (ahora lee ARP) lo detecta **1,000** con **0,0 FA/disp-día** sobre variación benigna |
 | E4 (evasión real), E5, E6 | No empezadas | — | — |
 
 ## Defensas del perfil de identidad (tras la ablación de E3B)
@@ -52,8 +53,14 @@
    `suave` dura más y deja más ventanas etiquetables) y **ningún episodio es invisible por
    construcción**. El OR con los canales de identidad sube el recall solo **+0,053** y a cambio
    de **+122 FA/disp-día** (826 con variación benigna): no compensa frente a floods ni escaneos.
-   El vigilante IP→MAC es ciego al ARP (capa 2). Medir evasión real exige una captura propia o un
-   generador de evasión, fuera del alcance de E4R.
+7. **Régimen invisible (E4C):** el ARP spoofing se detecta con el clasificador por ventana solo
+   mientras es rápido (recall 1,000 nativo). Separando sus tramas **5 s** —el tamaño de la ventana,
+   muy por debajo del suelo de efecto de 60 s del `gc_stale`— ninguna ventana alcanza K=2 y el ataque
+   es **invisible por construcción** para el supervisado (0,000), sin dejar de ser un ataque. El
+   **vigilante IP→MAC**, extendido para leer el ARP (y corregida su red local, antes era la del lab de
+   identidad), lo detecta al **1,000** en los pasos 5/15/30/60 s con **0,0 FA/disp-día** sobre la
+   variación benigna de E3B. La defensa contra el ataque lento no es un mejor clasificador de volumen,
+   sino una señal de identidad que no depende de la tasa.
 
 ## Restricciones que siguen en pie
 
@@ -67,8 +74,9 @@
 
 ## Pendiente para Nico
 
-- Decidir el mensaje del artículo con los cinco resultados de arriba.
-- Para E4 (laboratorio real): FA con variación real y DHCP real; los RST de la víctima frente
-  a un clon de pila completa en un switch; juzgar los contadores de IP-ID **entre ventanas**;
-  un mecanismo para aprender cambios legítimos sin aprender clones (registrado antes de medir
-  y medido en sesiones nuevas); defensa para la fase `no_confiable`.
+- Decidir el mensaje del artículo con los siete resultados de arriba.
+- Para E5 (laboratorio real): FA del vigilante con **DHCP y failover reales** (su 0,0 es optimista
+  porque el lab no los tiene); los RST de la víctima frente a un clon de pila completa en un switch;
+  juzgar los contadores de IP-ID **entre ventanas**; un mecanismo para aprender cambios legítimos sin
+  aprender clones (registrado antes de medir y medido en sesiones nuevas); defensa para la fase
+  `no_confiable`; y el DNS lento por carrera, que aquí solo se midió en tiempo nativo.
