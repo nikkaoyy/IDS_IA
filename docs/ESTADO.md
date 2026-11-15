@@ -17,7 +17,7 @@
 | **E4C — régimen invisible del ARP lento** | **Cerrada** | `docs/INFORME_E4C.md` | ARP a paso ≥ 5 s: supervisado **1,000 → 0,000** (invisible por construcción); el vigilante IP→MAC (ahora lee ARP) lo detecta **1,000** con **0,0 FA/disp-día** sobre variación benigna |
 | **E4 — evasión a nivel de pcap (consolida E4R+E4C)** | **Cerrada** | `docs/INFORME_E4.md` | Floods: pierden efecto antes de evadir el etiquetado (recall ≥ 0,5). ARP lento: supervisado **1,000 → 0,000**, vigilante IP→MAC **1,000** a 0,0 FA. Imitación de huella a nivel de paquete: laboratorio real |
 | **E5C — adoptar un cambio sin absorber un clon** | **Cerrada** | `docs/INFORME_E5C.md` | FA con variación **826 → 382/disp-día** (−54 %, IC sin solape, `no_confiable` igual); detección casi intacta (ritmo 1,000 → 0,975); `dos_pilas` casi no mejora (límite) |
-| E5 — Streaming (captura→ventanas→modelo→alerta en vivo) | No empezada | — | — |
+| **E5 — Streaming (captura→ventanas→modelo→alerta)** | **Cerrada** | `docs/INFORME_E5.md` | `MotorStreaming` con **paridad** probada con el lote; CLI `captura_en_vivo.py` (AsyncSniffer en vivo o replay offline); identidad + supervisado por ventana |
 | E6 — Mitigación (`dry-run`) y pronóstico de alertas | No empezada | — | — |
 | E7 — Cierre (notebook `.ipynb`, README, OE1) | No empezada | — | — |
 
