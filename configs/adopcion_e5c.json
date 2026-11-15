@@ -1,0 +1,9 @@
+{
+  "descripcion": "PEDIDO-E5C-1: FA con variación benigna y detección por nivel de clon, antes (apariciones, E3B) y después (persistencia, E5C).",
+  "variacion": {"dir_pcap": "data/pcap_variacion", "inicio": 0, "sesiones": 20, "regenerar": false},
+  "clones": {"dir_pcap": "data/pcap_clones", "inicio": 0, "sesiones": 20, "regenerar": false},
+  "suplantacion": {"dir_pcap": "data/pcap_e3b", "inicio": 0, "sesiones": 20, "regenerar": false},
+  "n_bootstrap": 1000,
+  "semilla_bootstrap": 42,
+  "salida": "reports/adopcion_e5c.json"
+}
