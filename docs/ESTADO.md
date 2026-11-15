@@ -18,7 +18,7 @@
 | **E4 — evasión a nivel de pcap (consolida E4R+E4C)** | **Cerrada** | `docs/INFORME_E4.md` | Floods: pierden efecto antes de evadir el etiquetado (recall ≥ 0,5). ARP lento: supervisado **1,000 → 0,000**, vigilante IP→MAC **1,000** a 0,0 FA. Imitación de huella a nivel de paquete: laboratorio real |
 | **E5C — adoptar un cambio sin absorber un clon** | **Cerrada** | `docs/INFORME_E5C.md` | FA con variación **826 → 382/disp-día** (−54 %, IC sin solape, `no_confiable` igual); detección casi intacta (ritmo 1,000 → 0,975); `dos_pilas` casi no mejora (límite) |
 | **E5 — Streaming (captura→ventanas→modelo→alerta)** | **Cerrada** | `docs/INFORME_E5.md` | `MotorStreaming` con **paridad** probada con el lote; CLI `captura_en_vivo.py` (AsyncSniffer en vivo o replay offline); identidad + supervisado por ventana |
-| E6 — Mitigación (`dry-run`) y pronóstico de alertas | No empezada | — | — |
+| **E6 — Mitigación (`dry-run`) y pronóstico** | **Cerrada** | `docs/INFORME_E6.md` | Mitigación escalable log→alerta→bloqueo→cuarentena, **dry-run por defecto** (no toca la red sin ejecutor explícito); pronóstico Holt de la tasa de alertas con aviso temprano y backtesting |
 | E7 — Cierre (notebook `.ipynb`, README, OE1) | No empezada | — | — |
 
 ## Defensas del perfil de identidad (tras la ablación de E3B)
