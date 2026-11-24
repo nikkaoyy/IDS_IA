@@ -107,3 +107,8 @@ sudo .venv/bin/python scripts/captura_en_vivo.py --iface eth0 --red-local 10.0.0
 | E7 | Cierre: cuaderno CRISP-DM de punta a punta | `notebooks/cierre_e7.ipynb` |
 
 Estado y conclusiones vigentes: `docs/ESTADO.md`.
+
+## Contexto académico
+
+Detección de intrusiones en red con aprendizaje automático: captura de tráfico, ventanas de tiempo, modelo XGBoost y una capa de identidad por dispositivo. Trabajo del curso **Modelos de Programación** de Ingeniería de Sistemas (Universidad Distrital Francisco José de Caldas),
+con el docente **Daza**.
