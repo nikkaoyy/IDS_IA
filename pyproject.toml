@@ -28,6 +28,12 @@ dev = [
     "matplotlib>=3.7",
     "statsmodels>=0.14",
 ]
+# Para ejecutar notebooks/cierre_e7.ipynb con `jupyter nbconvert --execute`.
+notebook = [
+    "nbconvert>=7.0",
+    "nbformat>=5.9",
+    "ipykernel>=6.0",
+]
 
 [tool.ruff]
 line-length = 100
