@@ -1,0 +1,58 @@
+{
+  "aviso": "tráfico sintético de laboratorio, generado por scripts/lab/generar_trafico.py con semilla fija; no es una captura de red real",
+  "archivo": "data/pcap/demo/sesion_demo.pcap",
+  "sha256": "3db1b93782256f7fab3cee27462129ec62ee8523983d81967fbc056454ec989b",
+  "bytes": 4293057,
+  "tramas": 9827,
+  "tramas_ataque_catalogo": 197,
+  "commit_partida": "655ad24",
+  "comando": "python scripts/generar_demo_pcap.py",
+  "canal_ataques": {
+    "generador": "scripts/lab/generar_trafico.py (congelado)",
+    "sesion": 0,
+    "semilla": 42000,
+    "ventana_s": [
+      236.0,
+      386.0
+    ],
+    "tramas": 8853,
+    "episodios": [
+      {
+        "episodio": 0,
+        "tipo": "arp_spoofing",
+        "variante": "carrera_host",
+        "intensidad": "media",
+        "capa": "enlace",
+        "atacante": "a4:83:e7:99:34:f4",
+        "origen": "clon",
+        "t_inicio_s": 276.409503,
+        "t_fin_s": 331.148229
+      }
+    ]
+  },
+  "canal_identidad": {
+    "generador": "scripts/lab/generar_clones.py",
+    "sesion": 1,
+    "semilla": 77001,
+    "ventana_original_s": [
+      234.6,
+      384.6
+    ],
+    "desfase_s": 1.4,
+    "tramas": 974,
+    "episodio": {
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:2d:25:a4:7d:30",
+      "pila_victima": "iot",
+      "pila_clon": "android",
+      "inicio_s": 305.956457,
+      "fin_s": 378.484698,
+      "ip_clon": "10.20.0.24",
+      "inicio_original_s": 304.55645691697765,
+      "fin_original_s": 377.0846979766172
+    },
+    "nota": "el clon no está en .tramas.csv: es verdad terreno del canal de identidad, no del modelo de ataques"
+  },
+  "tiempo": "ts = 1e12 µs + segundo de la sesión original (reloj sintético del generador)"
+}

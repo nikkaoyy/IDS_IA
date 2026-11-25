@@ -17,7 +17,9 @@ env/
 # Datos y capturas (no versionados por peso y reproducibilidad)
 data/*.csv
 data/*.pcap
-data/pcap/
+data/pcap/*
+# Excepción: el pcap de demostración (sintético, ~4 MB) y sus manifiestos sí se versionan.
+!data/pcap/demo/
 data/pcap_holdout/
 data/pcap_clones/
 data/pcap_variacion/

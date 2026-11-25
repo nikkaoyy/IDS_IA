@@ -1,0 +1,104 @@
+{
+  "semilla": 77001,
+  "desfase_s": 1.4,
+  "equipos": [
+    {
+      "mac": "02:d2:a4:c6:21:75",
+      "ip": "10.20.0.20",
+      "pila": "windows",
+      "conexiones_por_min": 2.3113814786289404,
+      "longitud_media": 505.95433826169585
+    },
+    {
+      "mac": "02:cd:76:42:5e:8b",
+      "ip": "10.20.0.21",
+      "pila": "iot",
+      "conexiones_por_min": 3.664835456310748,
+      "longitud_media": 270.30854292613213
+    },
+    {
+      "mac": "02:fe:d5:e5:2c:42",
+      "ip": "10.20.0.22",
+      "pila": "windows",
+      "conexiones_por_min": 1.8876273139885937,
+      "longitud_media": 246.9687128219333
+    },
+    {
+      "mac": "02:60:29:7f:e5:af",
+      "ip": "10.20.0.23",
+      "pila": "android",
+      "conexiones_por_min": 3.821776714240664,
+      "longitud_media": 308.7333615204148
+    },
+    {
+      "mac": "02:2d:25:a4:7d:30",
+      "ip": "10.20.0.24",
+      "pila": "iot",
+      "conexiones_por_min": 4.439234388072856,
+      "longitud_media": 261.5961689276342
+    },
+    {
+      "mac": "02:68:f9:e8:cb:7f",
+      "ip": "10.20.0.25",
+      "pila": "android",
+      "conexiones_por_min": 10.070141349669772,
+      "longitud_media": 493.79901998669055
+    },
+    {
+      "mac": "02:93:81:74:2a:9b",
+      "ip": "10.20.0.26",
+      "pila": "linux",
+      "conexiones_por_min": 8.993559258164574,
+      "longitud_media": 352.58264014513594
+    },
+    {
+      "mac": "02:24:db:a7:99:b0",
+      "ip": "10.20.0.27",
+      "pila": "android",
+      "conexiones_por_min": 7.809340459584586,
+      "longitud_media": 317.2212094898543
+    },
+    {
+      "mac": "02:d9:1a:5f:8b:3b",
+      "ip": "10.20.0.28",
+      "pila": "android",
+      "conexiones_por_min": 4.9809203593115035,
+      "longitud_media": 289.9591876031759
+    },
+    {
+      "mac": "02:ca:e6:83:a3:c7",
+      "ip": "10.20.0.29",
+      "pila": "android",
+      "conexiones_por_min": 2.3983347420726604,
+      "longitud_media": 292.34317078491756
+    },
+    {
+      "mac": "02:5f:0f:5f:03:c4",
+      "ip": "10.20.0.30",
+      "pila": "android",
+      "conexiones_por_min": 5.195614969623061,
+      "longitud_media": 364.56433565948913
+    },
+    {
+      "mac": "02:a6:c4:f9:4c:22",
+      "ip": "10.20.0.31",
+      "pila": "macos",
+      "conexiones_por_min": 4.499648595282979,
+      "longitud_media": 708.3078186849684
+    }
+  ],
+  "episodios": [
+    {
+      "episodio": 0,
+      "nivel": "ritmo",
+      "mac_victima": "02:2d:25:a4:7d:30",
+      "pila_victima": "iot",
+      "pila_clon": "android",
+      "inicio_s": 305.956457,
+      "fin_s": 378.484698,
+      "ip_clon": "10.20.0.24",
+      "inicio_original_s": 304.55645691697765,
+      "fin_original_s": 377.0846979766172
+    }
+  ]
+}
