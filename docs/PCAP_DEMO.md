@@ -135,3 +135,24 @@ Señales de **identidad** (`src/identidad.py`, fuera del contrato de 52 columnas
 Produce 708 filas (ventana de 5 s × MAC de origen) sobre 30 ventanas de 5 s y 41 MACs, con las 65
 columnas del dataset (52 de modelo + etiqueta + traza + identificación). 11 filas quedan etiquetadas
 `arp_spoofing` (las del atacante con al menos K = 2 tramas de ataque) y 697 como `normal`.
+
+## Replay offline en el motor de streaming (E5)
+
+```bash
+.venv/bin/python scripts/captura_en_vivo.py --pcap data/pcap/demo/sesion_demo.pcap \
+    --dataset data/dataset_lab.csv --red-local 10.0.0.0/24
+```
+
+Con el corpus regenerado (`data/dataset_lab.csv`, sha256 `7f06d099…a945`), el motor entrena el
+supervisado al arrancar (umbral 0,9086 a 1 FA/disp-día) y reproduce el pcap en 3,8 s: 9 827 tramas,
+708 ventanas, 51 alarmas del supervisado (12 sobre el atacante ARP `a4:83:e7:99:34:f4`), 5 de
+identidad (una sobre la MAC clonada `02:2d:25:a4:7d:30`) y 12 alertas del vigilante, con una latencia
+media de 4,1 ms por ventana. **Esto es una demostración, no una medida de falsas alarmas**:
+
+- son 150 s, menos de lo que el perfil de identidad necesita para salir de `no_confiable`;
+- el archivo junta dos segmentos, así que las columnas de nivel de segmento (`macs_activas`,
+  `macs_nuevas_por_s`, …) no se parecen a las del entrenamiento;
+- de las 39 alarmas del supervisado que no caen sobre el atacante, 10 son del gateway del generador
+  de clones (`02:00:00:00:00:01`) y 10 del resolver `b8:27:eb:2a:4f:6d`.
+
+Las cifras de FA del proyecto son las de `reports/`.
