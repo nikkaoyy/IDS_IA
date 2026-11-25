@@ -4,68 +4,90 @@ Prototipo del sistema de detección de intrusiones descrito en el artículo
 *"Detección de Intrusiones en Redes TCP/IP mediante Huella Digital de
 Dispositivos en el Protocolo IEEE 802.3 usando Inteligencia Artificial"*.
 
+Todos los datos del proyecto son **tráfico sintético de laboratorio** (generadores con semilla
+fija en `scripts/lab/`); no hay capturas de una red real. Licencia: MIT (`LICENSE`).
+
 ## Arquitectura
 
 ```
-Captura (Scapy) -> Extracción de huella IEEE 802.3 -> Preprocesamiento
-      -> Clasificación (Random Forest / XGBoost) -> Mitigación / Alerta
-                              ^
-                              |
-                    Simulador de ataque de suplantación
+Captura (Scapy) -> Huella IEEE 802.3 por ventana de 5 s -> Preprocesado
+   -> Clasificación (Random Forest / XGBoost)  +  Identidad del dispositivo
+   -> Mitigación (dry-run) / Alerta  +  Pronóstico de alertas
+                     ^
+     Evasión a nivel de pcap (E4) · suplantación de MAC/IP/pila (E3)
 ```
-
-Cada bloque corresponde a un módulo en `src/`:
 
 | Módulo | Responsabilidad |
 |---|---|
 | `src/capture.py` | Captura de tráfico en vivo con Scapy (requiere permisos de red) |
-| `src/fingerprint.py` | Extracción de la huella digital IEEE 802.3 (MAC, OUI, longitud, timing) |
-| `src/data.py` | Carga del dataset real (CICIDS2017/2018) o generación sintética de respaldo |
-| `src/preprocess.py` | División train/test y escalado de variables |
+| `src/streaming.py` | Motor de streaming: AsyncSniffer o replay → ventanas → modelo → alerta (E5) |
+| `src/ventanas.py` | Extractor de la huella por ventana, común al lote y al streaming |
+| `src/feature_schema.py` | Contrato de características: esquema 3.0, 52 columnas |
+| `src/fingerprint.py` | Huella IEEE 802.3 por trama (MAC, OUI, longitud, timing) |
+| `src/data.py` | Carga del dataset del laboratorio, semillas y holdout reservado |
+| `src/preprocess.py` | División y escalado |
 | `src/models.py` | Entrenamiento, evaluación y persistencia de Random Forest y XGBoost |
-| `src/attack_simulator.py` | Simulación del ataque de suplantación de huella digital |
-| `src/pipeline.py` | Orquestador (Algoritmo 1 del artículo): inferencia por trama y experimento completo |
+| `src/evaluacion.py` | Evaluación por episodio con IC bootstrap y FA/disp-día (E2) |
+| `src/anomalias.py` | Detector entrenado solo con benigno (contraste) |
+| `src/identidad.py` | Perfil de pila por dispositivo y vigilante IP→MAC (E3) |
+| `src/mitigacion.py` | Respuesta escalable log → alerta → bloqueo → cuarentena, dry-run por defecto (E6) |
+| `src/pronostico.py` | Pronóstico Holt de la tasa de alertas (E6) |
+| `src/attack_simulator.py` | Simulador original por columnas (se conserva; no es representativo, ver E4) |
+| `src/pipeline.py` | Orquestador (Algoritmo 1 del artículo) |
 
 ## Uso rápido
 
 ```bash
-pip install -r requirements.txt
-python3 -m src.pipeline
+uv venv && uv pip install -e ".[dev]"
+timeout 900 .venv/bin/python -m pytest -o addopts="" -q
+.venv/bin/python scripts/verificar_demo_pcap.py      # el pcap de demostración, campo por campo
 ```
 
-Pruebas: `pip install -r requirements.txt -r requirements-dev.txt` y luego `python -m pytest -q`.
+Para regenerar los datos y reproducir cada etapa, ver «Reproducir desde cero» más abajo.
 
-Esto ejecuta las Fases 2-4 de la metodología (datos, entrenamiento, evaluación
-comparativa y simulación de ataque) y guarda los modelos entrenados en `models/`.
+## Pendientes (abiertos de verdad)
 
-Mientras no se cuente con el dataset real, `src/data.py` genera datos sintéticos
-con la misma estructura de columnas, para que el pipeline sea ejecutable de
-punta a punta desde ya.
+Todos necesitan el laboratorio físico o sesiones nuevas; el núcleo software (OE1–OE3) está
+implementado y medido en el laboratorio sintético.
 
-## Pendientes (trazabilidad)
-
-- [ ] Sustituir `data/cicids2017_procesado.csv` (placeholder) por CICIDS2017/2018 real.
-- [ ] Ejecutar `src/capture.py` en el laboratorio de la asignatura para obtener huellas digitales reales.
-- [ ] Ajuste de hiperparámetros (`GridSearchCV`/`RandomizedSearchCV`).
-- [ ] Integrar `src/pipeline.py:inferir` en un bucle de captura en vivo (modo streaming).
+- [ ] Captura real sobre una interfaz del laboratorio (y ejecución real de la mitigación).
+- [ ] FA del vigilante IP→MAC con DHCP y failover reales (su 0,0 FA/disp-día es optimista).
+- [ ] RST de la víctima frente a un clon de pila completa en un switch.
+- [ ] Sesiones largas y nuevas (≥ 30; el holdout 20–29 está gastado) para cualquier cifra final.
 
 ## Estructura
 
 ```
 .
-├── src/
-│   ├── capture.py
-│   ├── fingerprint.py
-│   ├── data.py
-│   ├── preprocess.py
-│   ├── models.py
-│   ├── attack_simulator.py
-│   └── pipeline.py
+├── src/                    # módulos del IDS (tabla de arriba)
+├── scripts/                # evaluaciones por etapa, pcap -> ventanas, figuras, pcap demo
+│   ├── lab/                # generadores sintéticos (generar_trafico.py y generar_dataset_lab.py congelados)
+│   ├── evaluar*.py         # E2, E3, E4R/E4C, E5C, anomalías, holdout
+│   ├── pcap_to_features.py
+│   ├── captura_en_vivo.py  # E5: en vivo (root) o replay offline
+│   ├── figuras.py          # docs/figuras/ desde reports/
+│   ├── generar_demo_pcap.py
+│   └── verificar_demo_pcap.py
+├── tests/                  # pytest
+├── configs/                # configuración de cada evaluación (salida en reports/)
+├── reports/                # cifras congeladas de E1–E6 (JSON/MD)
+├── docs/
+│   ├── ESTADO.md           # estado y conclusiones vigentes
+│   ├── INFORME_*.md        # un informe por etapa
+│   ├── PCAP_DEMO.md
+│   ├── figuras/            # recall_por_intensidad.png, fa_disp_dia.png
+│   └── historial/          # pedidos y bitácoras de trabajo (registro)
 ├── notebooks/
+│   ├── cierre_e7.ipynb     # cierre CRISP-DM, lee reports/
+│   ├── final_report.ipynb
 │   └── IDS_IA_Ciberseguridad_proyecto.ipynb
-├── data/              # datasets (no versionados)
-├── models/             # modelos entrenados (.joblib, no versionados)
-└── requirements.txt
+├── doc_proyecto/           # anteproyecto (PDF) y culminacion_doc.md
+├── data/                   # datos regenerables (no versionados)...
+│   └── pcap/demo/          # ...salvo el pcap de demostración y sus manifiestos
+├── models/                 # modelos .joblib (no versionados)
+├── .github/workflows/tests.yml
+├── pyproject.toml
+└── LICENSE
 ```
 
 ## Etapas E1–E7 y cómo reproducir
@@ -177,3 +199,7 @@ byte a byte con los de E3 no se pudo comprobar. El corpus del paso 2 sí: el sha
 
 Detección de intrusiones en red con aprendizaje automático: captura de tráfico, ventanas de tiempo, modelo XGBoost y una capa de identidad por dispositivo. Trabajo de la asignatura **Fundamentos de redes de comunicaciones** de Ingeniería de Sistemas (Universidad Distrital Francisco José de Caldas),
 con el docente **Octavio José Salcedo Parra**.
+
+## Licencia
+
+MIT, © 2026 Nicolás Martínez Pineda. Ver `LICENSE`.

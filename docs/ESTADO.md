@@ -1,6 +1,6 @@
 # Estado del proyecto IDS (IEEE 802.3)
 
-> Dueño en esta ventana: cierre E4–E7. Actualizado el 2026-11-15; E4–E7 cerradas.
+> E1–E7 cerradas (2026-11-15). Cierre de entrega: 2026-11-25 (`INFORME-ENTREGA.md`).
 > Cifras con IC al 95 %; el detalle de cada una está en su informe.
 
 ## Etapas
@@ -96,16 +96,23 @@ Medida antes del cierre de entrega (commit de partida `31431f8`), sin datos en `
   nuevo va en generadores propios: `generar_clones.py` (77000+), `generar_variacion.py`
   (78000+), `generar_suplantacion.py` (79000+), `generar_contaminacion.py` (80000+).
   Sesiones de E3 ya usadas: clones 0–39, variación 0–19, suplantación 0–39, contaminación 0–19.
-- Sin `git push` desde estas ventanas.
+- `reports/` y `configs/` están congelados: los evaluadores escriben en `reports/`.
 
-## Pendiente para Nico
+## Pendientes abiertos (laboratorio físico)
 
-- Decidir el mensaje del artículo con los ocho resultados de arriba.
-- Para E6 (laboratorio real y ambigüedad de fondo): discriminar `dos_pilas` de un clon por el
-  **lapso** de aparición (una pila legítima sale salpicada toda la sesión; un clon es una racha
-  contigua tardía), registrado antes de medir y en sesiones nuevas; acotar la regresión de ritmo de
-  E5C; y lo del laboratorio real: FA del vigilante con **DHCP y failover reales** (su 0,0 es optimista
-  porque el lab no los tiene); los RST de la víctima frente a un clon de pila completa en un switch;
-  juzgar los contadores de IP-ID **entre ventanas**; un mecanismo para aprender cambios legítimos sin
-  aprender clones (registrado antes de medir y medido en sesiones nuevas); defensa para la fase
-  `no_confiable`; y el DNS lento por carrera, que aquí solo se midió en tiempo nativo.
+- Captura real sobre una interfaz del laboratorio (y ejecución real de la mitigación).
+- FA del vigilante IP→MAC con **DHCP y failover reales** (su 0,0 es optimista porque el lab
+  sintético no los tiene).
+- Los RST de la víctima frente a un clon de pila completa en un switch.
+- Sesiones largas y nuevas (≥ 30): toda cifra final nueva necesita sesiones no usadas.
+
+## Extensiones conocidas (registrar antes de medir, en sesiones nuevas)
+
+- Discriminar `dos_pilas` de un clon por el **lapso** de aparición (una pila legítima sale
+  salpicada toda la sesión; un clon es una racha contigua tardía).
+- Acotar la regresión de ritmo de E5C; juzgar los contadores de IP-ID **entre ventanas**.
+- Un mecanismo para aprender cambios legítimos sin aprender clones; defensa para la fase
+  `no_confiable`.
+- El DNS lento por carrera, que aquí solo se midió en tiempo nativo.
+- Decisión del autor: el mensaje del artículo con los ocho resultados de arriba
+  (`doc_proyecto/culminacion_doc.md`).

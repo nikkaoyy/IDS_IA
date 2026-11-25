@@ -1,57 +1,57 @@
 # IDS basado en IA — Huella Digital IEEE 802.3
 
-## Arquitectura
+> [!CAUTION] Antes de hacer cambios significativos, leer `docs/historial/CONTEXT_UPGRADE.md` (el
+> diagnóstico original, ya resuelto) y `docs/ESTADO.md` (estado y conclusiones vigentes).
+
+## Arquitectura y comandos
 
 ```
-Captura (Scapy) -> Extracción de huella IEEE 802.3 -> Preprocesamiento
-      -> Clasificación (Random Forest / XGBoost) -> Mitigación / Alerta
-                              ^
-                              |
-                    Simulador de ataque de suplantación
+Captura (Scapy, src/capture.py · src/streaming.py)
+   -> Huella IEEE 802.3 por ventana de 5 s (src/ventanas.py, contrato src/feature_schema.py)
+   -> Clasificación RF / XGBoost (src/models.py)  +  Identidad del dispositivo (src/identidad.py)
+   -> Mitigación en dry-run (src/mitigacion.py)  +  Pronóstico de alertas (src/pronostico.py)
+                     ^
+       Evasión a nivel de pcap (scripts/lab/retemporizar.py) y generadores de suplantación
 ```
 
-Cada módulo en `src/` mapea a un bloque de la Fig. 1 / Algoritmo 1 del artículo.
+Cada módulo de `src/` mapea a un bloque de la Fig. 1 / Algoritmo 1 del artículo. El extractor
+(`src/ventanas.py`) es el mismo para el lote (`scripts/pcap_to_features.py`) y el streaming.
+
+```
+src/        módulos del IDS (captura, ventanas, esquema, modelos, identidad, streaming,
+            mitigación, pronóstico, evaluación)
+scripts/    evaluaciones por etapa (evaluar*.py), pcap -> ventanas, figuras, pcap demo
+scripts/lab/ generadores sintéticos con semilla fija (generar_trafico.py y
+            generar_dataset_lab.py CONGELADOS) y retemporizador
+configs/    configuración de cada evaluación (rutas de entrada y de salida en reports/)
+reports/    cifras congeladas de E1–E6 (JSON/MD): evidencia del informe, no se reescribe
+docs/       informes por etapa, ESTADO.md, PCAP_DEMO.md, figuras/, historial/
+notebooks/  cierre_e7.ipynb (CRISP-DM, lee reports/)
+data/       datasets y pcaps regenerables (no versionados), salvo data/pcap/demo/
+models/     modelos .joblib (no versionados)
+tests/      pytest
+```
+
+```bash
+uv venv && uv pip install -e ".[dev]"            # entorno (".[dev,notebook]" para el cuaderno)
+.venv/bin/python -m pytest -o addopts="" -q       # suite
+.venv/bin/ruff check src/ tests/ scripts/         # lint
+.venv/bin/python scripts/lab/generar_dataset_lab.py --salida data/dataset_lab.csv  # corpus E1
+.venv/bin/python scripts/verificar_demo_pcap.py   # pcap de demostración
+.venv/bin/python scripts/figuras.py               # figuras desde reports/
+```
+
+Los comandos completos de reproducción (corpus, generadores de E3, evaluaciones) están en la
+sección «Reproducir desde cero» del `README.md`.
 
 ## Tech stack
 
-- Python 3.10+
+- Python 3.10+ (probado en 3.14; CI en 3.11)
 - scikit-learn, XGBoost — clasificación (RF y XGBoost)
-- Scapy — captura de tráfico de red
+- Scapy — captura y síntesis de tráfico
 - pandas, numpy — manipulación de datos
 - joblib — persistencia de modelos
-
-## Estructura del proyecto
-
-```
-src/
-├── capture.py           # Captura de tráfico en vivo (Scapy, requiere root)
-├── fingerprint.py       # Extracción de huella digital IEEE 802.3
-├── data.py              # Carga de dataset (CICIDS2017 o sintético)
-├── preprocess.py        # Split train/test + escalado
-├── models.py            # Entrenamiento, evaluación, persistencia RF/XGBoost
-├── attack_simulator.py  # Simulación de ataque de suplantación
-├── pipeline.py          # Orquestador del pipeline completo
-└── __init__.py
-notebooks/               # Jupyter notebook (CRISP-DM)
-data/                    # Datasets (no versionados)
-models/                  # Modelos entrenados .joblib (no versionados)
-```
-
-## Comandos
-
-```bash
-# Ejecutar pipeline completo (datos sintéticos si no hay dataset real)
-python3 -m src.pipeline
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Tests (cuando se implementen)
-python3 -m pytest tests/ -v
-
-# Linting (cuando se configure)
-ruff check src/ tests/
-```
+- statsmodels (opcional, pronóstico Holt-Winters), matplotlib (figuras)
 
 ## Convenciones de código
 
@@ -63,18 +63,41 @@ ruff check src/ tests/
 - Modelos se guardan en `models/` con joblib
 - Separación limpia: cada módulo tiene una responsabilidad única alineada al artículo
 
-## Estado del proyecto y problemas conocidos
+## Decisiones tomadas
 
-> [!CAUTION] Leer `CONTEXT_UPGRADE.md` antes de hacer cambios significativos.
+1. **Dataset propio del laboratorio, no CICIDS2017.** CICIDS no trae los campos IEEE 802.3 (MAC,
+   OUI, ethertype) ni las señales de pila (TTL, ventana, opciones TCP, IP-ID). Se usa un generador
+   sintético con verdad terreno por trama (`scripts/lab/generar_trafico.py`, congelado): 20
+   sesiones de desarrollo, sha256 `7f06d099…a945`. El holdout 20–29 está **gastado**: una cifra
+   final nueva necesita sesiones nuevas (≥ 30).
+2. **Un solo contrato de características.** Esquema 3.0, 52 columnas (`src/feature_schema.py`),
+   producido por `src/ventanas.py` tanto en lote como en streaming. Las señales de identidad viven
+   en `src/identidad.py`, **fuera** del contrato de ataques.
+3. **Evaluación por episodio**, con IC bootstrap, falsas alarmas por dispositivo-día (umbral a
+   1 FA/disp-día) y LOAO para medir la transferencia a tipos nuevos. La exactitud por ventana
+   queda solo como referencia.
+4. **Evasión medida a nivel de pcap.** Se usan `scripts/lab/retemporizar.py` y los generadores de
+   suplantación (`generar_clones.py`, `generar_variacion.py`, `generar_suplantacion.py`,
+   `generar_contaminacion.py`), no la perturbación de columnas agregadas. `src/attack_simulator.py`
+   se conserva, pero no es representativo.
+5. **Streaming real:** `src/streaming.py` (AsyncSniffer + ventanas) con paridad probada frente al
+   lote; `scripts/captura_en_vivo.py` en vivo (root) o en replay offline.
+6. **Mitigación en dry-run por defecto:** sin un `ejecutor` explícito no toca la red.
+7. **Proyecto profesionalizado:** git, `pyproject.toml`, pytest, ruff, CI
+   (`.github/workflows/tests.yml`), licencia MIT.
+8. **Cifras congeladas:** `reports/`, `configs/` y los generadores congelados no se modifican.
+   Los evaluadores escriben en `reports/`: ejecutarlos reescribe la evidencia.
 
-Problemas críticos documentados en `CONTEXT_UPGRADE.md`:
+## Extensiones conocidas
 
-1. **Features desconectadas**: `fingerprint.py` extrae features (MAC, OUI, longitud, ethertype, Δt) que NO son las que consume el modelo (num_conexiones_por_min, tasa_syn, entropia_puertos_destino). No hay camino funcional captura→modelo.
-2. **Resultados tautológicos**: El dataset sintético produce etiquetas como función determinista de 3 features → 100% accuracy siempre. No tiene valor científico.
-3. **Simulador invertido**: El ataque perturba tráfico legítimo esperando que se detecte como malicioso. Lo correcto es probar evasión (tráfico malicioso que intenta parecer legítimo).
-4. **Sin streaming**: La captura es por lotes (sniff), no en tiempo real.
-5. **Sin tests, sin git, sin pyproject.toml**.
-6. **CICIDS2017 no tiene campos 802.3** (MAC, OUI, ethertype). Falta decisión de dataset.
+Todas necesitan el laboratorio físico o sesiones nuevas (detalle en `docs/ESTADO.md`):
+
+- Captura real sobre una interfaz y ejecución real de la mitigación.
+- FA del vigilante IP→MAC con DHCP y failover reales (su 0,0 es optimista).
+- RST de la víctima frente a un clon de pila completa en un switch.
+- Sesiones largas y nuevas (≥ 30) para cualquier cifra final.
+- Distinguir `dos_pilas` de un clon por el lapso de aparición; aprender cambios legítimos sin
+  aprender clones; defensa en la fase `no_confiable`.
 
 ## Objetivos específicos del artículo (referencia)
 
