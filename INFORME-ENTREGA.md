@@ -87,14 +87,14 @@ Solo quedan menciones en el propio pedido, que es registro y se deja. No había 
 ## Bloque 2: cuaderno de cierre E7 (`655ad24`)
 
 Hallazgo: `notebooks/cierre_e7.ipynb` sí existió. El commit `b0a9418` («EA Cerrado (Reporte)») lo
-**renombró** a `notebooks/final_report.ipynb`, con el contenido idéntico:
+**renombró** a `notebooks/final_report.ipynb` (hoy en `docs/historial/`), con el contenido idéntico:
 
 ```
 $ git diff -M --stat 750fbb2 b0a9418 -- notebooks
  notebooks/{cierre_e7.ipynb => final_report.ipynb} | 0
 ```
 
-Como pedía el pedido, regeneré el cuaderno en lugar de editar el README. `final_report.ipynb` se deja
+Como pedía el pedido, regeneré el cuaderno en lugar de editar el README. `final_report.ipynb` (archivado en `docs/historial/` en el pedido 2) se deja
 como está. El nuevo `notebooks/cierre_e7.ipynb` tiene 25 celdas, sigue las seis fases CRISP-DM, cita
 en cada celda la etapa E1–E6 y el JSON de `reports/` del que sale cada cifra, y solo lee JSON
 congelados. Al final trae una tabla que compara cada cifra del texto con el JSON. Añadí a
@@ -405,8 +405,8 @@ Ningún rojo en ninguna corrida.
    pedido mandaba corregir solo materia y docente). Pero entró en el mismo commit erróneo `31431f8` y
    **no lo pude verificar** con ningún documento del repo: conviene que el autor lo confirme.
 2. **`cierre_e7.ipynb` no se perdió: se renombró.** `b0a9418` lo movió a
-   `notebooks/final_report.ipynb` sin cambios. Se regeneró uno nuevo como pedía el pedido y
-   `final_report.ipynb` se dejó intacto, así que hoy hay dos cuadernos de cierre.
+   `notebooks/final_report.ipynb` sin cambios (pedido 2: archivado en `docs/historial/`). Se regeneró
+   uno nuevo como pedía el pedido y el antiguo se dejó intacto, así que había dos cuadernos de cierre.
 3. **Cifras de E5 y E6 sin respaldo en `reports/`.** `docs/INFORME_E7.md` cita para E5 «1014
    ventanas, 62 alarmas de identidad, latencia 0,011 ms» y para E6 la escalada a BLOQUEO y el
    pronóstico Holt. Ningún JSON de `reports/` las contiene. El cuaderno lo dice explícitamente

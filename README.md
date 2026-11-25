@@ -76,10 +76,9 @@ implementado y medido en el laboratorio sintético.
 │   ├── INFORME_*.md        # un informe por etapa
 │   ├── PCAP_DEMO.md
 │   ├── figuras/            # recall_por_intensidad.png, fa_disp_dia.png
-│   └── historial/          # pedidos y bitácoras de trabajo (registro)
+│   └── historial/          # pedidos, bitácoras y el cuaderno de cierre anterior (registro)
 ├── notebooks/
 │   ├── cierre_e7.ipynb     # cierre CRISP-DM, lee reports/
-│   ├── final_report.ipynb
 │   └── IDS_IA_Ciberseguridad_proyecto.ipynb
 ├── doc_proyecto/           # anteproyecto (PDF) y culminacion_doc.md
 ├── data/                   # datos regenerables (no versionados)...
