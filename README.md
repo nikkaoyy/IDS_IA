@@ -110,5 +110,5 @@ Estado y conclusiones vigentes: `docs/ESTADO.md`.
 
 ## Contexto académico
 
-Detección de intrusiones en red con aprendizaje automático: captura de tráfico, ventanas de tiempo, modelo XGBoost y una capa de identidad por dispositivo. Trabajo del curso **Modelos de Programación** de Ingeniería de Sistemas (Universidad Distrital Francisco José de Caldas),
-con el docente **Daza**.
+Detección de intrusiones en red con aprendizaje automático: captura de tráfico, ventanas de tiempo, modelo XGBoost y una capa de identidad por dispositivo. Trabajo de la asignatura **Fundamentos de redes de comunicaciones** de Ingeniería de Sistemas (Universidad Distrital Francisco José de Caldas),
+con el docente **Octavio José Salcedo Parra**.
