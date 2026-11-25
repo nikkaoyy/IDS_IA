@@ -463,3 +463,111 @@ El PAT del clon no tiene el permiso `workflow`, así que GitHub rechaza el push 
 `.github/workflows/tests.yml`. Para no bloquear la entrega, el archivo se excluye del commit y queda
 como copia revisable en `/opt/data/entregas/ids_ci_tests.yml`: se añade desde la interfaz de GitHub o
 con un token que tenga «Workflows: Read and write». El resto del bloque 5 va tal cual.
+
+## Pedido 2 — correcciones de las desviaciones (2026-11-25)
+
+Cuatro commits sobre `15d286d`, uno por bloque. No hubo `git push`. No se tocaron `reports/*.json`
+existentes, `configs/`, los generadores congelados ni `.claude/`.
+
+```
+$ git log --oneline 15d286d..HEAD
+97fb8ba bloque 4: cuaderno de cierre único
+174060d bloque 3: origen del pcap demo en el README
+74251ff bloque 2: procedencia de E5 y E6
+d224a23 bloque 1: precisión del 382 de E5C
+```
+
+### Bloque 1 — precisión del 382 (`d224a23`)
+
+La primera mención de 382 en cada documento dice ahora `382 (381,5 exacto)`. `docs/ESTADO.md` lleva
+la nota «E5C: 381,456 exacto; los informes citan 382 por redondeo». `docs/INFORME_E5C.md` decía
+«→ 381 [326, 442]» y ahora dice «→ 381,5 [326, 442]». Ningún informe cita ya 381 a secas. La figura
+`fa_disp_dia.png` ya rotulaba 381,5 (lo comprobé abriéndola), así que no se regeneró.
+
+```
+$ grep -rln "382" --include='*.md' . | grep -v docs/historial      $ grep -rln "381,5" --include='*.md' .
+INFORME-ENTREGA.md                                                  INFORME-ENTREGA.md
+README.md                                                           README.md
+doc_proyecto/culminacion_doc.md                                     doc_proyecto/culminacion_doc.md
+docs/ESTADO.md                                                      docs/ESTADO.md
+docs/INFORME_ANOMALIAS.md                                           docs/INFORME_E5C.md
+docs/INFORME_E5C.md                                                 docs/INFORME_E7.md
+docs/INFORME_E7.md                                                  docs/historial/PROGRESO-E5C-1.md
+```
+
+`docs/INFORME_ANOMALIAS.md` no cita el 382 de E5C: coincide solo dentro de decimales de un volcado
+JSON (`0,18085106382978725`, …). Por eso no lleva la marca.
+
+### Bloque 2 — procedencia de E5 y E6 (`74251ff`)
+
+- **E5 (1014 ventanas, 62 alarmas de identidad, 0,011 ms):** salen de la celda 11 del cuaderno de
+  cierre anterior (`750fbb2`), que reproducía `data/pcap_clones/clones_000.pcap`. El cuaderno se
+  guardó sin salidas. **No está persistida en `reports/` y no se recalculó**: solo existe
+  `data/pcap_clones/clones_000.clones.json`, sin el `.pcap`, y regenerar el corpus de clones no entra
+  en este pedido. Lo dice el recuadro «Procedencia de las cifras» de `docs/INFORME_E5.md`.
+- **E6 (escalada a BLOQUEO en dry-run, Holt creciente con aviso temprano, backtesting MAE < 1):**
+  **persistida**. `scripts/demo_e6.py` repite tal cual las demos deterministas de las celdas 15–16
+  del cuaderno anterior y el backtesting de `tests/test_pronostico.py`, y escribe
+  `reports/mitigacion_pronostico_e6.json` (archivo nuevo; no se tocó ningún JSON existente). Tardó
+  0,6 s. Son demos de juguete, no mediciones sobre tráfico, y así lo dicen el JSON (`procedencia`) y
+  el recuadro de `docs/INFORME_E6.md`. Salida real:
+
+  ```
+  mitigacion: modo dry_run · ultimo_nivel BLOQUEO · acciones [alerta, bloqueo]
+              comando "ebtables -A FORWARD -s 02:ff:00:00:00:99 -j DROP" (no ejecutado)
+  pronostico: serie [0,0,1,1,2,3,4,6,8] · tendencia creciente · 3 pasos [8.264, 9.514, 10.763]
+              aviso_temprano True (umbral 10) · backtesting recta 0..29: mae 0.0, n_test 6
+  ```
+- `docs/ESTADO.md` y `docs/INFORME_E7.md` marcan esas cifras con `*` (E5, no persistida) y `**`
+  (E6, demo persistida), con notas al pie que remiten a los recuadros. `doc_proyecto/culminacion_doc.md`
+  lleva la misma remisión entre paréntesis.
+
+### Bloque 3 — origen del pcap demo (`174060d`)
+
+`README.md` (sección «Figuras y pcap de demostración») dice ahora que el pcap combina un episodio de
+`scripts/lab/generar_trafico.py` con uno de `scripts/lab/generar_clones.py` y que es tráfico
+sintético de laboratorio. `docs/PCAP_DEMO.md` enumera los mismos dos generadores en su cabecera.
+
+**Desviación respecto del pedido:** el pedido atribuía a `generar_clones.py` la falta de opciones TCP
+y el IP-ID fijo. En el código es al revés. `generar_trafico.py` no pone `options=` y deja `id=1`.
+`generar_clones.py` sí escribe opciones TCP (`options=pila["opciones"]`, línea 113) y un IP-ID por
+pila (`e.siguiente_ipid`). El README sigue al código y a `docs/PCAP_DEMO.md`.
+
+### Bloque 4 — cuaderno de cierre único (`97fb8ba`)
+
+`git mv notebooks/final_report.ipynb docs/historial/final_report_cierre_anterior.ipynb`. Al
+`docs/historial/README.md`, que ya existía, se le añadieron tres líneas, en vez de sobrescribirlo.
+El árbol del README ya no lista el cuaderno. `cierre_e7.ipynb` no se abrió: tiene 21 salidas y ninguna
+celda de código sin ejecutar.
+
+```
+$ ls notebooks/
+IDS_IA_Ciberseguridad_proyecto.ipynb
+cierre_e7.ipynb
+$ grep -rn "final_report" --include='*.md' . | grep -v docs/historial
+INFORME-ENTREGA.md:94: notebooks/{cierre_e7.ipynb => final_report.ipynb} | 0
+```
+
+La única coincidencia es la salida literal de `git diff --stat` del bloque 2 del primer pedido,
+citada arriba. No es un enlace y no la reescribí para no falsear la salida. Las demás menciones de
+este informe indican ya la ubicación nueva.
+
+### Suite y lint
+
+```
+$ timeout 900 .venv/bin/python -m pytest -o addopts="" -q | tail -3
+........................................................................ [ 68%]
+.................................xxxxxx...........................       [100%]
+203 passed, 7 xfailed in 321.13s (0:05:21)
+```
+
+Es el mismo conteo que al cierre del primer pedido (203 passed, 7 xfailed): ninguna prueba cambió de
+estado. `ruff check` sigue dando los 60 hallazgos anteriores de `src/` y `tests/` (punto 11). El
+script nuevo `scripts/demo_e6.py` pasa sin hallazgos.
+
+### Qué queda abierto
+
+- **La cifra de E5 (1014 / 62 / 0,011 ms) sigue sin persistir.** Para recalcularla hay que regenerar
+  `data/pcap_clones/` con `generar_clones.py` y correr la demo de streaming. Queda declarada, no
+  respaldada.
+- El CI (`.github/workflows/`) queda fuera, como indica el pedido.
