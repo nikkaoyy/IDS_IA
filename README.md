@@ -185,7 +185,7 @@ byte a byte con los de E3 no se pudo comprobar. El corpus del paso 2 sí: el sha
 - `docs/figuras/recall_por_intensidad.png`: recall del supervisado por intensidad (media 0,935 /
   suave 0,891 / ráfaga 0,824, con IC95). Datos: `reports/robustez_e4.json`.
 - `docs/figuras/fa_disp_dia.png`: FA/disp-día del canal de identidad con variación benigna, 826 →
-  382 con E5C, frente al presupuesto de 1 FA/disp-día (escala log). Datos: `reports/adopcion_e5c.json`.
+  382 (381,5 exacto) con E5C, frente al presupuesto de 1 FA/disp-día (escala log). Datos: `reports/adopcion_e5c.json`.
 - Las dos se regeneran desde cero con `scripts/figuras.py`, que solo lee `reports/`.
 - `data/pcap/demo/sesion_demo.pcap` (4,29 MB, 150 s): **tráfico sintético de laboratorio, generado
   por `scripts/lab/generar_trafico.py` con semilla fija; no es una captura de red real**. Trae un

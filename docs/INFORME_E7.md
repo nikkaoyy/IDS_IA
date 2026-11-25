@@ -25,7 +25,7 @@ Fase E7 del plan: atar el proyecto de punta a punta y dejarlo reproducible.
   retemporizar; ARP lento supervisado 1,000 → 0,000, vigilante 1,000 con 0,0 FA.
 - E5: el motor de streaming reproduce una sesión (1014 ventanas, 62 alarmas de identidad, latencia
   media 0,011 ms) con paridad respecto al lote.
-- E5C: FA con variación 826 → 382/disp-día sin perder detección (ritmo 1,000 → 0,975).
+- E5C: FA con variación 826 → 382 (381,5 exacto)/disp-día sin perder detección (ritmo 1,000 → 0,975).
 - E6: mitigación escala a BLOQUEO en dry-run (comando `ebtables` registrado, no ejecutado); el
   pronóstico Holt marca tendencia creciente y da aviso temprano.
 

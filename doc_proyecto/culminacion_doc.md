@@ -99,7 +99,7 @@ lectura honesta importa tanto como la cifra.
   víctima usa un contador de IP-ID global (Windows, IoT); con Linux/macOS/Android, **0 de 47**.
 - **Falsas alarmas con variación benigna realista** (actualización, VPN, dos pilas, descubrimiento):
   **826/disp-día**, sin que `no_confiable` las esconda (0,128 de las ventanas). La **tercera vía**
-  (adopción por persistencia exclusiva + valores de construcción) las baja a **382** (−54 %, IC sin
+  (adopción por persistencia exclusiva + valores de construcción) las baja a **382 (381,5 exacto)** (−54 %, IC sin
   solape) **sin perder detección** (ritmo 1,000 → 0,975: un clon absorbido de 40). La mitad que queda
   es de un equipo con **dos pilas concurrentes**, que a nivel de huella es **indistinguible de un
   clon**: el límite de fondo del canal de identidad.

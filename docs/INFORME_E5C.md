@@ -40,7 +40,7 @@ antes/después es fiel.
 | deriva lenta | 4,9 | 4,9 |
 | ventanas en `no_confiable` (con variación) | 0,128 | 0,128 |
 
-Los IC de la FA global **no se solapan** (826 [730, 920] → 381 [326, 442]): la bajada del **54 %** es
+Los IC de la FA global **no se solapan** (826 [730, 920] → 381,5 [326, 442]): la bajada del **54 %** es
 clara. Y no es por silenciar: la proporción `no_confiable` es idéntica (0,128), así que la mejora es
 **aprendizaje real** del cambio legítimo, no un detector apagado con otro nombre.
 
@@ -72,7 +72,7 @@ clara. Y no es por silenciar: la proporción `no_confiable` es idéntica (0,128)
 
 > Una tercera vía entre congelar y no congelar —adoptar un valor nuevo solo cuando persiste de forma
 > **exclusiva**, y eximir los que el equipo ya mostraba al construir su perfil— **reduce las falsas
-> alarmas con variación benigna de 826 a 382 por dispositivo-día (−54 %, con intervalos que no se
+> alarmas con variación benigna de 826 a 382 (381,5 exacto) por dispositivo-día (−54 %, con intervalos que no se
 > solapan)** sin apagarse en `no_confiable` y sin perder la detección de los clones que cambian la
 > pila (ingenuo 0,975, ritmo 0,975, pila completa 0,20). El precio es un clon de ritmo absorbido de
 > cada cuarenta, cuando la víctima calla medio minuto. La mitad de las falsas alarmas que quedan son
