@@ -116,11 +116,13 @@ lectura honesta importa tanto como la cifra.
   sigue viendo no es un mejor clasificador de volumen sino el **vigilante de identidad IP→MAC**
   (1,000, con **0,0 FA/disp-día** sobre variación benigna).
 - **Streaming (E5):** el motor en vivo reproduce el lote con **paridad de features probada**; en una
-  sesión de prueba, 1014 ventanas, 62 alarmas de identidad, latencia media **0,011 ms** por ventana.
+  sesión de prueba, 1014 ventanas, 62 alarmas de identidad, latencia media **0,011 ms** por ventana (no persistida en `reports/`; procedencia en
+  `docs/INFORME_E5.md`).
 - **Mitigación (E6):** escala a bloqueo/cuarentena por ventana deslizante, en **dry-run** (comando
   `ebtables` correcto, registrado, no ejecutado).
 - **Pronóstico (E6):** Holt sobre la tasa de alertas marca tendencia creciente y da **aviso temprano**
-  antes de que se acumulen las alertas (backtesting MAE < 1 en una tendencia lineal).
+  antes de que se acumulen las alertas (backtesting MAE < 1 en una tendencia lineal; demo de juguete en
+  `reports/mitigacion_pronostico_e6.json`).
 
 ### 3.4 Comparación RF vs XGBoost (lo que pedía OE3)
 

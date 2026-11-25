@@ -1,5 +1,20 @@
 # Informe E6 — Mitigación y pronóstico (OE3)
 
+> **Procedencia de las cifras** (añadido en la entrega, pedido 2)
+>
+> - Las cifras de E6 que citan `docs/INFORME_E7.md` y `doc_proyecto/culminacion_doc.md` —la
+>   mitigación **escala a BLOQUEO** en dry-run (comando `ebtables` registrado, no ejecutado) y el
+>   pronóstico **Holt marca tendencia creciente y da aviso temprano**, con backtesting **MAE < 1**
+>   sobre una recta— salían de las demos de las celdas 15–16 del cuaderno de cierre anterior (commit
+>   `750fbb2`, 2026-11-15, guardado sin salidas) y de `tests/test_pronostico.py`.
+> - **Ahora están persistidas** en `reports/mitigacion_pronostico_e6.json`, escrito por
+>   `python scripts/demo_e6.py` (determinista, < 1 s, sin red ni corpus): último nivel `BLOQUEO`,
+>   acciones `alerta → bloqueo`, modo `dry_run`; Holt sobre la serie `[0, 0, 1, 1, 2, 3, 4, 6, 8]`:
+>   tendencia `creciente`, pronóstico a 3 pasos 8,264 / 9,514 / 10,763, aviso temprano `True` con
+>   umbral 10; backtesting en la recta 0..29: MAE 0,0 (n_test = 6).
+> - Son **demostraciones del módulo con entradas de juguete**, no mediciones sobre tráfico del
+>   laboratorio. No hay cifra de E6 medida sobre tráfico.
+
 Fase E6 del plan: cerrar los dos mecanismos de OE3 que faltaban —responder a la amenaza y
 anticiparla—.
 

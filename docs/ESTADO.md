@@ -17,11 +17,17 @@
 | **E4C — régimen invisible del ARP lento** | **Cerrada** | `docs/INFORME_E4C.md` | ARP a paso ≥ 5 s: supervisado **1,000 → 0,000** (invisible por construcción); el vigilante IP→MAC (ahora lee ARP) lo detecta **1,000** con **0,0 FA/disp-día** sobre variación benigna |
 | **E4 — evasión a nivel de pcap (consolida E4R+E4C)** | **Cerrada** | `docs/INFORME_E4.md` | Floods: pierden efecto antes de evadir el etiquetado (recall ≥ 0,5). ARP lento: supervisado **1,000 → 0,000**, vigilante IP→MAC **1,000** a 0,0 FA. Imitación de huella a nivel de paquete: laboratorio real |
 | **E5C — adoptar un cambio sin absorber un clon** | **Cerrada** | `docs/INFORME_E5C.md` | FA con variación **826 → 382 (381,5 exacto)/disp-día** (−54 %, IC sin solape, `no_confiable` igual); detección casi intacta (ritmo 1,000 → 0,975); `dos_pilas` casi no mejora (límite) |
-| **E5 — Streaming (captura→ventanas→modelo→alerta)** | **Cerrada** | `docs/INFORME_E5.md` | `MotorStreaming` con **paridad** probada con el lote; CLI `captura_en_vivo.py` (AsyncSniffer en vivo o replay offline); identidad + supervisado por ventana |
-| **E6 — Mitigación (`dry-run`) y pronóstico** | **Cerrada** | `docs/INFORME_E6.md` | Mitigación escalable log→alerta→bloqueo→cuarentena, **dry-run por defecto** (no toca la red sin ejecutor explícito); pronóstico Holt de la tasa de alertas con aviso temprano y backtesting |
+| **E5 — Streaming (captura→ventanas→modelo→alerta)** | **Cerrada** | `docs/INFORME_E5.md` | `MotorStreaming` con **paridad** probada con el lote; CLI `captura_en_vivo.py` (AsyncSniffer en vivo o replay offline); identidad + supervisado por ventana; demo de una sesión: 1014 ventanas, 62 alarmas, 0,011 ms\* |
+| **E6 — Mitigación (`dry-run`) y pronóstico** | **Cerrada** | `docs/INFORME_E6.md` | Mitigación escalable log→alerta→bloqueo→cuarentena, **dry-run por defecto** (no toca la red sin ejecutor explícito); pronóstico Holt de la tasa de alertas con aviso temprano y backtesting\*\* |
 | **E7 — Cierre (notebook `.ipynb`)** | **Cerrada** | `docs/INFORME_E7.md` | `notebooks/cierre_e7.ipynb` CRISP-DM de punta a punta (celdas validadas); README con los comandos de E1–E7 |
 
 E5C: 381,456 exacto; los informes citan 382 por redondeo.
+
+\* Cifra de E5 **no persistida en `reports/`** (necesita `data/pcap_clones/`): ver el recuadro
+«Procedencia de las cifras» de `docs/INFORME_E5.md`.
+
+\*\* Cifras de E6: demo de juguete persistida en `reports/mitigacion_pronostico_e6.json`; ver el
+recuadro «Procedencia de las cifras» de `docs/INFORME_E6.md`.
 
 ## Línea base 2026-11-25
 

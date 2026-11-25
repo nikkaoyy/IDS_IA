@@ -1,5 +1,19 @@
 # Informe E5 — Captura en streaming (tiempo real)
 
+> **Procedencia de las cifras** (añadido en la entrega, pedido 2)
+>
+> - **1014 ventanas, 62 alarmas de identidad, latencia media 0,011 ms por ventana** (citadas en
+>   `docs/INFORME_E7.md` y `doc_proyecto/culminacion_doc.md`, no en este informe): salen de la demo
+>   offline de la celda 11 del cuaderno de cierre anterior (commit `750fbb2`, 2026-11-15; hoy
+>   archivado en `docs/historial/`), que reproduce
+>   `data/pcap_clones/clones_000.pcap` con `MotorStreaming(modelo=None, con_identidad=True)`. El
+>   cuaderno se guardó **sin salidas**, así que la cifra solo consta en el texto de los informes.
+> - **No está persistida en `reports/`.** No se recalculó: necesita `data/pcap_clones/clones_000.pcap`,
+>   que no está en la copia de trabajo (solo queda `clones_000.clones.json`), y regenerar el corpus de
+>   clones queda fuera de este pedido. La latencia, además, depende de la máquina.
+> - Lo que sí está respaldado: la **paridad** con el lote y el comportamiento del motor, por las 7
+>   pruebas de `tests/test_streaming.py`.
+
 Fase E5 del plan: conectar el camino que era por lotes en vivo —captura → ventanas → modelo +
 identidad → alerta— sin cambiar las features ni el contrato.
 

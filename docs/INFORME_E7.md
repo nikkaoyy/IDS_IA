@@ -23,11 +23,16 @@ Fase E7 del plan: atar el proyecto de punta a punta y dejarlo reproducible.
   suplantación 0,950); IP-ID por flujo baja la FA de 16,19 a 0,38/disp-día.
 - E4: recall por intensidad (media 0,935 / suave 0,891 / ráfaga 0,824), 0 invisibles sin
   retemporizar; ARP lento supervisado 1,000 → 0,000, vigilante 1,000 con 0,0 FA.
-- E5: el motor de streaming reproduce una sesión (1014 ventanas, 62 alarmas de identidad, latencia
+- E5\*: el motor de streaming reproduce una sesión (1014 ventanas, 62 alarmas de identidad, latencia
   media 0,011 ms) con paridad respecto al lote.
 - E5C: FA con variación 826 → 382 (381,5 exacto)/disp-día sin perder detección (ritmo 1,000 → 0,975).
-- E6: mitigación escala a BLOQUEO en dry-run (comando `ebtables` registrado, no ejecutado); el
+- E6\*\*: mitigación escala a BLOQUEO en dry-run (comando `ebtables` registrado, no ejecutado); el
   pronóstico Holt marca tendencia creciente y da aviso temprano.
+
+\* No persistida en `reports/`: procedencia en el recuadro de `docs/INFORME_E5.md`.
+
+\*\* Persistida en `reports/mitigacion_pronostico_e6.json` (`scripts/demo_e6.py`, demo de juguete):
+recuadro de procedencia en `docs/INFORME_E6.md`.
 
 ## Qué queda fuera (laboratorio real)
 
