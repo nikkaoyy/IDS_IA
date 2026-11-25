@@ -191,6 +191,9 @@ byte a byte con los de E3 no se pudo comprobar. El corpus del paso 2 sí: el sha
   por `scripts/lab/generar_trafico.py` con semilla fija; no es una captura de red real**. Trae un
   episodio de ARP spoofing y un clon de MAC (este último de `generar_clones.py`). Qué contiene, cómo
   abrirlo en Wireshark y qué columna sale de cada campo: [`docs/PCAP_DEMO.md`](docs/PCAP_DEMO.md).
+- Origen del pcap demo: combina un episodio de `scripts/lab/generar_trafico.py` (ARP spoofing; ese
+  generador no escribe opciones TCP y deja el IP-ID fijo en 1) con uno de `scripts/lab/generar_clones.py`
+  (clon de MAC, con las señales de pila). Es **tráfico sintético de laboratorio**.
 
 ![Recall por intensidad](docs/figuras/recall_por_intensidad.png)
 ![FA por dispositivo-día](docs/figuras/fa_disp_dia.png)

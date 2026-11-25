@@ -2,7 +2,8 @@
 
 > **Tráfico sintético de laboratorio, generado por `scripts/lab/generar_trafico.py` con semilla fija;
 > no es una captura de red real.**
-> El episodio de clon de MAC sale de `scripts/lab/generar_clones.py`, también con semilla fija. No se
+> Combina un episodio de `scripts/lab/generar_trafico.py` (ARP spoofing) con uno de
+> `scripts/lab/generar_clones.py` (clon de MAC), los dos con semilla fija. No se
 > emitió nada por ninguna interfaz: todo se escribió directamente a archivo.
 
 ## Qué contiene
