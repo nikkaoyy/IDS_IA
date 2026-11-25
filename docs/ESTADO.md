@@ -21,6 +21,21 @@
 | **E6 — Mitigación (`dry-run`) y pronóstico** | **Cerrada** | `docs/INFORME_E6.md` | Mitigación escalable log→alerta→bloqueo→cuarentena, **dry-run por defecto** (no toca la red sin ejecutor explícito); pronóstico Holt de la tasa de alertas con aviso temprano y backtesting |
 | **E7 — Cierre (notebook `.ipynb`)** | **Cerrada** | `docs/INFORME_E7.md` | `notebooks/cierre_e7.ipynb` CRISP-DM de punta a punta (celdas validadas); README con los comandos de E1–E7 |
 
+## Línea base 2026-11-25
+
+Medida antes del cierre de entrega (commit de partida `31431f8`), sin datos en `data/` ni modelos en
+`models/` (solo `.gitkeep`).
+
+- Entorno: Python 3.14.9 (CPython, `.venv` creado con `uv venv` + `uv pip install -e ".[dev]"`),
+  xgboost 3.4.1, scikit-learn 1.9.1, scapy 2.8.0, Linux 6.8.
+- Comando: `timeout 900 .venv/bin/python -m pytest -o addopts="" -q`
+- Resultado: **200 passed, 1 xfailed, 9 skipped** en 290,92 s; código de salida 0. Ningún archivo
+  se colgó (la suite terminó dentro del plazo de 900 s).
+- Los 9 skipped son por falta de `data/dataset_lab.csv` (no versionado): `tests/test_data.py` (2),
+  `tests/test_holdout.py` (1), `tests/test_separabilidad.py` (6, la puerta de separabilidad de E1).
+- El xfail es el declarado: `tests/test_anomalias.py::test_una_anomalia_evidente_da_alarma[isolation_forest_pca]`
+  («IF sobre PCA satura fuera del rango del primer componente»).
+
 ## Defensas del perfil de identidad (tras la ablación de E3B)
 
 - Se quedan: sin aprendizaje en alerta (compromiso: evita la absorción y causa las FA
